@@ -73,11 +73,11 @@ public class StructureImpl implements Structure {
         dbrefs         = new ArrayList<DBRef>();
         pdbHeader      = new PDBHeader();
         ssbonds        = new ArrayList<SSBond>();
-        
+
 	}
 
 	/** get the ID used by Hibernate
-     * 
+     *
      * @return the ID used by Hibernate
      */
     public Long getId() {
@@ -85,16 +85,16 @@ public class StructureImpl implements Structure {
     }
 
     /** set the ID used by Hibernate
-     * 
+     *
      * @param id
-     */ 
+     */
     public void setId(Long id) {
         this.id = id;
     }
-	
-	
+
+
 	/** construct a Structure object that only contains a single group
-	 * 
+	 *
 	 * @param g
 	 */
 	public StructureImpl(Group g){
@@ -107,7 +107,7 @@ public class StructureImpl implements Structure {
 	}
 
 	/** construct a Structure object that contains a particular chain
-	 * 
+	 *
 	 * @param c
 	 */
 	public StructureImpl(Chain c){
@@ -116,7 +116,7 @@ public class StructureImpl implements Structure {
 	}
 
 	/** returns an identical copy of this structure .
-	 * @return an identical Structure object     
+	 * @return an identical Structure object
 	 */
 	public Structure clone() {
 
@@ -140,7 +140,7 @@ public class StructureImpl implements Structure {
 
 			for (int j=0;j<size(i);j++){
 
-				Chain current_chain = (Chain) getChain(i,j); 
+				Chain current_chain = (Chain) getChain(i,j);
 				Chain cloned_chain  = (Chain) current_chain.clone();
 
 				cloned_model.add(cloned_chain);
@@ -148,11 +148,11 @@ public class StructureImpl implements Structure {
 			n.addModel(cloned_model);
 
 		}
-		
+
 		for (SSBond ssbond: ssbonds){
 			n.addSSBond(ssbond.clone());
 		}
-		
+
 		//n.setSeqRes(this.getSeqRes());
 		return n ;
 	}
@@ -164,7 +164,7 @@ public class StructureImpl implements Structure {
 
 		// if structure is xray there will be only one "model".
 		if ( modelnr > models.size())
-			throw new StructureException(" no model nr " + modelnr + 
+			throw new StructureException(" no model nr " + modelnr +
 					" in this structure. (contains "+models.size()+")");
 
 
@@ -173,7 +173,7 @@ public class StructureImpl implements Structure {
 		List<Group> groups = c.getAtomGroups();
 
 		// now iterate over all groups in this chain.
-		// in order to find the amino acid that has this pdbRenum.               
+		// in order to find the amino acid that has this pdbRenum.
 
 		Iterator<Group> giter = groups.iterator();
 		while (giter.hasNext()){
@@ -181,17 +181,17 @@ public class StructureImpl implements Structure {
 			String rnum = g.getPDBCode();
 
 			// we only mutate amino acids
-			// and ignore hetatoms and nucleotides in this case                   
-			if (rnum.equals(pdbResnum)) 
-				return g;       
-		} 
+			// and ignore hetatoms and nucleotides in this case
+			if (rnum.equals(pdbResnum))
+				return g;
+		}
 
 		throw new StructureException("could not find group " + pdbResnum +
 				" in chain " + chainId);
 	}
 
 
-	public Group findGroup(String chainName, String pdbResnum) throws StructureException 
+	public Group findGroup(String chainName, String pdbResnum) throws StructureException
 	{
 		return findGroup(chainName, pdbResnum, 0);
 
@@ -235,7 +235,7 @@ public class StructureImpl implements Structure {
 	/**
 	 *
 	 * get PDB code of structure .
-	 * 
+	 *
 	 * @return a String representing the PDBCode value
 	 * @see #setPDBCode
 	 */
@@ -252,9 +252,9 @@ public class StructureImpl implements Structure {
 	 */
 	public void   setName(String nam) { name = nam; }
 
-	/** get biological name of Structure. 
+	/** get biological name of Structure.
 	 *
-	 * @return a String representing the name 
+	 * @return a String representing the name
 	 * @see #setName
 	 */
 	public String getName()           { return name;  }
@@ -279,11 +279,11 @@ public class StructureImpl implements Structure {
 
 	 */
 	public void      setConnections(List<Map<String,Integer>> conns) { connections = conns ; }
-	/** 
+	/**
 	 * Returns the connections value.
 	 *
 	 * @return a List object representing the connections value
-	 * @see Structure interface 
+	 * @see Structure interface
 	 * @see #setConnections
 	 */
 	public List<Map<String,Integer>> getConnections()                { return connections ;}
@@ -308,17 +308,17 @@ public class StructureImpl implements Structure {
 			models.add(model);
 
 		} else {
-			List<Chain> model = models.get(modelnr);	    
+			List<Chain> model = models.get(modelnr);
 			model.add(chain);
 		}
-		
-		
-		
+
+
+
 	}
 
 
-	
-	
+
+
 	/** retrieve a chain by it's position within the Structure.
 	 *
 	 * @param number  an int
@@ -357,49 +357,64 @@ public class StructureImpl implements Structure {
 		models.add(model);
 	}
 
-	
+
 	public void setChains(List<Chain> chains){
-		
+
 		setModel(0,chains);
 	}
-	
-	
-    
+
+
+
     public void setModel(int position, List<Chain> model){
-    	if (model == null)     		
-    		throw new IllegalArgumentException("trying to set model to null!");    		
-    	
-    	for (Chain c: model)    		  		
+    	if (model == null)
+    		throw new IllegalArgumentException("trying to set model to null!");
+
+    	for (Chain c: model)
     		c.setParent(this);
-    	
+
     	//System.out.println("model size:" + models.size());
-    	
+
     	if (models.size() ==0){
     		models.add(model);
     	} else {
     		models.set(position, model);
     	}
     }
-    
+
 	/** string representation.
 	 *
 	 */
 	public String toString(){
 		String newline = System.getProperty("line.separator");
 		StringBuffer str = new StringBuffer();
-		str.append("structure "+name+ " " + pdb_id + " ") ;
-        
-		if ( isNmr() ) str.append( " models: "+nrModels()+newline) ;
-		
-        str.append(pdbHeader.toString()+newline) ;
+		str.append("structure ");
+		str.append(name);
+		str.append(" ");
+		str.append(pdb_id);
+		str.append(" ");
+
+		if ( isNmr() ){
+			str.append( " models: ");
+			str.append(nrModels());
+			str.append(newline) ;
+		}
+
+        str.append(pdbHeader.toString());
+        str.append(newline) ;
 
         for (int i=0;i<nrModels();i++){
-			if (isNmr() ) str.append(" model["+i+"]:+newline");
-			str.append(" chains:"+newline);
-			
+			if (isNmr() ) {
+				str.append(" model[");
+				str.append(i);
+				str.append("]:");
+				str.append(newline);
+			}
+			str.append(" chains:");
+			str.append(newline);
+
 			for (int j=0;j<size(i);j++){
-				
-				Chain cha = (Chain)getChain(i,j); 
+
+				Chain cha = (Chain)getChain(i,j);
 				List<Group> agr = cha.getAtomGroups("amino");
 				List<Group> hgr = cha.getAtomGroups("hetatm");
 				List<Group> ngr = cha.getAtomGroups("nucleotide");
@@ -412,14 +427,14 @@ public class StructureImpl implements Structure {
 						str.append(molName);
 					}
 				}
-				
-				
+
+
 				str.append(newline);
                 str.append(" length SEQRES: " +cha.getSeqResLength());
 				str.append(" length ATOM: " +cha.getAtomLength());
 				str.append(" aminos: " +agr.size());
 				str.append(" hetatms: "+hgr.size());
-				str.append(" nucleotides: "+ngr.size() + newline);                
+				str.append(" nucleotides: "+ngr.size() + newline);
 			}
 
 		}
@@ -439,7 +454,7 @@ public class StructureImpl implements Structure {
 	}
 
 	/** return number of chains , if NMR return number of chains of first model .
-	 * 
+	 *
 	 */
 	public int size() {
 		int modelnr = 0 ;
@@ -451,21 +466,21 @@ public class StructureImpl implements Structure {
 			return 0 ;
 		}
 
-	} 
+	}
 
 	/** return number of chains  of model.
 	 *
 	 */
 	public int size(int modelnr) { return getChains(modelnr).size();   }
 
-	// some NMR stuff : 
+	// some NMR stuff :
 
 	/** return number of models. */
 	public int nrModels() {
 		return models.size() ;
 	}
 
-	/** is this structure an nmr structure ? 
+	/** is this structure an nmr structure ?
 	 */
 	public boolean isNmr() {return nmrflag ;  }
 
@@ -476,16 +491,16 @@ public class StructureImpl implements Structure {
 	/** retrieve all chains of a model.
 	 *
 	 * @param modelnr  an int
-	 * @return a List object     
+	 * @return a List object
 	 */
 	public List<Chain> getChains(int modelnr){
 		return getModel(modelnr);
 	}
-    
+
 	public List<Chain> getChains(){
 		return getModel(0);
 	}
-	
+
     public void setChains(int modelnr, List<Chain> chains){
     	for (Chain c: chains){
     		c.setParent(this);
@@ -502,14 +517,14 @@ public class StructureImpl implements Structure {
 	 */
 	public List<Chain> getModel(int modelnr) {
 
-		List<Chain> model = models.get(modelnr);		
+		List<Chain> model = models.get(modelnr);
 		return model;
-	}    
+	}
 
 
 
 
-	public Chain getChainByPDB(String chainId, int modelnr) 
+	public Chain getChainByPDB(String chainId, int modelnr)
 	throws StructureException{
 
 		List<Chain> chains = getChains(modelnr);
@@ -524,13 +539,13 @@ public class StructureImpl implements Structure {
 	}
 
 
-	public Chain getChainByPDB(String chainId) 
+	public Chain getChainByPDB(String chainId)
 	throws StructureException{
 		return getChainByPDB(chainId,0);
 	}
 
 
-	/** create a String that contains the contents of a PDB file. 
+	/** create a String that contains the contents of a PDB file.
 	 *
 	 * @return a String that represents the structure as a PDB file.
 	 */
@@ -564,7 +579,7 @@ public class StructureImpl implements Structure {
 	}
 
 	public List<Compound> getCompounds() {
-		return compounds;  
+		return compounds;
 	}
 
 	public Compound getCompoundById(String molId) {
@@ -573,7 +588,7 @@ public class StructureImpl implements Structure {
 				return mol;
 			}
 		}
-		return null; 
+		return null;
 	}
 
 
@@ -585,47 +600,47 @@ public class StructureImpl implements Structure {
     public void setDBRefs(List<DBRef> dbrefs) {
     	if ( dbrefs == null)
     		throw new IllegalArgumentException("trying to set dbrefs to null!");
-    	
+
     	for( DBRef ref : dbrefs){
     		ref.setParent(this);
     	}
-        this.dbrefs = dbrefs;        
+        this.dbrefs = dbrefs;
     }
 
 
 	public PDBHeader getPDBHeader() {
 		return pdbHeader;
 	}
-	
+
 	public void setPDBHeader(PDBHeader pdbHeader){
 		this.pdbHeader = pdbHeader;
 	}
-	
+
     /** get the list of SSBonds as they have been defined in the PDB files
-     * 
+     *
      * @return a list of SSBonds
      */
     public List<SSBond> getSSBonds(){
     	return ssbonds;
-    	
+
     }
     /** set the list of SSBonds for this structure
-     * 
+     *
      * @param ssbonds
      */
     public void setSSBonds(List<SSBond> ssbonds){
     	this.ssbonds = ssbonds;
     }
-    
+
     /** add a single SSBond to this structure
-     * 
+     *
      * @param ssbond
      */
     public void addSSBond(SSBond ssbond){
     	ssbonds.add(ssbond);
     	ssbond.setSerNum(ssbonds.size());
     }
-    
+
 
 
 }

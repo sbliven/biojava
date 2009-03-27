@@ -16,7 +16,7 @@
  * at:
  *
  *      http://www.biojava.org/
- * 
+ *
  * Created on Jun 8, 2007
  *
  */
@@ -42,7 +42,7 @@ public class StructurePairAlignerTest extends TestCase {
         assertNotNull(inStream);
         InputStream inStream2 = this.getClass().getResourceAsStream("/files/1tap.pdb");
         assertNotNull(inStream2);
-        
+
         PDBFileParser pdbpars = new PDBFileParser();
         try {
             structure1 = pdbpars.parsePDBFile(inStream) ;
@@ -53,41 +53,41 @@ public class StructurePairAlignerTest extends TestCase {
 
         assertNotNull(structure1);
         assertNotNull(structure2);
-        assertEquals("structure does not contain one chain ", 2 ,structure1.size());
-          
+        assertEquals("structure does not contain one chain ", 1 ,structure1.size());
+
     }
 
-    
+
     public void testAlignStructureStructure() {
        StructurePairAligner aligner = new StructurePairAligner();
-      
+
        boolean allFine = true;
        String msg = "";
        try {
            aligner.align(structure1,structure2);
-           
+
            AlternativeAlignment[] aligs = aligner.getAlignments();
            assertEquals("the number of obtained alternative alignments is not correct",20, aligs.length);
-           AlternativeAlignment a = aligs[0];           
+           AlternativeAlignment a = aligs[0];
            assertEquals("the expected nr of eq. residues is not correct.",48,a.getEqr());
-           
+
            // they are v. close, but not identical
            assertTrue(a.getRmsd() < 3);
            assertTrue(a.getRmsd() > 2);
            assertTrue(a.getPercId() > 9);
            assertTrue(a.getScore() > 150);
-           
+
        } catch (Exception e){
            msg = e.getMessage();
            allFine = false;
        }
        assertTrue(allFine);
        assertEquals("an error occured","" ,msg);
-       
-       
-       
+
+
+
     }
 
-  
+
 
 }

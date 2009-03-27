@@ -16,7 +16,7 @@
  * at:
  *
  *      http://www.biojava.org/
- * 
+ *
  * Created on Jan 4, 2006
  *
  */
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.io.SymbolTokenization;
@@ -36,7 +37,7 @@ import org.biojava.bio.symbol.Symbol;
 
 
 /** A class that provides some tool methods.
- * 
+ *
  * @author Andreas Prlic
  * @since 1.0
  * @version %I% %G%
@@ -44,26 +45,28 @@ import org.biojava.bio.symbol.Symbol;
 public class StructureTools {
 
 	/** The Atom name of C-alpha atoms.
-	 * 
+	 *
 	 */
     public static final String   caAtomName         = "CA" ;
- 
+
     /** The names of the Atoms that form the backbone.
-     * 
+     *
      */
     public static final String[] backboneAtomNames = {"N","CA","C","O","CB"};
-    
+
     public static final Character UNKNOWN_GROUP_LABEL = new Character('x');;
-    
+
 	// there is a file format change in PDB 3.0 and nucleotides are being renamed
 	static private Map<String, Integer> nucleotides30 ;
 	static private Map<String, Integer> nucleotides23 ;
-    
-	
+
+
 	// for conversion 3code 1code
 	private static  SymbolTokenization threeLetter ;
 	private static  SymbolTokenization oneLetter ;
-	
+
+	public static Logger logger =  Logger.getLogger("org.biojava.bio.structure");
+
     static {
 		nucleotides30 = new HashMap<String,Integer>();
 		nucleotides30.put("DA",1);
@@ -93,56 +96,59 @@ public class StructureTools {
 
 
 
-		// store nucleic acids (C, G, A, T, U, and I), and 
+		// store nucleic acids (C, G, A, T, U, and I), and
 		// the modified versions of nucleic acids (+C, +G, +A, +T, +U, and +I), and
 		nucleotides23  = new HashMap<String,Integer>();
 		String[] names = {"C","G","A","T","U","I","+C","+G","+A","+T","+U","+I"};
 		for (int i = 0; i < names.length; i++) {
 			String n = names[i];
-			nucleotides23.put(n,1);		
+			nucleotides23.put(n,1);
 		}
-		
-		
-		
+
+
+
 		try {
 			Alphabet alpha_prot = ProteinTools.getAlphabet();
 			threeLetter = alpha_prot.getTokenization("name");
 			oneLetter  = alpha_prot.getTokenization("token");
 		} catch (Exception e) {
+			// this should not happen.
+			// only if BioJava has not been built correctly...
+			logger.config(e.getMessage());
 			e.printStackTrace() ;
 		}
 
     }
-    
-    
+
+
     /** Count how many number of Atoms are contained within a Structure object.
-     * 
+     *
      * @param s the structure object
      * @return the number of Atoms in this Structure
      */
     public static int getNrAtoms(Structure s){
-       
+
         int nrAtoms = 0;
-        
+
         Iterator<Group> iter = new GroupIterator(s);
-        
+
         while ( iter.hasNext()){
             Group g = (Group) iter.next();
             nrAtoms += g.size();
         }
-        
+
         return nrAtoms;
     }
-    
-    
+
+
     /** Count how many groups are contained within a structure object.
-     * 
+     *
      * @param s the structure object
      * @return the number of groups in the structure
      */
     public static int getNrGroups(Structure s){
         int nrGroups = 0;
-        
+
         List<Chain> chains = s.getChains(0);
         Iterator<Chain> iter = chains.iterator();
         while (iter.hasNext()){
@@ -151,23 +157,23 @@ public class StructureTools {
         }
         return nrGroups;
     }
-    
-    
+
+
     /** Returns an array of the requested Atoms from the Structure object. Iterates over all groups
      * and checks if the requested atoms are in this group, no matter if this is a AminoAcid or Hetatom group.
      *
-     * 
-     * @param s the structure to get the atoms from 
-     * 
+     *
+     * @param s the structure to get the atoms from
+     *
      * @param atomNames  contains the atom names to be used.
      * @return an Atom[] array
-     */ 
+     */
     public static Atom[] getAtomArray(Structure s, String[] atomNames){
         Iterator<Group> iter = new GroupIterator(s);
         List<Atom> atoms = new ArrayList<Atom>();
         while ( iter.hasNext()){
             Group g = (Group) iter.next();
-            
+
             // a temp container for the atoms of this group
             List<Atom> thisGroupAtoms = new ArrayList<Atom>();
             // flag to check if this group contains all the requested atoms.
@@ -177,11 +183,11 @@ public class StructureTools {
                 try {
                     Atom a = g.getAtom(atomName);
                     thisGroupAtoms.add(a);
-                } catch (StructureException e){                	
+                } catch (StructureException e){
                     // this group does not have a required atom, skip it...
                     thisGroupAllAtoms = false;
-                    break;                   
-                }            
+                    break;
+                }
             }
             if ( thisGroupAllAtoms){
                 // add the atoms of this group to the array.
@@ -191,15 +197,15 @@ public class StructureTools {
                     atoms.add(a);
                 }
             }
-            
+
         }
         return (Atom[]) atoms.toArray(new Atom[atoms.size()]);
-   
-    } 
-    
-   
-    
-    
+
+    }
+
+
+
+
     /** Returns an Atom array of the CA atoms.
      * @param s the structure object
      * @return an Atom[] array
@@ -208,9 +214,9 @@ public class StructureTools {
         String[] atomNames = {caAtomName};
         return getAtomArray(s,atomNames);
     }
-    
+
     /** Returns an Atom array of the MainChain atoms.
-    
+
      * @param s the structure object
      * @return an Atom[] array
      */
@@ -219,15 +225,15 @@ public class StructureTools {
         return getAtomArray(s,atomNames);
     }
 
-    
+
     /** convert three character amino acid codes into single character
-	 *  e.g. convert CYS to C 
+	 *  e.g. convert CYS to C
 	 *  @return a character
 	 *  @param code3 a three character amino acid representation String
 	 *  @throws IllegalSymbolException
 	 */
 
-	public static Character convert_3code_1code(String code3) 
+	public static Character convert_3code_1code(String code3)
 	throws IllegalSymbolException
 	{
 		Symbol sym   =  threeLetter.parseToken(code3) ;
@@ -236,10 +242,10 @@ public class StructureTools {
 		return new Character(code1.charAt(0)) ;
 
 	}
-    
+
     /** convert a three letter code into single character.
 	 * catches for unusual characters
-	 * 
+	 *
 	 * @param groupCode3 three letter representation
 	 * @return null if group is a nucleotide code
 	 */
@@ -256,28 +262,28 @@ public class StructureTools {
 				//System.out.println("nucleotide, aminoCode1:"+aminoCode1);
 				aminoCode1= null;
 			} else {
-				// does not seem to be so let's assume it is 
+				// does not seem to be so let's assume it is
 				//  nonstandard aminoacid and label it "X"
-				System.out.println("unknown group name "+groupCode3 );
-				aminoCode1 = UNKNOWN_GROUP_LABEL; 
+				logger.warning("unknown group name "+groupCode3 );
+				aminoCode1 = UNKNOWN_GROUP_LABEL;
 			}
 		}
 
 		return aminoCode1;
 
 	}
-    
-    
+
+
     /* Test if the threelettercode of an ATOM entry corresponds to a
 	 * nucleotide or to an aminoacid.
 	 * @param a 3-character code for a group.
-	 * 
+	 *
 	 */
 	public static boolean isNucleotide(String groupCode3){
 
 		String code = groupCode3.trim();
-		if ( nucleotides30.containsKey(code)){    	
-			return true;    		
+		if ( nucleotides30.containsKey(code)){
+			return true;
 		}
 
 		if ( nucleotides23.containsKey(code)){
@@ -286,5 +292,7 @@ public class StructureTools {
 
 		return false ;
 	}
-    
+
+
+
 }

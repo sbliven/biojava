@@ -37,7 +37,8 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 
 /**
  * A Chain in a PDB file. It contains several groups which can be of
- * type "amino", "hetatm", "nucleotide".
+ * one of the types defined in the {@link GroupType} constants.
+ *
  * @author Andreas Prlic
  * @author Jules Jacobsen
  * @since 1.4
@@ -45,11 +46,11 @@ import org.biojava.bio.symbol.IllegalSymbolException;
 public class ChainImpl implements Chain {
 
 	/** The default chain identifier is an empty space.
-	 * 
+	 *
 	 */
 	public static String DEFAULT_CHAIN_ID = "A";
 
-	String swissprot_id ; 
+	String swissprot_id ;
 	String name ; // like in PDBfile
 	List <Group> groups;
 	Annotation annotation ;
@@ -75,40 +76,40 @@ public class ChainImpl implements Chain {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public Long getId() {
 		return id;
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public void setParent(Structure parent) {
 		this.parent = parent;
 	}
 
 	/** Returns the parent Structure of this chain.
-	 * 
+	 *
 	 * @return the parent Structure object
 	 */
 
 	public Structure getParent() {
-		
-		
+
+
 		return parent;
 	}
 
 
 	/** Returns an identical copy of this Chain .
-	 * @return an identical copy of this Chain 
+	 * @return an identical copy of this Chain
 	 */
 	public Object clone() {
 		// go through all groups and add to new Chain.
@@ -120,35 +121,35 @@ public class ChainImpl implements Chain {
 		for (int i=0;i<groups.size();i++){
 			Group g = (Group)groups.get(i);
 			n.addGroup((Group)g.clone());
-		}		
+		}
 		n.setHeader(this.getHeader());
 
 		return n ;
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public void setAnnotation(Annotation anno){
 		annotation = anno;
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public Annotation getAnnotation(){
 		return annotation;
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public void setHeader(Compound mol) {
 		this.mol = mol;
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public Compound getHeader() {
 		return this.mol;
@@ -172,7 +173,7 @@ public class ChainImpl implements Chain {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public void addGroup(Group group) {
 
@@ -185,30 +186,30 @@ public class ChainImpl implements Chain {
 		if ( pdbResnum != null) {
 			Integer pos = new Integer(groups.size()-1);
 			// ARGH sometimes numbering in PDB files is confusing.
-			// e.g. PDB: 1sfe 
+			// e.g. PDB: 1sfe
 			/*
-			 * ATOM    620  N   GLY    93     -24.320  -6.591   4.210  1.00 46.82           N  
-			 * ATOM    621  CA  GLY    93     -24.960  -6.849   5.497  1.00 47.35           C  
-			 * ATOM    622  C   GLY    93     -26.076  -5.873   5.804  1.00 47.24           C  
-			 * ATOM    623  O   GLY    93     -26.382  -4.986   5.006  1.00 47.56           O  
+			 * ATOM    620  N   GLY    93     -24.320  -6.591   4.210  1.00 46.82           N
+			 * ATOM    621  CA  GLY    93     -24.960  -6.849   5.497  1.00 47.35           C
+			 * ATOM    622  C   GLY    93     -26.076  -5.873   5.804  1.00 47.24           C
+			 * ATOM    623  O   GLY    93     -26.382  -4.986   5.006  1.00 47.56           O
              and ...
-			 * HETATM 1348  O   HOH    92     -21.853 -16.886  19.138  1.00 66.92           O  
-			 * HETATM 1349  O   HOH    93     -26.126   1.226  29.069  1.00 71.69           O  
-			 * HETATM 1350  O   HOH    94     -22.250 -18.060  -6.401  1.00 61.97           O 
+			 * HETATM 1348  O   HOH    92     -21.853 -16.886  19.138  1.00 66.92           O
+			 * HETATM 1349  O   HOH    93     -26.126   1.226  29.069  1.00 71.69           O
+			 * HETATM 1350  O   HOH    94     -22.250 -18.060  -6.401  1.00 61.97           O
 			 */
 
 			// this check is to give in this case the entry priority that is an AminoAcid / comes first...
 			if (  pdbResnumMap.containsKey(pdbResnum)) {
 				if ( group instanceof AminoAcid)
 					pdbResnumMap.put(pdbResnum,pos);
-			} else                
+			} else
 				pdbResnumMap.put(pdbResnum,pos);
 		}
 
 	}
 
 	/** return the group at position .
-	 * 
+	 *
 	 *
 	 * @param position  an int
 	 * @return a Group object
@@ -222,18 +223,19 @@ public class ChainImpl implements Chain {
 
 
 	/** return the group at position .
-	 * 
+	 *
 	 *
 	 * @param position  an int
-	 * @return a Group object    
+	 * @return a Group object
 	 */
 	public Group getAtomGroup(int position) {
 
 		return (Group)groups.get(position);
 	}
 
-	/** return an array of all groups of a special type (e.g. amino,
-	 * hetatm, nucleotide).
+	/** Return a list of all groups of one of the types defined in hte {@link GroupType} constants.
+	 *
+	 *
 	 * @param type  a String
 	 * @return an List object containing the groups of type...
 	 * @deprecated use getAtomGroups instead
@@ -243,7 +245,8 @@ public class ChainImpl implements Chain {
 	}
 
 	/**  Get the Groups of a certain type, that are listed int the ATOM records of the PDB file.
-	 *  @param type the type of the groups to return. 
+	 *
+	 *  @param type the type of the groups to return. Can be one of the 3 types defined in the {@link GroupType} constants
 	 *  @return a list of group objects
 	 */
 	public List<Group> getAtomGroups(String type){
@@ -254,12 +257,12 @@ public class ChainImpl implements Chain {
 				tmp.add(g);
 			}
 		}
-		//Group[] g = (Group[])tmp.toArray(new Group[tmp.size()]);
+
 		return tmp ;
 	}
 
 	/** return all groups of this chain .
-	 * @return an ArrayList object representing the Groups of this Chain.
+	 * @return a List object representing the Groups of this Chain.
 	 * @deprecated use getAtomGroups instead
 	 */
 	public List<Group> getGroups(){
@@ -268,14 +271,14 @@ public class ChainImpl implements Chain {
 
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public List<Group> getAtomGroups(){
 		return groups ;
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public void setAtomGroups(List<Group> groups){
 		for (Group g:groups){
@@ -283,11 +286,11 @@ public class ChainImpl implements Chain {
 		}
 		this.groups = groups;
 	}
-	
+
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
-	public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd, boolean ignoreMissing) 
+	public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd, boolean ignoreMissing)
 	throws StructureException {
 
 		if (! ignoreMissing )
@@ -343,11 +346,11 @@ public class ChainImpl implements Chain {
 				break;
 			}
 			if (doIntCheck && adding){
-				
+
 				try {
 					int pos = Integer.parseInt(g.getPDBCode());
 					if (pos >= endPos) {
-						adding = false; 
+						adding = false;
 						break;
 					}
 				} catch (Exception e){
@@ -359,8 +362,8 @@ public class ChainImpl implements Chain {
 		if ( ! foundStart){
 			throw new StructureException("did not find start PDB residue number " + pdbresnumStart + " in chain " + name);
 		}
-		
-		
+
+
 		//not checking if the end has been found in this case...
 
 		return (Group[]) retlst.toArray(new Group[retlst.size()] );
@@ -376,12 +379,12 @@ public class ChainImpl implements Chain {
 		}
 
 	}
-	
+
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 */
-	public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd) 
+	public Group[] getGroupsByPDB(String pdbresnumStart, String pdbresnumEnd)
 	throws StructureException {
 
 		List<Group> retlst = new ArrayList<Group>();
@@ -397,7 +400,7 @@ public class ChainImpl implements Chain {
 				foundStart = true;
 			}
 
-			if ( adding) 
+			if ( adding)
 				retlst.add(g);
 
 			if ( g.getPDBCode().equals(pdbresnumEnd)) {
@@ -428,11 +431,11 @@ public class ChainImpl implements Chain {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public int getLengthAminos() {
 
-		List<Group> g = getAtomGroups("amino");
+		List<Group> g = getAtomGroups(GroupType.AMINOACID);
 		return g.size() ;
 	}
 
@@ -444,7 +447,7 @@ public class ChainImpl implements Chain {
 	/** get and set the name of this chain (Chain id in PDB file ).
 	 * @param nam a String specifying the name value
 	 * @see #getName
-	 * 
+	 *
 	 */
 
 	public void   setName(String nam) { name = nam;   }
@@ -465,10 +468,10 @@ public class ChainImpl implements Chain {
 		str.append("Chain >"+getName()+"<"+newline) ;
 		if ( mol != null ){
 			if ( mol.getMolName() != null){
-				str.append(mol.getMolName()+newline); 
+				str.append(mol.getMolName()+newline);
 			}
 		}
-		str.append("total SEQRES length: " + getSeqResGroups().size() + 
+		str.append("total SEQRES length: " + getSeqResGroups().size() +
 				" total ATOM length:" + getAtomLength() + " residues " + newline);
 
 		// loop over the residues
@@ -476,35 +479,35 @@ public class ChainImpl implements Chain {
 		for ( int i = 0 ; i < seqResGroups.size();i++){
 			Group gr = (Group) seqResGroups.get(i);
 			str.append(gr.toString() + newline) ;
-		} 
+		}
 		return str.toString() ;
 
 	}
 
 	/** Convert the SEQRES groups of a Chain to a Biojava Sequence object.
-     * 
+     *
      * @return the SEQRES groups of the Chain as a Sequence object.
-     * @throws IllegalSymbolException 
+     * @throws IllegalSymbolException
      */
     public Sequence getBJSequence() throws IllegalSymbolException {
-    	
+
     	//List<Group> groups = c.getSeqResGroups();
     	String seq = getSeqResSequence();
-    	
+
     	String name = "";
     	if ( this.getParent() != null )
     		name = getParent().getPDBCode();
     	name += "." + getName();
-    	    	
+
     	return ProteinTools.createProteinSequence(seq, name );
-    	
+
     }
-	
+
 
 
 	/** get amino acid sequence of the chain. for backwards compatibility this returns
-	 * the Atom sequence of the chain. 
-	 * @return a String representing the sequence.	    
+	 * the Atom sequence of the chain.
+	 * @return a String representing the sequence.
 	 * @deprecated use getAtomSequence instead
 	 * @see #getAtomSequence()
 	 * @see #getSeqResSequence()
@@ -515,7 +518,7 @@ public class ChainImpl implements Chain {
 
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public String getAtomSequence(){
 
@@ -531,7 +534,7 @@ public class ChainImpl implements Chain {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public String getSeqResSequence(){
 
@@ -541,6 +544,7 @@ public class ChainImpl implements Chain {
 				AminoAcid aa = (AminoAcid)group;
 				str.append(aa.getAminoType()) ;
 			}
+
 		}
 		return str.toString();
 
@@ -548,7 +552,7 @@ public class ChainImpl implements Chain {
 
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public Group getSeqResGroup(int position) {
 
@@ -556,21 +560,21 @@ public class ChainImpl implements Chain {
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
-	public List<Group> getSeqResGroups(String type) {	   
+	public List<Group> getSeqResGroups(String type) {
 		return seqResGroups;
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public List<Group> getSeqResGroups() {
 		return seqResGroups;
 	}
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public void setSeqResGroups(List<Group> groups){
 		for (Group g: groups){
@@ -581,7 +585,7 @@ public class ChainImpl implements Chain {
 
 
 	/** {@inheritDoc}
-	 * 
+	 *
 	 */
 	public int getAtomLength() {
 

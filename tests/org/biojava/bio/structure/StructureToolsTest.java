@@ -16,7 +16,7 @@
  * at:
  *
  *      http://www.biojava.org/
- * 
+ *
  * Created on Jun 8, 2007
  *
  */
@@ -32,7 +32,7 @@ import junit.framework.TestCase;
 public class StructureToolsTest extends TestCase {
 
     Structure structure;
-    
+
     protected void setUp()
     {
         InputStream inStream = this.getClass().getResourceAsStream("/files/5pti.pdb");
@@ -49,10 +49,10 @@ public class StructureToolsTest extends TestCase {
 
         assertNotNull(structure);
 
-        assertEquals("structure does not contain one chain ", 2 ,structure.size()); 
+        assertEquals("structure does not contain one chain ", 1 ,structure.size());
     }
-    
-    
+
+
     public void testGetCAAtoms(){
         Atom[] cas = StructureTools.getAtomCAArray(structure);
         assertEquals("did not find the expected number of Atoms (58), but got " + cas.length,58,cas.length);
@@ -61,10 +61,10 @@ public class StructureToolsTest extends TestCase {
     public void testGetNrAtoms(){
         int length = StructureTools.getNrAtoms(structure);
         assertEquals("did not find the expected number of Atoms (1104), but got " + length,1104,length);
-   
-        
+
+
     }
 
-   
-    
+
+
 }

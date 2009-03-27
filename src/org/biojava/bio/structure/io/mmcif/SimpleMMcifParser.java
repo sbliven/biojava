@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
@@ -37,18 +38,22 @@ import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
 import org.biojava.bio.structure.io.mmcif.model.EntityPolySeq;
 import org.biojava.bio.structure.io.mmcif.model.Exptl;
+import org.biojava.bio.structure.io.mmcif.model.PdbxEntityNonPoly;
+import org.biojava.bio.structure.io.mmcif.model.PdbxNonPolyScheme;
 import org.biojava.bio.structure.io.mmcif.model.PdbxPolySeqScheme;
+import org.biojava.bio.structure.io.mmcif.model.Refine;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
 import org.biojava.bio.structure.io.mmcif.model.StructAsym;
+import org.biojava.bio.structure.io.mmcif.model.StructKeywords;
 import org.biojava.bio.structure.io.mmcif.model.StructRef;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 
 
 /** A simple mmCif file parser
- * 
+ *
  * @author Andreas Prlic
  * @since 1.7
- * Usage: 
+ * Usage:
  * <pre>
    		String file = "path/to/mmcif/file";
   		MMcifParser parser = new SimpleMMcifParser();
@@ -78,8 +83,9 @@ public class SimpleMMcifParser implements MMcifParser {
 	private static final char s1 = '\'';
 	private static final char s2 = '\"';
 
-
 	Struct struct ;
+
+	public static Logger logger =  Logger.getLogger("org.biojava.bio.structure");
 
 	public SimpleMMcifParser(){
 		consumers = new ArrayList<MMcifConsumer>();
@@ -97,7 +103,7 @@ public class SimpleMMcifParser implements MMcifParser {
 	}
 
 	public void removeMMcifConsumer(MMcifConsumer consumer) {
-		consumers.remove(consumer);		
+		consumers.remove(consumer);
 	}
 
 	public static void main(String[] args){
@@ -123,7 +129,7 @@ public class SimpleMMcifParser implements MMcifParser {
 
 	}
 
-	public void parse(BufferedReader buf) 
+	public void parse(BufferedReader buf)
 	throws IOException {
 
 		triggerDocumentStart();
@@ -131,7 +137,7 @@ public class SimpleMMcifParser implements MMcifParser {
 
 		// init container objects...
 		struct = new Struct();
-		String line = null; 
+		String line = null;
 
 		boolean inLoop = false;
 
@@ -165,10 +171,11 @@ public class SimpleMMcifParser implements MMcifParser {
 
 
 				}
+
 				if ( line.startsWith(FIELD_LINE)){
 					// found another field.
 					String txt = line.trim();
-					//System.out.println(txt);
+					//System.out.println("line: " + txt);
 					if ( txt.indexOf('.') > -1){
 
 						String[] spl = txt.split("\\.");
@@ -178,29 +185,28 @@ public class SimpleMMcifParser implements MMcifParser {
 						loopFields.add(attribute);
 						if ( spl.length > 2){
 							System.err.println("found nested attribute, not supported, yet!");
-						}	
+						}
 					} else {
-						category = txt;						
+						category = txt;
 					}
 
 
 				} else {
 					// we found a data line
-
 					lineData = processLine(line, buf, loopFields.size());
 					if ( lineData.size() != loopFields.size()){
 						System.err.println("did not find enough data fields...");
 
 					}
 
-					endLineChecks(category, loopFields,lineData);				
+					endLineChecks(category, loopFields,lineData);
 					lineData.clear();
 
 
 				}
 
 			} else {
-
+				// not in loop
 
 				if ( line.startsWith(LOOP_START)){
 					loopFields.clear();
@@ -209,15 +215,15 @@ public class SimpleMMcifParser implements MMcifParser {
 					lineData.clear();
 					continue;
 				} else if (line.startsWith(LOOP_END)){
-					inLoop = false;	
+					inLoop = false;
 					if ( category != null)
 						endLineChecks(category, loopFields, lineData);
 					category = null;
 					loopFields.clear();
 					lineData.clear();
 				} else {
-
 					// a boring normal line
+					//System.out.println("boring data line: " + line + " " + inLoop + " " );
 					List<String> data = processLine(line, buf, 2);
 					//System.out.println("got a single line " + data);
 					String key = data.get(0);
@@ -230,9 +236,6 @@ public class SimpleMMcifParser implements MMcifParser {
 
 				}
 			}
-
-
-
 		}
 
 		if (struct != null){
@@ -244,7 +247,7 @@ public class SimpleMMcifParser implements MMcifParser {
 	}
 
 	private List<String> processSingleLine(String line){
-		//System.out.println("processSingleLine " + line);
+		//System.out.println("SS processSingleLine " + line);
 		List<String> data = new ArrayList<String>();
 
 		if ( line.trim().length() == 1){
@@ -289,11 +292,11 @@ public class SimpleMMcifParser implements MMcifParser {
 							}
 						}
 					}
-					
-					
+
+
 					if ( wordEnd ) {
-					
-					// at end of string
+
+						// at end of string
 						if ( ! word.equals(""))
 							data.add(word);
 						word     = "";
@@ -302,7 +305,7 @@ public class SimpleMMcifParser implements MMcifParser {
 					} else {
 						word += c;
 					}
-					
+
 				} else {
 					// the beginning of a new string
 					inString = true;
@@ -321,10 +324,10 @@ public class SimpleMMcifParser implements MMcifParser {
 							}
 						}
 					}
-										
+
 					if ( wordEnd ) {
-					
-					// at end of string
+
+						// at end of string
 						if ( ! word.equals(""))
 							data.add(word);
 						word     = "";
@@ -351,17 +354,17 @@ public class SimpleMMcifParser implements MMcifParser {
 	}
 
 	/** get the content of a cif entry
-	 * 
+	 *
 	 * @param line
 	 * @param buf
 	 * @return
 	 */
-	private List<String> processLine(String line, 
+	private List<String> processLine(String line,
 			BufferedReader buf,
 			int fieldLength)
 			throws IOException{
 
-		//System.out.println("processLine " + fieldLength + " " + line);
+		//System.out.println("XX processLine " + fieldLength + " " + line);
 		// go through the line and process each character
 		List<String> lineData = new ArrayList<String>();
 
@@ -375,7 +378,12 @@ public class SimpleMMcifParser implements MMcifParser {
 				if (! inString){
 
 					inString = true;
-					bigWord = "";
+					if ( line.length() > 1)
+						bigWord = line.substring(1);
+					else
+						bigWord = "";
+
+
 				} else {
 					// the end of a word
 					lineData.add(bigWord);
@@ -388,8 +396,9 @@ public class SimpleMMcifParser implements MMcifParser {
 					//TODO: make bigWord a stringbuffer...
 					bigWord += (line);
 				else {
+
 					List<String> dat = processSingleLine(line);
-					//System.out.println("processSingleLIne got:" + dat);
+
 					for (String d : dat){
 						lineData.add(d);
 					}
@@ -399,7 +408,7 @@ public class SimpleMMcifParser implements MMcifParser {
 			//System.out.println("in process line : " + lineData.size() + " " + fieldLength);
 
 			if ( lineData.size() > fieldLength){
-			
+
 				System.err.println("wrong data length ("+lineData.size()+
 						") should be ("+fieldLength+") at line " + line + " got lineData: " + lineData);
 				return lineData;
@@ -420,23 +429,26 @@ public class SimpleMMcifParser implements MMcifParser {
 
 	private void endLineChecks(String category,List<String> loopFields, List<String> lineData ) throws IOException{
 
-		//System.out.println("parsed the following data: " +category + " fields: "+
-		//		loopFields + " DATA: " + 
-		//		lineData);
 
+		/*System.out.println("parsed the following data: " +category + " fields: "+
+				loopFields + " DATA: " +
+				lineData);
+		if (category.equals("_struct")){
+			System.exit(0);
+		}*/
 		if ( loopFields.size() != lineData.size()){
 			System.err.println("looks like we got a problem with nested string quote characters:");
 			throw new IOException("data lenght ("+ lineData.size() +
 					") != fields length ("+loopFields.size()+
 					") category: " +category + " fields: "+
-					loopFields + " DATA: " + 
+					loopFields + " DATA: " +
 					lineData );
 		}
 
 		if ( category.equals("_entity")){
 
 			Entity e =  (Entity) buildObject(
-					"org.biojava.bio.structure.io.mmcif.model.Entity", 
+					"org.biojava.bio.structure.io.mmcif.model.Entity",
 					loopFields,lineData);
 			triggerNewEntity(e);
 
@@ -444,14 +456,13 @@ public class SimpleMMcifParser implements MMcifParser {
 
 			struct =  (Struct) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.Struct",
-					loopFields, lineData);		
+					loopFields, lineData);
 
 		} else if ( category.equals("_atom_site")){
 
 			AtomSite a = (AtomSite) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.AtomSite",
 					loopFields, lineData);
-
 			triggerNewAtomSite(a);
 
 		} else if ( category.equals("_database_PDB_rev")){
@@ -473,43 +484,69 @@ public class SimpleMMcifParser implements MMcifParser {
 					"org.biojava.bio.structure.io.mmcif.model.Exptl",
 					loopFields,lineData);
 
-			triggerExptl(exptl);						
+			triggerExptl(exptl);
 
 		} else if ( category.equals("_struct_ref")){
 			StructRef sref  = (StructRef) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.StructRef",
 					loopFields,lineData);
 
-			triggerNewStrucRef(sref);		
+			triggerNewStrucRef(sref);
 
 		} else if ( category.equals("_struct_ref_seq")){
 			StructRefSeq sref  = (StructRefSeq) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.StructRefSeq",
 					loopFields,lineData);
 
-			triggerNewStrucRefSeq(sref);		
+			triggerNewStrucRefSeq(sref);
 		} else if ( category.equals("_entity_poly_seq")){
 			EntityPolySeq exptl  = (EntityPolySeq) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.EntityPolySeq",
 					loopFields,lineData);
 
-			triggerNewEntityPolySeq(exptl);						
+			triggerNewEntityPolySeq(exptl);
 
 		} else if ( category.equals("_struct_asym")){
 			StructAsym sasym  = (StructAsym) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.StructAsym",
 					loopFields,lineData);
 
-			triggerNewStructAsym(sasym);					
+			triggerNewStructAsym(sasym);
 
 		} else if ( category.equals("_pdbx_poly_seq_scheme")){
 			PdbxPolySeqScheme ppss  = (PdbxPolySeqScheme) buildObject(
 					"org.biojava.bio.structure.io.mmcif.model.PdbxPolySeqScheme",
 					loopFields,lineData);
 
-			triggerNewPdbxPolySeqScheme(ppss);					
+			triggerNewPdbxPolySeqScheme(ppss);
 
+		} else if ( category.equals("_pdbx_nonpoly_scheme")){
+			PdbxNonPolyScheme ppss  = (PdbxNonPolyScheme) buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.PdbxNonPolyScheme",
+					loopFields,lineData);
+
+			triggerNewPdbxNonPolyScheme(ppss);
+
+		} else if ( category.equals("_pdbx_entity_nonpoly")){
+			PdbxEntityNonPoly pen = (PdbxEntityNonPoly) buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.PdbxEntityNonPoly",
+					loopFields,lineData
+			);
+			triggerNewPdbxEntityNonPoly(pen);
+		} else if ( category.equals("_struct_keywords")){
+			StructKeywords kw = (StructKeywords)buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.StructKeywords",
+					loopFields,lineData
+			);
+			triggerNewStructKeywords(kw);
+		} else if (category.equals("_refine")){
+			Refine r = (Refine)buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.Refine",
+					loopFields,lineData
+			);
+			triggerNewRefine(r);
 		}
+		//TODO: trigger a generic bean that can deal with all missing data types...
 
 	}
 
@@ -528,7 +565,7 @@ public class SimpleMMcifParser implements MMcifParser {
 
 			String u = key.substring(0,1).toUpperCase();
 			try {
-				Method m = c.getMethod("set" + u + key.substring(1,key.length()) , String.class);					
+				Method m = c.getMethod("set" + u + key.substring(1,key.length()) , String.class);
 				m.invoke(o,val);
 			}
 			catch (InvocationTargetException iex){
@@ -538,11 +575,34 @@ public class SimpleMMcifParser implements MMcifParser {
 				aex.printStackTrace();
 			}
 			catch( NoSuchMethodException nex){
-				System.err.println("trying to set field " + key + " in "+ c.getName() + ", but not found! (value:" + val + ")");
+				if ( val.equals("?") || val.equals(".")) {
+					logger.info("trying to set field >" + key + "< in >"+ c.getName() + "<, but not found. Since value is >"+val+"<  most probably just ignore this.");
+				} else {
+					logger.warning("trying to set field >" + key + "< in >"+ c.getName() + "<, but not found! (value:" + val + ")");
+				}
 			}
 		} else {
 			System.err.println("trying to set key/value pair on object " +o.getClass().getName() + " but did not find in " + lineData);
 		}
+	}
+
+	private void setArray(Class c, Object o, String key, String val){
+
+
+		// TODO: not implemented yet!
+			//logger.info("Setting of array not implemented at the present for " + key + " " + val);
+		/*
+		int pos = key.indexOf("[");
+		String varName = key.substring(0,pos);
+		String u = varName.substring(0,1).toUpperCase();
+		try {
+			Method m = c.getMethod("set" + u + varName.substring(1,varName.length()) , String.class);
+			m.invoke(o,val);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		 */
+
 	}
 
 	private Object buildObject(String className, List<String> loopFields, List<String> lineData) {
@@ -563,11 +623,17 @@ public class SimpleMMcifParser implements MMcifParser {
 				String u = key.substring(0,1).toUpperCase();
 
 				try {
-					Method m = c.getMethod("set" + u + key.substring(1,key.length()) , String.class);					
+					Method m = c.getMethod("set" + u + key.substring(1,key.length()) , String.class);
 					m.invoke(o,val);
 				}
 				catch( NoSuchMethodException nex){
-					System.err.println("trying to set field " + key + " in "+ c.getName() +", but not found! (value:" + val + ")");
+
+					if (key.indexOf("[") > -1) {
+						setArray(c,o,key,val);
+
+					} else {
+						System.err.println("Trying to set field " + key + " in "+ c.getName() +", but not found! (value:" + val + ")");
+					}
 				}
 			}
 		} catch (InstantiationException eix){
@@ -584,30 +650,30 @@ public class SimpleMMcifParser implements MMcifParser {
 
 	public void triggerNewEntity(Entity entity){
 		for(MMcifConsumer c : consumers){
-			c.newEntity(entity);			
+			c.newEntity(entity);
 		}
 	}
 
 	public void triggerNewEntityPolySeq(EntityPolySeq epolseq){
 		for(MMcifConsumer c : consumers){
-			c.newEntityPolySeq(epolseq);			
+			c.newEntityPolySeq(epolseq);
 		}
 	}
 	public void triggerNewStructAsym(StructAsym sasym){
 		for(MMcifConsumer c : consumers){
-			c.newStructAsym(sasym);			
+			c.newStructAsym(sasym);
 		}
 	}
 
 	private void triggerStructData(Struct struct){
 		for(MMcifConsumer c : consumers){
-			c.setStruct(struct);			
+			c.setStruct(struct);
 		}
 	}
 
 	private void triggerNewAtomSite(AtomSite atom){
 		for(MMcifConsumer c : consumers){
-			c.newAtomSite(atom);		
+			c.newAtomSite(atom);
 		}
 	}
 
@@ -646,16 +712,35 @@ public class SimpleMMcifParser implements MMcifParser {
 			c.newPdbxPolySeqScheme(ppss);
 		}
 	}
-
+	private void triggerNewPdbxNonPolyScheme(PdbxNonPolyScheme ppss){
+		for(MMcifConsumer c : consumers){
+			c.newPdbxNonPolyScheme(ppss);
+		}
+	}
+	public void triggerNewPdbxEntityNonPoly(PdbxEntityNonPoly pen){
+		for (MMcifConsumer c: consumers){
+			c.newPdbxEntityNonPoly(pen);
+		}
+	}
+	public void triggerNewStructKeywords(StructKeywords kw){
+		for (MMcifConsumer c: consumers){
+			c.newStructKeywords(kw);
+		}
+	}
+	public void triggerNewRefine(Refine r){
+		for (MMcifConsumer c: consumers){
+			c.newRefine(r);
+		}
+	}
 	public void triggerDocumentStart(){
 		for(MMcifConsumer c : consumers){
-			c.documentStart();	
+			c.documentStart();
+		}
+	}
+	public void triggerDocumentEnd(){
+		for(MMcifConsumer c : consumers){
+			c.documentEnd();
 		}
 	}
 
-	public void triggerDocumentEnd(){
-		for(MMcifConsumer c : consumers){
-			c.documentEnd();	
-		}
-	}
 }

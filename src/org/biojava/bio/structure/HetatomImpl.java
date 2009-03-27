@@ -42,67 +42,67 @@ import org.biojava.bio.structure.io.PDBParseException;
  * @since 1.4
  */
 public class HetatomImpl implements Group {
-    
+
     /** this is a "hetatm".
      *
      */
-    public static final String type = "hetatm" ;
-    
+    public static final String type = GroupType.HETATM ;
+
     Map<String, Object> properties ;
-    
+
     long id;
-    
+
     /* stores if 3d coordinates are available. */
     boolean pdb_flag ;
-    
+
     /* 3 letter name of amino acid in pdb file. */
     String pdb_name ;
-    
+
     /* pdb numbering. */
     String pdb_code ;
-    
+
     List<Atom> atoms ;
-    
+
     //WeakReference parent;
     Chain parent;
     /* Construct a Hetatom instance. */
     public HetatomImpl() {
         super();
-        
-        
+
+
         pdb_flag = false;
         pdb_name = null ;
         pdb_code = null ;
-        atoms    = new ArrayList<Atom>();    
+        atoms    = new ArrayList<Atom>();
         properties = new HashMap<String,Object>();
         parent = null;
     }
-    
-    /* returns an identical copy of this structure 
+
+    /* returns an identical copy of this structure
      public Object clone() {
-     Hetatom n = new Hetatom();	
+     Hetatom n = new Hetatom();
      }
      */
-    
-    
-    
-    
+
+
+
+
     /**
-     *  returns true or false, depending if this group has 3D coordinates or not.     
+     *  returns true or false, depending if this group has 3D coordinates or not.
      * @return true if Group has 3D coordinates
      */
     public boolean has3D() {
         return pdb_flag;
     }
-    
+
     /** flag if group has 3D data.
-     * 
+     *
      * @param flag  true to set flag that this Group has 3D coordinates
      */
     public void setPDBFlag(boolean flag){
         pdb_flag = flag ;
     }
-    
+
     /**
      * Returns the PDBCode.
      * @see #setPDBCode
@@ -111,21 +111,21 @@ public class HetatomImpl implements Group {
     public String getPDBCode() {
         return pdb_code;
     }
-    
+
     /** set the PDB code.
      * @see #getPDBCode
      */
     public void setPDBCode(String pdb) {
         pdb_code = pdb ;
     }
-    
+
     /** set three character name of Group .
      *
      * @param s  a String specifying the PDBName value
      * @see #getPDBName
      * @throws PDBParseException ...
      */
-    public void setPDBName(String s) 
+    public void setPDBName(String s)
     throws PDBParseException
     {
         // hetatoms can have pdb_name length < 3. e.g. CU (see 1a4a position 1200 )
@@ -134,7 +134,7 @@ public class HetatomImpl implements Group {
         //}
         pdb_name =s ;
     }
-    
+
     /**
      * Returns the PDBName.
      *
@@ -142,7 +142,7 @@ public class HetatomImpl implements Group {
      * @see #setPDBName
      */
     public String getPDBName() { return pdb_name;}
-    
+
     /** add an atom to this group. */
     public void addAtom(Atom atom){
         atom.setParent(this);
@@ -152,32 +152,32 @@ public class HetatomImpl implements Group {
             setPDBFlag(true);
         }
     };
-    
-    
-    /** remove all atoms 
-     * 
+
+
+    /** remove all atoms
+     *
      */
     public void clearAtoms() {
-        atoms.clear(); 
+        atoms.clear();
         setPDBFlag(false);
     }
-    
-    /** getnumber of atoms. 
+
+    /** getnumber of atoms.
      *  @return number of atoms
      */
     public int size(){ return atoms.size();   }
-    
+
     /** get all atoms of this group .
      * returns a List of all atoms in this Group
      * @return an List object representing the atoms value
      */
     public List<Atom> getAtoms(){
         //Atom[] atms = (Atom[])atoms.toArray(new Atom[atoms.size()]);
-        
+
         return atoms ;
     }
-    
-    
+
+
     /** set the atoms of this group
      * @see org.biojava.bio.structure.Atom
      * @param atoms a list of atoms
@@ -190,11 +190,11 @@ public class HetatomImpl implements Group {
     	if ( atoms.size() > 0) {
     		pdb_flag = true;
     	}
-    		
+
     }
-    
-    
-    /**  get an atom throws StructureException if atom not found.	 
+
+
+    /**  get an atom throws StructureException if atom not found.
      * @param name  a String
      * @return an Atom object
      * @throws StructureException ...
@@ -202,34 +202,34 @@ public class HetatomImpl implements Group {
     public Atom getAtom(String name)
     throws StructureException
     {
-        
+
         for (int i=0;i<atoms.size();i++){
             Atom atom = atoms.get(i);
             if (atom.getName().equals(name)){
                 return atom;
             }
         }
-        
+
         throw new StructureException(" No atom "+name + " in group " + pdb_name + " " + pdb_code + " !");
-        
+
     }
-    
+
     /** return an atom by its position in the internal List.
      *
      * @param position  an int
      * @return an Atom object
-     * @throws StructureException ...     
+     * @throws StructureException ...
      */
-    public Atom getAtom(int position) 
+    public Atom getAtom(int position)
     throws StructureException
     {
         if ((position < 0)|| ( position >= atoms.size())) {
             throw new StructureException("No atom found at position "+position);
         }
         Atom a = atoms.get(position);
-        return a ;	
+        return a ;
     }
-    
+
     /** test is an Atom with name is existing. */
     public boolean hasAtom(String name){
         for (int i=0;i<atoms.size();i++){
@@ -240,28 +240,28 @@ public class HetatomImpl implements Group {
         }
         return false ;
     }
-    
+
     /**
      * Returns the type value.
      *
      * @return a String representing the type value
      */
     public String getType(){ return type;}
-    
+
     public String toString(){
-        
+
         String str = "Hetatom "+ pdb_code + " " + pdb_name +  " "+ pdb_flag;
         if (pdb_flag) {
             str = str + "atoms: "+atoms.size();
         }
-        
-        
+
+
         return str ;
-        
+
     }
-    
-    
-    
+
+
+
     /** calculate if a groups has all atoms required for an amino acid
      this allows to include chemically modified amino acids that
      are labeled hetatoms into some computations ... the usual way
@@ -270,7 +270,7 @@ public class HetatomImpl implements Group {
      amino atoms are : N, CA, C, O, CB
      GLY does not have CB (unless we would calculate some artificially
      </p>
-     
+
      Example: 1DW9 chain A first group is a Selenomethionine, provided as HETATM, but here returns true.
      <pre>
      HETATM    1  N   MSE A   1      11.720  20.973   1.584  0.00  0.00           N
@@ -280,45 +280,45 @@ public class HetatomImpl implements Group {
      HETATM    5  CB  MSE A   1      10.407  19.441   0.088  0.00  0.00           C
      </pre>
      @see #getType
-     
+
      */
-    
-    
+
+
     public boolean hasAminoAtoms(){
         // if this method call is performed too often, it should become a
         // private method and provide a flag for Group object ...
-        
-        String[] atoms ; 
+
+        String[] atoms ;
         if ( getType().equals("amino") & getPDBName().equals("GLY")){
             atoms = new String[] { "N","CA","C","O"};
         } else {
             atoms = new String[] { "N","CA","C","O","CB" };
         }
-        
-        
+
+
         for (int i = 0 ; i < atoms.length; i++) {
             if ( ! hasAtom(atoms[i])) {
                 //System.out.println("not amino atoms");
                 return false ;
             }
         }
-        
+
         return true ;
     }
-    
-    
+
+
     /** properties of this amino acid. currerntly available properties.
      * are:
      * phi
      * psi
-     * 
+     *
      * @see #getProperties
      */
     public void setProperties(Map<String,Object> props) {
         properties =  props ;
     }
-    
-    /** return properties. 
+
+    /** return properties.
      *
      * @return a HashMap object representing the properties value
      * @see #setProperties
@@ -326,16 +326,16 @@ public class HetatomImpl implements Group {
     public Map<String, Object> getProperties() {
         return properties ;
     }
-    
+
     /** set a single property .
      *
-     * @see #getProperties  
+     * @see #getProperties
      * @see #getProperty
      */
     public void setProperty(String key, Object value){
         properties.put(key,value);
     }
-    
+
     /** get a single property .
      * @param key  a String
      * @return an Object
@@ -345,9 +345,9 @@ public class HetatomImpl implements Group {
     public Object getProperty(String key){
         return properties.get(key);
     }
-    
-    
-    /** return an AtomIterator. 
+
+
+    /** return an AtomIterator.
      *
      * @return an Iterator object
      */
@@ -355,12 +355,12 @@ public class HetatomImpl implements Group {
         Iterator<Atom> iter = new AtomIterator(this);
         return iter ;
     }
-    
+
     /** returns and identical copy of this Group object .
-     * @return  and identical copy of this Group object 
+     * @return  and identical copy of this Group object
      */
     public Object clone(){
-        
+
         HetatomImpl n = new HetatomImpl();
         n.setPDBFlag(has3D());
         n.setPDBCode(getPDBCode());
@@ -376,42 +376,42 @@ public class HetatomImpl implements Group {
         }
         return n;
     }
-    
+
     /** Set the back-reference (to its parent Chain)
-     * @param parent the parent Chain 
+     * @param parent the parent Chain
      */
-    
+
     public void setParent(Chain parent) {
         this.parent = parent ;
     }
-    
-    /** Returns the parent Chain of the Group 
-     * 
+
+    /** Returns the parent Chain of the Group
+     *
      * @return Chain the Chain object that contains the Group
-     * 
-     * 
+     *
+     *
      */
-    
+
     public Chain getParent() {
         return parent;
     }
 
     /** the Hibernate database ID
-     * 
+     *
      * @return the id
      */
-	public long getId() {		
+	public long getId() {
 		return id;
 	}
 
 	/** the Hibernate database ID
-     * 
+     *
      * @param id the hibernate id
      */
-	public void setId(long id) {		
+	public void setId(long id) {
 		this.id = id;
 	}
-    
-    
-    
+
+
+
 }

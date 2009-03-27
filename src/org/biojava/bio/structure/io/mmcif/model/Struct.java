@@ -22,7 +22,7 @@
 package org.biojava.bio.structure.io.mmcif.model;
 
 /** a bean to contain the data of the _struct lines
- * 
+ *
  * @author Andreas Prlic
  *
  */
@@ -31,11 +31,12 @@ public class Struct {
 	String title;
 	String pdbx_descriptor;
 	String pdbx_model_details;
-	
+	String pdbx_model_type_details;
+
 	public String toString(){
 		return "entry_id:" +entry_id + " title:" + title + " pdbx_descriptor:" +pdbx_descriptor + " pdbx_model_details:"+pdbx_model_details;
 	}
-	
+
 	public String getEntry_id() {
 		return entry_id;
 	}
@@ -60,8 +61,16 @@ public class Struct {
 	public void setPdbx_model_details(String pdbx_model_details) {
 		this.pdbx_model_details = pdbx_model_details;
 	}
-	
-	
-	
-	
+
+	public String getPdbx_model_type_details() {
+		return pdbx_model_type_details;
+	}
+
+	public void setPdbx_model_type_details(String pdbx_model_type_details) {
+		this.pdbx_model_type_details = pdbx_model_type_details;
+	}
+
+
+
+
 }

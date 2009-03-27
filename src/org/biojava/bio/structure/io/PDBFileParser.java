@@ -60,9 +60,9 @@ import org.biojava.bio.structure.StructureTools;
 /**
  * This class implements the actual PDB file parsing. Do not access it directly, but
  * via the PDBFileReader class.
- * 
+ *
  * <h2>Parsing</h2>
- * 
+ *
  * During the PDBfile parsing several Flags can be set:
  * <ul>
  * <li> {@link #setParseCAOnly(boolean)} - parse only the Atom records for C-alpha atoms</li>
@@ -71,25 +71,25 @@ import org.biojava.bio.structure.StructureTools;
  * <li> {@link #setAlignSeqRes(boolean)} - should the AminoAcid sequences from the SEQRES
  *      and ATOM records of a PDB file be aligned? (default:yes)</li>
  * </ul>
- * 
+ *
  * <p>
  * To provide excessive memory usage for large PDB files, there is the ATOM_CA_THRESHOLD.
  * If more Atoms than this threshold are being parsed in a PDB file, the parser will automatically
  * switch to a C-alpha only representation.
  * </p>
- * 
+ *
  * <p>
  * The result of the parsing of the PDB file is a new {@link Structure} object.
  * </p>
- * 
- * 
+ *
+ *
  * For more documentation on how to work with the Structure API please
  * see <a href="http://biojava.org/wiki/BioJava:CookBook#Protein_Structure" target="_top">
- * http://biojava.org/wiki/BioJava:CookBook#Protein_Structure</a> 
- * 
- * 
- * 
- * 
+ * http://biojava.org/wiki/BioJava:CookBook#Protein_Structure</a>
+ *
+ *
+ *
+ *
  * <h2>Example</h2>
  * <p>
  * Q: How can I get a Structure object from a PDB file?
@@ -98,7 +98,7 @@ import org.biojava.bio.structure.StructureTools;
  * A:
  * <pre>
  public {@link Structure} loadStructure(String pathToPDBFile){
- 	    // The PDBFileParser is wrapped by the PDBFileReader 
+ 	    // The PDBFileParser is wrapped by the PDBFileReader
 		{@link PDBFileReader} pdbreader = new {@link PDBFileReader}();
 
 		{@link Structure} structure = null;
@@ -112,7 +112,7 @@ import org.biojava.bio.structure.StructureTools;
 	}
  </pre>
  *
- * 
+ *
  * @author Andreas Prlic
  * @author Jules Jacobsen
  * @since 1.4
@@ -175,7 +175,7 @@ public class PDBFileParser  {
 
 	private static final List<String> sourceFieldValues = new ArrayList<String>(
 			Arrays.asList("ENGINEERED:", "MOL_ID:", "SYNTHETIC:", "FRAGMENT:",
-					"ORGANISM_SCIENTIFIC:", "ORGANISM_COMMON:", 
+					"ORGANISM_SCIENTIFIC:", "ORGANISM_COMMON:",
 					"ORGANISM_TAXID:","STRAIN:",
 					"VARIANT:", "CELL_LINE:", "ATCC:", "ORGAN:", "TISSUE:",
 					"CELL:", "ORGANELLE:", "SECRETION:", "GENE:",
@@ -199,32 +199,32 @@ public class PDBFileParser  {
 	private String previousContinuationField = "";
 
 	/** Secondary strucuture assigned by the PDB author/
-	 * 
+	 *
 	 */
 	public static final String PDB_AUTHOR_ASSIGNMENT = "PDB_AUTHOR_ASSIGNMENT";
 
 	/** Helix secondary structure assignment.
-	 * 
+	 *
 	 */
 	public static final String HELIX  = "HELIX";
 
 	/** Strand secondary structure assignment.
-	 * 
+	 *
 	 */
 	public static final String STRAND = "STRAND";
 
 	/** Turn secondary structure assignment.
-	 * 
+	 *
 	 */
 	public static final String TURN   = "TURN";
 
 	int atomCount;
 
-	/** the maximum number of atoms that will be parsed before the parser switches to a CA-only 
-	 * representation of the PDB file. If this limit is exceeded also the SEQRES groups will be 
+	/** the maximum number of atoms that will be parsed before the parser switches to a CA-only
+	 * representation of the PDB file. If this limit is exceeded also the SEQRES groups will be
 	 * ignored.
 	 */
-	public static final int ATOM_CA_THRESHOLD = 500000; 
+	public static final int ATOM_CA_THRESHOLD = 500000;
 
 	/**  the maximum number of atoms we will add to a structure
      this protects from memory overflows in the few really big protein structures.
@@ -234,7 +234,7 @@ public class PDBFileParser  {
 	private boolean atomOverflow;
 
 	/** Set the flag to only read in Ca atoms - this is useful for parsing large structures like 1htq.
-	 * 
+	 *
 	 */
 	public boolean parseCAOnly;
 
@@ -274,14 +274,14 @@ public class PDBFileParser  {
 
 	}
 	/** the flag if only the C-alpha atoms of the structure should be parsed.
-	 * 
+	 *
 	 * @return the flag
 	 */
 	public boolean isParseCAOnly() {
 		return parseCAOnly;
 	}
 	/** the flag if only the C-alpha atoms of the structure should be parsed.
-	 * 
+	 *
 	 * @param parseCAOnly boolean flag to enable or disable C-alpha only parsing
 	 */
 	public void setParseCAOnly(boolean parseCAOnly) {
@@ -291,7 +291,7 @@ public class PDBFileParser  {
 
 
 	/** Flag if the SEQRES amino acids should be aligned with the ATOM amino acids.
-	 * 
+	 *
 	 * @return flag if SEQRES - ATOM amino acids alignment is enabled
 	 */
 	public boolean isAlignSeqRes() {
@@ -332,7 +332,7 @@ public class PDBFileParser  {
 
 
 		HashMap<String,Object> header = new HashMap<String,Object> ();
-		header.put ("idCode","");		
+		header.put ("idCode","");
 		header.put ("classification","")         ;
 		header.put ("depDate","0000-00-00");
 		header.put ("title","");
@@ -361,13 +361,13 @@ public class PDBFileParser  {
 		return s ;
 	}
 
-	/** initiale new group, either Hetatom or AminoAcid */
+	/** initiate new group, either Hetatom, Nucleotide, or AminoAcid */
 	private Group getNewGroup(String recordName,Character aminoCode1) {
 
 		Group group;
 		if ( recordName.equals("ATOM") ) {
 			if (aminoCode1 == null)  {
-				// it is a nucleotidee
+				// it is a nucleotide
 				NucleotideImpl nu = new NucleotideImpl();
 				group = nu;
 
@@ -377,7 +377,7 @@ public class PDBFileParser  {
 			} else {
 				AminoAcidImpl aa = new AminoAcidImpl() ;
 				aa.setAminoType(aminoCode1);
-				group = aa ;	
+				group = aa ;
 			}
 		}
 		else {
@@ -409,7 +409,7 @@ public class PDBFileParser  {
 
 		String classification  = line.substring (10, 50).trim() ;
 		String deposition_date = line.substring (50, 59).trim() ;
-		String pdbCode          = line.substring (62, 66).trim() ;       
+		String pdbCode         = line.substring (62, 66).trim() ;
 
 		header.put("idCode",pdbCode);
 		structure.setPDBCode(pdbCode);
@@ -423,6 +423,8 @@ public class PDBFileParser  {
 		try {
 			Date dep = dateFormat.parse(deposition_date);
 			pdbHeader.setDepDate(dep);
+			header.put("depDate",deposition_date);
+
 		} catch (ParseException e){
 			e.printStackTrace();
 		}
@@ -493,21 +495,21 @@ public class PDBFileParser  {
 
 	}
 
-	/** 
+	/**
       Handler for
       <pre>
       COLUMNS     DATA TYPE        FIELD           DEFINITION
 --------------------------------------------------------------
  1 -  6     Record name      "SHEET "
- 8 - 10     Integer          strand       Strand number which starts at 1 
-                                          for each strand within a sheet 
+ 8 - 10     Integer          strand       Strand number which starts at 1
+                                          for each strand within a sheet
                                           and increases by one.
 12 - 14     LString(3)       sheetID      Sheet identifier.
 15 - 16     Integer          numStrands   Number of strands in sheet.
 18 - 20     Residue name     initResName  Residue name of initial residue.
-22          Character        initChainID  Chain identifier of initial 
+22          Character        initChainID  Chain identifier of initial
                                           residue in strand.
-23 - 26     Integer          initSeqNum   Sequence number of initial 
+23 - 26     Integer          initSeqNum   Sequence number of initial
                                           residue in strand.
 27          AChar            initICode    Insertion code of initial residue
                                           in strand.
@@ -516,13 +518,13 @@ public class PDBFileParser  {
                                           residue.
 34 - 37     Integer          endSeqNum    Sequence number of terminal
                                           residue.
-38          AChar            endICode     Insertion code of terminal 
+38          AChar            endICode     Insertion code of terminal
                                           residue.
 39 - 40     Integer          sense        Sense of strand with respect to
                                           previous strand in the sheet. 0
                                           if first strand, 1 if parallel,
                                           -1 if anti-parallel.
-42 - 45     Atom             curAtom      Registration. Atom name in 
+42 - 45     Atom             curAtom      Registration. Atom name in
                                           current strand.
 46 - 48     Residue name     curResName   Registration. Residue name in
                                           current strand.
@@ -576,7 +578,7 @@ public class PDBFileParser  {
 	}
 
 
-	/** 
+	/**
 	 * Handler for TURN lines
      <pre>
      COLUMNS      DATA TYPE        FIELD         DEFINITION
@@ -591,13 +593,13 @@ public class PDBFileParser  {
                                             containing this turn.
 21 - 24      Integer          initSeqNum    Sequence number of initial residue
                                             in turn.
-25           AChar            initICode     Insertion code of initial residue 
+25           AChar            initICode     Insertion code of initial residue
                                             in turn.
-27 - 29      Residue name     endResName    Residue name of terminal residue 
+27 - 29      Residue name     endResName    Residue name of terminal residue
                                             of turn.
 31           Character        endChainId    Chain identifier for the chain
                                             containing this turn.
-32 - 35      Integer          endSeqNum     Sequence number of terminal 
+32 - 35      Integer          endSeqNum     Sequence number of terminal
                                             residue of turn.
 36           AChar            endICode      Insertion code of terminal residue
                                             of turn.
@@ -633,8 +635,8 @@ public class PDBFileParser  {
 		turnList.add(m);
 	}
 
-	/** 
-	 Handler for 
+	/**
+	 Handler for
 	 REVDAT Record format:
 
 	 COLUMNS       DATA TYPE      FIELD         DEFINITION
@@ -663,10 +665,12 @@ public class PDBFileParser  {
 	 */
 	private void pdb_REVDAT_Handler(String line) {
 
+		// only keep the first...
 		String modDate = (String) header.get("modDate");
+
 		if ( modDate.equals("0000-00-00") ) {
 			// modDate is still initialized
-			String modificationDate = line.substring (13, 22).trim() ;       
+			String modificationDate = line.substring (13, 22).trim() ;
 			header.put("modDate",modificationDate);
 
 			try {
@@ -751,7 +755,7 @@ public class PDBFileParser  {
         GLA gamma-carboxy-glutamic acid
                  1         2         3         4         5         6         7
         1234567890123456789012345678901234567890123456789012345678901234567890
-        SEQRES   1 A  376  LYS PRO VAL THR VAL LYS LEU VAL ASP SER GLN ALA THR 
+        SEQRES   1 A  376  LYS PRO VAL THR VAL LYS LEU VAL ASP SER GLN ALA THR
         SEQRES   1 A   21  GLY ILE VAL GLU GLN CYS CYS THR SER ILE CYS SER LEU
         SEQRES   2 A   21  TYR GLN LEU GLU ASN TYR CYS ASN
         SEQRES   1 B   30  PHE VAL ASN GLN HIS LEU CYS GLY SER HIS LEU VAL GLU
@@ -766,7 +770,7 @@ public class PDBFileParser  {
 
 		//System.out.println(line);
 		String recordName = line.substring(0, 6).trim();
-		String chainID    = line.substring(11, 12);  
+		String chainID    = line.substring(11, 12);
 		String newLength   = line.substring(13,17).trim();
 		String subSequence = line.substring(18, 70);
 
@@ -789,7 +793,7 @@ public class PDBFileParser  {
 		if ( current_chain == null) {
 
 			current_chain = new ChainImpl();
-			current_chain.setName(chainID);				
+			current_chain.setName(chainID);
 
 		}
 
@@ -805,12 +809,12 @@ public class PDBFileParser  {
 			// but getNewGroup takes care of that and converts ATOM records with aminoCode1 == nnull to nucleotide...
 			//System.out.println(line);
 			// b
-			//} 
+			//}
 			current_group = getNewGroup("ATOM", aminoCode1);
 
 			try {
 				current_group.setPDBName(threeLetter);
-			} catch (PDBParseException p){				
+			} catch (PDBParseException p){
 				System.err.println(p.getMessage() );
 			}
 			if ( current_group instanceof AminoAcid){
@@ -826,13 +830,13 @@ public class PDBFileParser  {
 		if ( test == null)
 			seqResChains.add(current_chain);
 
-		current_group = null;	
+		current_group = null;
 		current_chain = null;
 		//structure.setSeqRes(seqResChains);
 
 		//		 the current chain is finished!
 		//if ( current_chain.getLength() != lengthCheck ){
-		//	System.err.println("the length of chain " + current_chain.getName() + "(" + 
+		//	System.err.println("the length of chain " + current_chain.getName() + "(" +
 		//			current_chain.getLength() + ") does not match the expected " + lengthCheck);
 		//}
 
@@ -855,9 +859,16 @@ public class PDBFileParser  {
 
 	 */
 	private void pdb_TITLE_Handler(String line) {
-		String title = line.substring(10,70).trim();
+		String title;
+		if ( line.length() > 69)
+			title = line.substring(10,70).trim();
+		else
+			title = line.substring(10,line.length()).trim();
+
 		String t= (String)header.get("title") ;
-		t += title + " ";
+		if ( (t != null) && (! t.equals("")))
+			t += " ";
+		t += title;
 		header.put("title",t);
 		pdbHeader.setTitle(t);
 	}
@@ -979,7 +990,7 @@ public class PDBFileParser  {
 	}
 
 	/** set the value in the currrent molId object
-	 * 
+	 *
 	 * @param field
 	 * @param value
 	 */
@@ -1078,16 +1089,16 @@ public class PDBFileParser  {
 
 	/** Handler for
 	 * SOURCE Record format
-	 * 
+	 *
 	 * The SOURCE record specifies the biological and/or chemical source of each biological molecule in the entry. Sources are described by both the common name and the scientific name, e.g., genus and species. Strain and/or cell-line for immortalized cells are given when they help to uniquely identify the biological entity studied.
 Record Format
 
-COLUMNS   DATA TYPE         FIELD          DEFINITION                        
+COLUMNS   DATA TYPE         FIELD          DEFINITION
 -------------------------------------------------------------------------------
- 1 -  6   Record name       "SOURCE"                                         
- 9 - 10   Continuation      continuation   Allows concatenation of multiple records.                         
-11 - 70   Specification     srcName        Identifies the source of the macromolecule in 
-           list                            a token: value format.                        
+ 1 -  6   Record name       "SOURCE"
+ 9 - 10   Continuation      continuation   Allows concatenation of multiple records.
+11 - 70   Specification     srcName        Identifies the source of the macromolecule in
+           list                            a token: value format.
 	 * @param line the line to be parsed
 
 	 */
@@ -1294,7 +1305,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 
 	/** Handler for
-	 REMARK  2 
+	 REMARK  2
 
 	 * For diffraction experiments:
 
@@ -1308,13 +1319,19 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	 */
 
 	private void pdb_REMARK_2_Handler(String line) {
-
+		//System.out.println(line);
 		int i = line.indexOf("ANGSTROM");
 		if ( i != -1) {
 			// line contains ANGSTROM info...
-			String resolution = line.substring(22,27).trim();
+			//get the chars between 22 and where Angstrom starts
+			// this is for backwards compatibility
+			// new PDB files start at 24!!!
+			//System.out.println(i);
+
+			String resolution = line.substring(22,i).trim();
+			//System.out.println(resolution);
 			// convert string to float
-			float res = 99 ;
+			float res = PDBHeader.DEFAULT_RESOLUTION ;
 			try {
 				res = Float.parseFloat(resolution);
 			} catch (NumberFormatException e) {
@@ -1322,6 +1339,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 				System.err.println("could not parse resolution from line and ignoring it " + line);
 				return ;
 			}
+			//System.out.println("got resolution:" +res);
 			header.put("resolution",new Float(res));
 			pdbHeader.setResolution(res);
 		}
@@ -1329,7 +1347,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	}
 
 
-	/** Handler for REMARK lines 
+	/** Handler for REMARK lines
 	 */
 	private void pdb_REMARK_Handler(String line) {
 		// finish off the compound handler!
@@ -1367,7 +1385,11 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 	private void pdb_EXPDTA_Handler(String line) {
 
-		String technique  = line.substring (10, 70).trim() ;
+		String technique  ;
+		if (line.length() > 69)
+			technique = line.substring (10, 70).trim() ;
+		else
+			technique = line.substring(10).trim();
 
 		String t =(String) header.get("technique");
 		t += technique +" ";
@@ -1384,7 +1406,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 	/**
 	 Handler for
-	 ATOM Record Format 
+	 ATOM Record Format
 	 <pre>
 	 COLUMNS        DATA TYPE       FIELD         DEFINITION
 	 ---------------------------------------------------------------------------------
@@ -1409,7 +1431,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	 79 - 80        LString(2)      charge        Charge on the atom.
 	 </pre>
 	 */
-	private void  pdb_ATOM_Handler(String line) 
+	private void  pdb_ATOM_Handler(String line)
 	throws PDBParseException
 	{
 
@@ -1457,7 +1479,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		//012345678901234567890123456789012345678901234567890123456789
 		//ATOM      1  N   MET     1      20.154  29.699   5.276   1.0
 		//ATOM    112  CA  ASP   112      41.017  33.527  28.371  1.00  0.00
-		//ATOM     53  CA  MET     7      23.772  33.989 -21.600  1.00  0.00           C  
+		//ATOM     53  CA  MET     7      23.772  33.989 -21.600  1.00  0.00           C
 		//ATOM    112  CA  ASP   112      37.613  26.621  33.571     0     0
 
 
@@ -1489,7 +1511,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		double y = Double.parseDouble (line.substring (38, 46).trim());
 		double z = Double.parseDouble (line.substring (46, 54).trim());
 
-		double[] coords = new double[3];       
+		double[] coords = new double[3];
 		coords[0] = x ;
 		coords[1] = y ;
 		coords[2] = z ;
@@ -1504,13 +1526,13 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		}
 
 		double tempf = 0.0;
-		if ( line.length() > 65)  
+		if ( line.length() > 65)
 			try {
 				tempf = Double.parseDouble (line.substring (60, 66).trim());
 			}  catch (NumberFormatException e){}
 
 			atom.setOccupancy(  occu  );
-			atom.setTempFactor( tempf );		
+			atom.setTempFactor( tempf );
 
 			String chain_id      = line.substring(21,22);
 
@@ -1548,7 +1570,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 				Chain testchain ;
 				testchain = isKnownChain(current_chain.getName(),current_model);
 				if ( testchain == null) {
-					current_model.add(current_chain);		
+					current_model.add(current_chain);
 				}
 
 				//see if chain_id of new residue is one of the previous chains ...
@@ -1573,7 +1595,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 			// check if residue number is the same ...
 			// insertion code is part of residue number
-			if ( ! residueNumber.equals(current_group.getPDBCode())) {	    
+			if ( ! residueNumber.equals(current_group.getPDBCode())) {
 				//System.out.println("end of residue: "+current_group.getPDBCode()+" "+residueNumber);
 				current_chain.addGroup(current_group);
 
@@ -1597,7 +1619,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		for ( int i =0; i< structure.nrModels() ; i++){
 			//  iterate over all known models ...
 			List<Chain> model = structure.getModel(i);
-			model = CAConverter.getCAOnly(model);            
+			model = CAConverter.getCAOnly(model);
 			structure.setModel(i,model);
 		}
 
@@ -1620,9 +1642,9 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		return b ;
 	}
 
-	/** 
+	/**
 	 Handler for
-	 CONECT Record Format 
+	 CONECT Record Format
 
 	 COLUMNS         DATA TYPE        FIELD           DEFINITION
 	 ---------------------------------------------------------------------------------
@@ -1644,7 +1666,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	 atom
 	 57 - 61         Integer          serial          Serial number of salt bridged
 	 atom
-	 */  
+	 */
 	private void pdb_CONECT_Handler(String line) {
 		//System.out.println(line);
 		// this try .. catch is e.g. to catch 1gte which has wrongly formatted lines...
@@ -1690,7 +1712,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 	/*
 	 Handler for
-	 MODEL Record Format 
+	 MODEL Record Format
 
 	 COLUMNS       DATA TYPE      FIELD         DEFINITION
 	 ----------------------------------------------------------------------
@@ -1725,17 +1747,17 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
      1 - 6        Record name        "DBREF "
      8 - 11       IDcode             idCode         ID code of this entry.
     13            Character          chainID        Chain identifier.
-    15 - 18       Integer            seqBegin       Initial sequence number 
+    15 - 18       Integer            seqBegin       Initial sequence number
                                                     of the PDB sequence segment.
-    19            AChar              insertBegin    Initial insertion code 
+    19            AChar              insertBegin    Initial insertion code
                                                     of the PDB sequence segment.
-    21 - 24       Integer            seqEnd         Ending sequence number 
+    21 - 24       Integer            seqEnd         Ending sequence number
                                                     of the PDB sequence segment.
-    25            AChar              insertEnd      Ending insertion code 
+    25            AChar              insertEnd      Ending insertion code
                                                     of the PDB sequence segment.
-    27 - 32       LString            database       Sequence database name. 
+    27 - 32       LString            database       Sequence database name.
     34 - 41       LString            dbAccession    Sequence database accession code.
-    43 - 54      LString            dbIdCode        Sequence database 
+    43 - 54      LString            dbIdCode        Sequence database
                                                     identification code.
     56 - 60      Integer            dbseqBegin      Initial sequence number of the
                                                     database seqment.
@@ -1751,8 +1773,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	private void pdb_DBREF_Handler(String line){
 		DBRef dbref = new DBRef();
 		String idCode      = line.substring(7,11);
-		String chainId     = line.substring(12,13);                      
-		String seqBegin    = line.substring(14,18);        
+		String chainId     = line.substring(12,13);
+		String seqBegin    = line.substring(14,18);
 		String insertBegin = line.substring(18,19);
 		String seqEnd      = line.substring(20,24);
 		String insertEnd   = line.substring(24,25);
@@ -1766,7 +1788,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 		dbref.setIdCode(idCode);
 		dbref.setChainId(chainId.charAt(0));
-		dbref.setSeqBegin(intFromString(seqBegin));        
+		dbref.setSeqBegin(intFromString(seqBegin));
 		dbref.setInsertBegin(insertBegin.charAt(0));
 		dbref.setSeqEnd(intFromString(seqEnd));
 		dbref.setInsertEnd(insertEnd.charAt(0));
@@ -1783,8 +1805,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	}
 
 	/* process the disulfid bond info provided by an SSBOND record
-	 * 
-	 * 
+	 *
+	 *
 	COLUMNS        DATA TYPE       FIELD         DEFINITION
 	-------------------------------------------------------------------
 	 1 -  6        Record name     "SSBOND"
@@ -1802,11 +1824,11 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	 */
 	private void pdb_SSBOND_Handler(String line){
 		String chain1      = line.substring(15,16);
-		String seqNum1     = line.substring(18,21).trim();                      
-		String icode1      = line.substring(21,22);  
+		String seqNum1     = line.substring(18,21).trim();
+		String icode1      = line.substring(21,22);
 		String chain2      = line.substring(29,30);
-		String seqNum2     = line.substring(31,35).trim();                      
-		String icode2      = line.substring(35,36);  
+		String seqNum2     = line.substring(31,35).trim();
+		String icode2      = line.substring(35,36);
 
 		if (icode1.equals(" "))
 			icode1 = "";
@@ -1828,7 +1850,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 
 	private int intFromString(String intString){
-		int val = Integer.MIN_VALUE; 
+		int val = Integer.MIN_VALUE;
 		try {
 			val = Integer.parseInt(intString.trim());
 		} catch (NumberFormatException ex){
@@ -1840,7 +1862,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 
 	/** test if the chain is already known (is in current_model
-	 * ArrayList) and if yes, returns the chain 
+	 * ArrayList) and if yes, returns the chain
 	 * if no -> returns null
 	 */
 	private Chain isKnownChain(String chainID, List<Chain> chains){
@@ -1859,7 +1881,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 
 
-	private BufferedReader getBufferedReader(InputStream inStream) 
+	private BufferedReader getBufferedReader(InputStream inStream)
 	throws IOException {
 
 		BufferedReader buf ;
@@ -1879,9 +1901,9 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	 *
 	 * @param inStream  an InputStream object
 	 * @return a Structure object
-	 * @throws IOException     
+	 * @throws IOException
 	 */
-	public Structure parsePDBFile(InputStream inStream) 
+	public Structure parsePDBFile(InputStream inStream)
 	throws IOException
 	{
 
@@ -1908,10 +1930,10 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 	 * @throws IOException ...
 	 */
 
-	public Structure parsePDBFile(BufferedReader buf) 
-	throws IOException 
-	{      
-		// (re)set structure 
+	public Structure parsePDBFile(BufferedReader buf)
+	throws IOException
+	{
+		// (re)set structure
 
 		structure     = new StructureImpl() ;
 		current_model = new ArrayList<Chain>();
@@ -1927,7 +1949,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		sourceLines.clear();
 		compndLines.clear();
 		isLastCompndLine = false;
-		isLastSourceLine = false;		
+		isLastSourceLine = false;
 		molTypeCounter = 1;
 		compounds.clear();
 		helixList.clear();
@@ -1953,17 +1975,17 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 				// System.out.println (">"+line+"<");
 
-				// ignore empty lines     
-				if ( line.equals("") || 
+				// ignore empty lines
+				if ( line.equals("") ||
 						(line.equals(NEWLINE))){
 
-					line = buf.readLine (); 
+					line = buf.readLine ();
 					continue;
 				}
 
 
-				// ignore short TER and END lines 
-				if ( (line.startsWith("TER")) || 
+				// ignore short TER and END lines
+				if ( (line.startsWith("TER")) ||
 						(line.startsWith("END"))) {
 
 					line = buf.readLine ();
@@ -2030,7 +2052,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 					}
 				} catch (Exception e){
 					// the line is badly formatted, ignore it!
-					e.printStackTrace();					
+					e.printStackTrace();
 					System.err.println("badly formatted line ... " + line);
 				}
 				line = buf.readLine ();
@@ -2046,7 +2068,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 			throw new IOException ("Error parsing PDB file");
 		}
 
-		if ( parseSecStruc) 
+		if ( parseSecStruc)
 			setSecStruc();
 
 
@@ -2192,7 +2214,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 							Map<String,String> assignmentMap = new HashMap<String,String>();
 							assignmentMap.put(assignment,type);
-							aa.setSecStruc(assignmentMap);                        
+							aa.setSecStruc(assignmentMap);
 						}
 
 					}
@@ -2211,8 +2233,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 
 
 	/** After the parsing of a PDB file the {@link Chain} and  {@link Compound}
-	 * objects need to be linked to each other. 
-	 * 
+	 * objects need to be linked to each other.
+	 *
 	 * @param s the structure
 	 */
 	public void linkChains2Compound(Structure s){
@@ -2251,13 +2273,13 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 					chainIds.add(ch.getName());
 					comp.setChainId(chainIds);
 					comp.addChain(ch);
-				} 
+				}
 			}
 		}
 
 		for (Compound comp: compounds){
 			if ( comp.getChainId() == null) {
-				// could not link to chain 
+				// could not link to chain
 				// TODO: should this be allowed to happen?
 				continue;
 			}

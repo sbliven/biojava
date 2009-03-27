@@ -22,29 +22,30 @@
 package org.biojava.bio.structure.io.mmcif.model;
 
 public class StructRefSeq extends AbstractBean{
-	String align_id;                       
-	String ref_id;                         
-	String pdbx_PDB_id_code;               
-	String pdbx_strand_id;                 
-	String seq_align_beg;                  
-	String pdbx_seq_align_beg_ins_code;    
-	String seq_align_end;                  
-	String pdbx_seq_align_end_ins_code;    
-	String pdbx_db_accession;              
-	String db_align_beg;                   
-	String pdbx_db_align_beg_ins_code;     
-	String db_align_end;                   
-	String pdbx_db_align_end_ins_code;     
-	String pdbx_auth_seq_align_beg;        
+	String align_id;
+	String ref_id;
+	String pdbx_PDB_id_code;
+	String pdbx_strand_id;
+	String seq_align_beg;
+	String pdbx_seq_align_beg_ins_code;
+	String seq_align_end;
+	String pdbx_seq_align_end_ins_code;
+	String pdbx_db_accession;
+	String db_align_beg;
+	String pdbx_db_align_beg_ins_code;
+	String db_align_end;
+	String pdbx_db_align_end_ins_code;
+	String pdbx_auth_seq_align_beg;
 	String pdbx_auth_seq_align_end;
-	
+	String details;
+
 	public StructRefSeq(){
 		super();
 		pdbx_db_align_beg_ins_code = "?";
 		pdbx_db_align_end_ins_code = "?";
-		
+
 	}
-	
+
 	public String getAlign_id() {
 		return align_id;
 	}
@@ -135,5 +136,11 @@ public class StructRefSeq extends AbstractBean{
 	public void setPdbx_auth_seq_align_end(String pdbx_auth_seq_align_end) {
 		this.pdbx_auth_seq_align_end = pdbx_auth_seq_align_end;
 	}
-	
+	public String getDetails() {
+		return details;
+	}
+	public void setDetails(String details) {
+		this.details = details;
+	}
+
 }

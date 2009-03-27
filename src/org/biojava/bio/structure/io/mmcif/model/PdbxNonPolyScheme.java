@@ -1,33 +1,11 @@
-/*
- *                    BioJava development code
- *
- * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  If you do not have a copy,
- * see:
- *
- *      http://www.gnu.org/copyleft/lesser.html
- *
- * Copyright for this code is held jointly by the individual
- * authors.  These should be listed in @author doc comments.
- *
- * For more information on the BioJava project and its aims,
- * or to join the biojava-l mailing list, visit the home page
- * at:
- *
- *      http://www.biojava.org/
- *
- * created at Jun 5, 2008
- */
 package org.biojava.bio.structure.io.mmcif.model;
 
-/** A bean for the PDBX_POLY_SEQ_SCHEME category, which provides residue level nomenclature
- * mapping for polymer entities.
+/** A bean for the PDBX_NONPOLY_SCHEME category, which provides residue level nomenclature
+ * mapping for non-polymer entities.
  * @author Andreas Prlic
  * @since 1.7
  */
-
-public class PdbxPolySeqScheme extends AbstractBean{
+public class PdbxNonPolyScheme {
 	String asym_id;
 	String entity_id;
 	String seq_id;
@@ -39,7 +17,6 @@ public class PdbxPolySeqScheme extends AbstractBean{
 	String auth_mon_id;
 	String pdb_strand_id;
 	String pdb_ins_code;
-	String hetero;
 	public String getAsym_id() {
 		return asym_id;
 	}
@@ -106,12 +83,5 @@ public class PdbxPolySeqScheme extends AbstractBean{
 	public void setPdb_ins_code(String pdb_ins_code) {
 		this.pdb_ins_code = pdb_ins_code;
 	}
-	public String getHetero() {
-		return hetero;
-	}
-	public void setHetero(String hetero) {
-		this.hetero = hetero;
-	}
-
 
 }

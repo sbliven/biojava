@@ -23,24 +23,25 @@ package org.biojava.bio.structure.io.mmcif.model;
 
 
 /** Container for _entity_poly_seq records
- * 
+ *
 <pre>
-  Field Name 	 		mmCIF Data Item 	 
-  Section   	  		n.a.   	 
-  Serial_No   	  		n.a.   	 
-  Strand_ID   			PDB strand ID corresponding to   _entity_poly_seq.entity_id   	** 
-  Strand_Length   	  	derived   	 
-  Residue_Names   	  	_entity_poly_seq.mon_id   	 
-** Chemically distinct polymer strands are mapped to mmCIF entities. Two instances or the same polymer molecule in the PDB data file are mapped to a single mmCIF entity (eg. a homodimer). For convenience a table of monomer label correspondences is stored in category   PDBX_POLY_SEQ_SCHEME  
+  Field Name 	 		mmCIF Data Item
+  Section   	  		n.a.
+  Serial_No   	  		n.a.
+  Strand_ID   			PDB strand ID corresponding to   _entity_poly_seq.entity_id   	**
+  Strand_Length   	  	derived
+  Residue_Names   	  	_entity_poly_seq.mon_id
+** Chemically distinct polymer strands are mapped to mmCIF entities. Two instances or the same polymer molecule in the PDB data file are mapped to a single mmCIF entity (eg. a homodimer). For convenience a table of monomer label correspondences is stored in category   PDBX_POLY_SEQ_SCHEME
 
 </pre>
  * @author Andreas Prlic
- *
+ * @since 1.7
  */
 public class EntityPolySeq extends AbstractBean{
 	String entity_id;
 	String num;
 	String mon_id;
+	String hetero;
 	public String getEntity_id() {
 		return entity_id;
 	}
@@ -59,5 +60,11 @@ public class EntityPolySeq extends AbstractBean{
 	public void setMon_id(String mon_id) {
 		this.mon_id = mon_id;
 	}
-	
+	public String getHetero() {
+		return hetero;
+	}
+	public void setHetero(String hetero) {
+		this.hetero = hetero;
+	}
+
 }

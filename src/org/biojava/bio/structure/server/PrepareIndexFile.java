@@ -49,9 +49,9 @@ public class PrepareIndexFile {
 
 	public static void main (String[] args){
 		try {
-			File pdbLocation = new File("/Users/andreas/WORK/PDB/mmcif_files/");
+			File pdbLocation = new File("/Users/andreas/WORK/PDB/mmCIF/");
 			FlatFileInstallation installation = new FlatFileInstallation(pdbLocation);
-			
+
 			//File indexFile = new File("/Users/andreas/WORK/PDB/pdbindex.idx");
 			//File chainFile = new File("/Users/andreas/WORK/PDB/chainindex.idx");
 			//installation.setPDBInfoFile(indexFile);
@@ -69,64 +69,64 @@ public class PrepareIndexFile {
 	}
 
 	/** prepare the index file for this installation
-	 * 
+	 *
 	 * @param installation
 	 */
-	public void prepareIndexFileForInstallation(FlatFileInstallation installation) 
+	public void prepareIndexFileForInstallation(FlatFileInstallation installation)
 	throws FileNotFoundException,IOException{
 
 		File[] pdbfiles = getAllPDB(installation.getFilePath());
-		
+
 		createPDBInfoList(pdbfiles, installation.getPDBInfoFile(), installation.getChainInfoFile());
 
-	
+
 	}
 
 
 	/** parses a set of PDB files and writes info into a file
 	 * the file is tab separated and has the following columns:
 	 * name length  resolution depositionDate modificationDate  technique title classification filename
-	 * 
+	 *
 	 * binaryDirectory: a directory in which binary files containing the atoms will be places, to provide a speedup
-	 * 
+	 *
 	 * This method needs to be run, before a DBSearch can be performed, since the files created by this method
 	 * are required for the DBSearch
-	 * 
+	 *
 	 * @param pdbfiles
 	 * @param outputFile
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public  void createPDBInfoList(File[] pdbfiles, File outputFile, File chainInfoFile) 
+	public  void createPDBInfoList(File[] pdbfiles, File outputFile, File chainInfoFile)
 	throws FileNotFoundException, IOException
 	{
 
 		//String outputfile = "/Users/ap3/WORK/PDB/rotated.pdb";
 
-		FileOutputStream out= new FileOutputStream(outputFile); 
+		FileOutputStream out= new FileOutputStream(outputFile);
 		PrintStream p =  new PrintStream( out );
 		PrintWriter pdbWriter = new PrintWriter(p);
 
 		FileOutputStream cout = new FileOutputStream(chainInfoFile);
 		PrintStream pc = new PrintStream(cout);
 		PrintWriter chainWriter = new PrintWriter(pc);
-		
-		
+
+
 		PDBFileReader pdbreader = new PDBFileReader();
-		
+
 		logPDBInfoFile(pdbWriter, chainWriter, pdbreader, pdbfiles);
 	}
-	
-	protected void logPDBInfoFile(PrintWriter pdbWriter, PrintWriter chainWriter, StructureIOFile pdbreader, File[] pdbfiles ) 
+
+	protected void logPDBInfoFile(PrintWriter pdbWriter, PrintWriter chainWriter, StructureIOFile pdbreader, File[] pdbfiles )
 	throws IOException{
-		
-		pdbWriter.println("//pdbId\tnrCAAtoms\ttechnique\tresolution\tdepDate\tmodDate\ttitle\tclassification\ttime");
+
+		pdbWriter.println("//pdbId\tnrCAAtoms\ttechnique\tresolution\tdepDate\tmodDate\ttitle\tclassification\ttime\tpath");
 		chainWriter.println("//pdbId\tchainId\tseqResLength\tatomLength\taminoLength\thetLength\tnucleotideLength\tmolName\tmolId\tdbrefs");
 		int l = pdbfiles.length;
-        
-        
-        long loopStart = System.currentTimeMillis();     
-        
+
+
+        long loopStart = System.currentTimeMillis();
+
 		for ( int i = 0 ; i < l ; i++){
 			//if (i != 36)
 			//	continue;
@@ -137,37 +137,37 @@ public class PrepareIndexFile {
 			*/
            // if ( i< 16055)
              //   continue;
-            
+
 			File f = pdbfiles[i];
-            
+
             String pdb = f.getName().substring(3,7);
-                        
-           
+
+
 			long startTime = System.currentTimeMillis();
-            System.out.println("# " + i + " / " + l + " " + f ); 
+            System.out.println("# " + i + " / " + l + " " + f );
             //System.out.println("getting " + f);
             Structure s = null;
-            
+
             s = pdbreader.getStructure(f);
-          
+
 			long stopTime = System.currentTimeMillis();
 
-			logPDBInfo(pdbWriter, s, startTime, stopTime);
+			logPDBInfo(pdbWriter, s, startTime, stopTime,f);
 			logChainInfo(chainWriter, s);
-			
+
 		}
         long loopEnd = System.currentTimeMillis();
 		pdbWriter.flush();
 		pdbWriter.close();
 		chainWriter.flush();
 		chainWriter.close();
-        
+
         long time = ((loopEnd-loopStart) / (long) (1000*60));
         System.out.println("loop took: " + time + " minutes" );
 	}
 
 	/** 			get the matching compound for this chain
-	 * 
+	 *
 	 * @param compounds
 	 * @param c
 	 * @return
@@ -180,10 +180,10 @@ public class PrepareIndexFile {
 			if ( chainIds.contains(c.getName()))
 				return comp;
 		}
-		
+
 		return null;
 	}
-	
+
 	private String getDBRefStringForChain(List<DBRef> dbrefs, Chain c){
 		List<String> dbIds = new ArrayList<String>();
 		for (DBRef dbref : dbrefs){
@@ -198,23 +198,23 @@ public class PrepareIndexFile {
 			if ( pos < dbIds.size());
 				buf.append(":");
 		}
-		
+
 		return buf.toString();
-		
+
 	}
 	private  void logChainInfo(PrintWriter chainWriter, Structure s ){
-		
+
 		String pdbCode = s.getPDBCode();
-		List<Chain> chains = s.getChains(0);		
+		List<Chain> chains = s.getChains(0);
 		List<Compound> compounds = s.getCompounds();
 		List<DBRef> dbrefs = s.getDBRefs();
-		
+
 		for ( Chain c : chains){
-			
+
 			List<Group> agr = c.getAtomGroups("amino");
 			List<Group> hgr = c.getAtomGroups("hetatm");
 			List<Group> ngr = c.getAtomGroups("nucleotide");
-			
+
 			Compound comp =  getCompoundForChain(compounds, c);
 			String molName = "-";
 			String molId   = "-";
@@ -223,8 +223,8 @@ public class PrepareIndexFile {
 				molId   = comp.getMolId();
 			}
 			String dbRefString = getDBRefStringForChain(dbrefs,c);
-			
-			String str = String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t", 
+
+			String str = String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t",
 					pdbCode,
 					c.getName(),
 					c.getSeqResLength(),
@@ -238,12 +238,12 @@ public class PrepareIndexFile {
 			);
 			chainWriter.println(str);
 		}
-		
-		
-		
+
+
+
 	}
-	
-	private  void logPDBInfo(PrintWriter pdbWriter, Structure s, long startTime,long stopTime ){
+
+	private  void logPDBInfo(PrintWriter pdbWriter, Structure s, long startTime,long stopTime, File path ){
 		// only used first model in nmrs ...
 		if ( s.isNmr()){
 			List<Chain> chains = s.getModel(0);
@@ -261,16 +261,17 @@ public class PrepareIndexFile {
 		Atom[] ca = StructureTools.getAtomCAArray(s);
 
 		PDBHeader header = s.getPDBHeader();
-		String infoline = String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t",				
+		String infoline = String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\t%s",
 				s.getPDBCode(),
-				ca.length,            		
+				ca.length,
 				header.getTechnique(),
 				header.getResolution(),
 				dateFormat.format(header.getDepDate()),
 				dateFormat.format(header.getModDate()),
 				header.getTitle(),
 				header.getClassification(),
-				((stopTime-startTime) / (float) 1000)
+				((stopTime-startTime) / (float) 1000),
+				path.getAbsolutePath()
 		);
 
 
@@ -280,10 +281,10 @@ public class PrepareIndexFile {
 
 		pdbWriter.println(infoline);
 	}
-	
-	
+
+
 	/** get all PDBfiles from a directory
-	 * 
+	 *
 	 * @param dir the directory that contains all PDB files
 	 * @return an array of PDB Files
 	 */
@@ -307,8 +308,8 @@ public class PrepareIndexFile {
 
 		return (File[]) pdbFiles.toArray(new File[pdbFiles.size()]);
 	}
-	
-	
+
+
 
 
 }

@@ -6,10 +6,13 @@ COMPND   2 MOLECULE: TRYPSIN INHIBITOR;
 COMPND   3 CHAIN: A;                                                            
 COMPND   4 ENGINEERED: YES                                                      
 SOURCE    MOL_ID: 1;                                                            
-SOURCE   2 ORGANISM_SCIENTIFIC: BOS TAURUS                                      
+SOURCE   2 ORGANISM_SCIENTIFIC: BOS TAURUS;                                     
+SOURCE   3 ORGANISM_COMMON: CATTLE;                                             
+SOURCE   4 ORGANISM_TAXID: 9913                                                 
 KEYWDS    PROTEINASE INHIBITOR (TRYPSIN)                                        
-EXPDTA    X-RAY DIFFRACTION                                                     
+EXPDTA    X-RAY DIFFRACTION; NEUTRON DIFFRACTION                                
 AUTHOR    A.WLODAWER,R.HUBER                                                    
+REVDAT   6   24-FEB-09 5PTI    1       VERSN                                    
 REVDAT   5   15-JAN-90 5PTI    1       JRNL                                     
 REVDAT   4   16-OCT-87 5PTI    1       HELIX                                    
 REVDAT   3   16-APR-87 5PTI    1       REMARK                                   
@@ -20,22 +23,24 @@ JRNL        TITL   STRUCTURE OF BOVINE PANCREATIC TRYPSIN INHIBITOR.
 JRNL        TITL 2 RESULTS OF JOINT NEUTRON AND X-RAY REFINEMENT OF             
 JRNL        TITL 3 CRYSTAL FORM II                                              
 JRNL        REF    J.MOL.BIOL.                   V. 180   301 1984              
-JRNL        REFN   ASTM JMOBAK  UK ISSN 0022-2836                               
+JRNL        REFN                   ISSN 0022-2836                               
+JRNL        PMID   6210373                                                      
+JRNL        DOI    10.1016/S0022-2836(84)80006-6                                
 REMARK   1                                                                      
 REMARK   1 REFERENCE 1                                                          
 REMARK   1  AUTH   A.WLODAWER,J.DEISENHOFER,R.HUBER                             
 REMARK   1  TITL   COMPARISON OF TWO HIGHLY REFINED STRUCTURES OF               
 REMARK   1  TITL 2 BOVINE PANCREATIC TRYPSIN INHIBITOR                          
 REMARK   1  REF    J.MOL.BIOL.                   V. 193   145 1987              
-REMARK   1  REFN   ASTM JMOBAK  UK ISSN 0022-2836                               
+REMARK   1  REFN                   ISSN 0022-2836                               
 REMARK   1 REFERENCE 2                                                          
 REMARK   1  AUTH   J.WALTER,R.HUBER                                             
 REMARK   1  TITL   PANCREATIC TRYPSIN INHIBITOR. A NEW CRYSTAL FORM             
 REMARK   1  TITL 2 AND ITS ANALYSIS                                             
 REMARK   1  REF    J.MOL.BIOL.                   V. 167   911 1983              
-REMARK   1  REFN   ASTM JMOBAK  UK ISSN 0022-2836                               
+REMARK   1  REFN                   ISSN 0022-2836                               
 REMARK   2                                                                      
-REMARK   2 RESOLUTION. 1.00 ANGSTROMS.                                          
+REMARK   2 RESOLUTION.    1.00 ANGSTROMS.                                       
 REMARK   3                                                                      
 REMARK   3 REFINEMENT.                                                          
 REMARK   3   PROGRAM     : NULL                                                 
@@ -122,13 +127,13 @@ REMARK   3  TOPOLOGY FILE  1   : NULL
 REMARK   3                                                                      
 REMARK   3  OTHER REFINEMENT REMARKS: NULL                                      
 REMARK   4                                                                      
-REMARK   4 5PTI COMPLIES WITH FORMAT V. 3.0, 1-DEC-2006                         
-REMARK   4                                                                      
-REMARK   4 THIS IS THE REMEDIATED VERSION OF THIS PDB ENTRY.                    
-REMARK   4 REMEDIATED DATA FILE REVISION 3.100 (2007-03-18)                     
+REMARK   4 5PTI COMPLIES WITH FORMAT V. 3.15, 01-DEC-08                         
+REMARK 100                                                                      
+REMARK 100 THIS ENTRY HAS BEEN PROCESSED BY BNL.                                
 REMARK 200                                                                      
 REMARK 200 EXPERIMENTAL DETAILS                                                 
-REMARK 200  EXPERIMENT TYPE                : X-RAY DIFFRACTION                  
+REMARK 200  EXPERIMENT TYPE                : X-RAY DIFFRACTION; NEUTRON         
+REMARK 200                                   DIFFRACTION                        
 REMARK 200  DATE OF DATA COLLECTION        : NULL                               
 REMARK 200  TEMPERATURE           (KELVIN) : NULL                               
 REMARK 200  PH                             : NULL                               
@@ -188,9 +193,9 @@ REMARK 290
 REMARK 290      SYMOP   SYMMETRY                                                
 REMARK 290     NNNMMM   OPERATOR                                                
 REMARK 290       1555   X,Y,Z                                                   
-REMARK 290       2555   1/2-X,-Y,1/2+Z                                          
-REMARK 290       3555   -X,1/2+Y,1/2-Z                                          
-REMARK 290       4555   1/2+X,1/2-Y,-Z                                          
+REMARK 290       2555   -X+1/2,-Y,Z+1/2                                         
+REMARK 290       3555   -X,Y+1/2,-Z+1/2                                         
+REMARK 290       4555   X+1/2,-Y+1/2,-Z                                         
 REMARK 290                                                                      
 REMARK 290     WHERE NNN -> OPERATOR NUMBER                                     
 REMARK 290           MMM -> TRANSLATION VECTOR                                  
@@ -215,11 +220,11 @@ REMARK 290
 REMARK 290 REMARK: NULL                                                         
 REMARK 300                                                                      
 REMARK 300 BIOMOLECULE: 1                                                       
-REMARK 300 THIS ENTRY CONTAINS THE CRYSTALLOGRAPHIC ASYMMETRIC UNIT             
-REMARK 300 WHICH CONSISTS OF 1 CHAIN(S). SEE REMARK 350 FOR                     
-REMARK 300 INFORMATION ON GENERATING THE BIOLOGICAL MOLECULE(S).                
+REMARK 300 SEE REMARK 350 FOR THE AUTHOR PROVIDED AND/OR PROGRAM                
+REMARK 300 GENERATED ASSEMBLY INFORMATION FOR THE STRUCTURE IN                  
+REMARK 300 THIS ENTRY. THE REMARK MAY ALSO PROVIDE INFORMATION ON               
+REMARK 300 BURIED SURFACE AREA.                                                 
 REMARK 350                                                                      
-REMARK 350 GENERATING THE BIOMOLECULE                                           
 REMARK 350 COORDINATES FOR A COMPLETE MULTIMER REPRESENTING THE KNOWN           
 REMARK 350 BIOLOGICALLY SIGNIFICANT OLIGOMERIZATION STATE OF THE                
 REMARK 350 MOLECULE CAN BE GENERATED BY APPLYING BIOMT TRANSFORMATIONS          
@@ -227,6 +232,9 @@ REMARK 350 GIVEN BELOW.  BOTH NON-CRYSTALLOGRAPHIC AND
 REMARK 350 CRYSTALLOGRAPHIC OPERATIONS ARE GIVEN.                               
 REMARK 350                                                                      
 REMARK 350 BIOMOLECULE: 1                                                       
+REMARK 350 AUTHOR DETERMINED BIOLOGICAL UNIT: MONOMERIC                         
+REMARK 350 SOFTWARE DETERMINED QUATERNARY STRUCTURE: MONOMERIC                  
+REMARK 350 SOFTWARE USED: PISA                                                  
 REMARK 350 APPLY THE FOLLOWING TO CHAINS: A                                     
 REMARK 350   BIOMT1   1  1.000000  0.000000  0.000000        0.00000            
 REMARK 350   BIOMT2   1  0.000000  1.000000  0.000000        0.00000            
@@ -237,10 +245,10 @@ REMARK 500 SUBTOPIC: CLOSE CONTACTS IN SAME ASYMMETRIC UNIT
 REMARK 500                                                                      
 REMARK 500 THE FOLLOWING ATOMS ARE IN CLOSE CONTACT.                            
 REMARK 500                                                                      
-REMARK 500  ATM1  RES C  SSEQI   ATM2  RES C  SSEQI                             
-REMARK 500   OE2  GLU A     7     O    DOD     225              1.33            
-REMARK 500   O    DOD      80     O    DOD     302              1.91            
-REMARK 500   OE1  GLU A    49     O    DOD     304              2.03            
+REMARK 500  ATM1  RES C  SSEQI   ATM2  RES C  SSEQI           DISTANCE          
+REMARK 500   OE1  GLU A    49     O    DOD A   304              2.03            
+REMARK 500                                                                      
+REMARK 500 REMARK: NULL                                                         
 REMARK 500                                                                      
 REMARK 500 GEOMETRY AND STEREOCHEMISTRY                                         
 REMARK 500 SUBTOPIC: CLOSE CONTACTS                                             
@@ -257,7 +265,9 @@ REMARK 500 2.2 ANGSTROMS FOR CONTACTS NOT INVOLVING HYDROGEN ATOMS
 REMARK 500 1.6 ANGSTROMS FOR CONTACTS INVOLVING HYDROGEN ATOMS                  
 REMARK 500                                                                      
 REMARK 500  ATM1  RES C  SSEQI   ATM2  RES C  SSEQI  SSYMOP   DISTANCE          
-REMARK 500   O    ALA A    58     O    DOD     320     2564     2.19            
+REMARK 500   O    ALA A    58     O    DOD A   320     2564     2.19            
+REMARK 500                                                                      
+REMARK 500 REMARK: NULL                                                         
 REMARK 500                                                                      
 REMARK 500 GEOMETRY AND STEREOCHEMISTRY                                         
 REMARK 500 SUBTOPIC: COVALENT BOND ANGLES                                       
@@ -270,35 +280,85 @@ REMARK 500
 REMARK 500 STANDARD TABLE:                                                      
 REMARK 500 FORMAT: (10X,I3,1X,A3,1X,A1,I4,A1,3(1X,A4,2X),12X,F5.1)              
 REMARK 500                                                                      
-REMARK 500 EXPECTED VALUES: ENGH AND HUBER, 1991                                
+REMARK 500 EXPECTED VALUES PROTEIN: ENGH AND HUBER, 1999                        
+REMARK 500 EXPECTED VALUES NUCLEIC ACID: CLOWNEY ET AL 1996                     
 REMARK 500                                                                      
 REMARK 500  M RES CSSEQI ATM1   ATM2   ATM3                                     
-REMARK 500    GLU A   7   OE1 -  CD  -  OE2 ANGL. DEV. =-32.6 DEGREES           
-REMARK 500    ARG A  17   CD  -  NE  -  CZ  ANGL. DEV. = 29.0 DEGREES           
+REMARK 500    ASP A   3   CB  -  CA  -  C   ANGL. DEV. =  16.9 DEGREES          
+REMARK 500    ASP A   3   OD1 -  CG  -  OD2 ANGL. DEV. = -11.7 DEGREES          
+REMARK 500    ASP A   3   CB  -  CG  -  OD2 ANGL. DEV. =  10.4 DEGREES          
+REMARK 500    GLU A   7   OE1 -  CD  -  OE2 ANGL. DEV. =   8.2 DEGREES          
+REMARK 500    GLU A   7   OE1 -  CD  -  OE2 ANGL. DEV. = -33.0 DEGREES          
+REMARK 500    TYR A  10   CB  -  CG  -  CD1 ANGL. DEV. =  -3.8 DEGREES          
+REMARK 500    CYS A  14   CB  -  CA  -  C   ANGL. DEV. =   7.4 DEGREES          
+REMARK 500    ARG A  17   CD  -  NE  -  CZ  ANGL. DEV. =  29.6 DEGREES          
+REMARK 500    ARG A  17   NE  -  CZ  -  NH1 ANGL. DEV. =   3.3 DEGREES          
+REMARK 500    TYR A  23   CZ  -  CE2 -  CD2 ANGL. DEV. =  -5.5 DEGREES          
+REMARK 500    PHE A  45   CB  -  CG  -  CD2 ANGL. DEV. =  -4.4 DEGREES          
+REMARK 500    GLU A  49   CB  -  CG  -  CD  ANGL. DEV. =  16.5 DEGREES          
+REMARK 500    GLU A  49   OE1 -  CD  -  OE2 ANGL. DEV. = -28.5 DEGREES          
+REMARK 500    GLU A  49   CG  -  CD  -  OE1 ANGL. DEV. =  20.9 DEGREES          
+REMARK 500    ASP A  50   CB  -  CA  -  C   ANGL. DEV. = -15.5 DEGREES          
+REMARK 500    ASP A  50   OD1 -  CG  -  OD2 ANGL. DEV. =  21.9 DEGREES          
+REMARK 500    ASP A  50   CB  -  CG  -  OD1 ANGL. DEV. = -10.5 DEGREES          
+REMARK 500    ASP A  50   CB  -  CG  -  OD2 ANGL. DEV. = -11.3 DEGREES          
+REMARK 500    GLY A  57   C   -  N   -  CA  ANGL. DEV. =  14.5 DEGREES          
+REMARK 500    ALA A  58   CB  -  CA  -  C   ANGL. DEV. =  19.3 DEGREES          
+REMARK 500                                                                      
+REMARK 500 REMARK: NULL                                                         
+REMARK 500                                                                      
+REMARK 500 GEOMETRY AND STEREOCHEMISTRY                                         
+REMARK 500 SUBTOPIC: CHIRAL CENTERS                                             
+REMARK 500                                                                      
+REMARK 500 UNEXPECTED CONFIGURATION OF THE FOLLOWING CHIRAL                     
+REMARK 500 CENTER(S) USING IMPROPER CA--C--CB--N CHIRALITY                      
+REMARK 500 M=MODEL NUMBER; RES=RESIDUE NAME; C=CHAIN                            
+REMARK 500 IDENTIFIER; SSEQ=SEQUENCE NUMBER; I=INSERTION CODE                   
+REMARK 500                                                                      
+REMARK 500 STANDARD TABLE:                                                      
+REMARK 500 FORMAT: (11X,I3,1X,A3,1X,A1,I4,A1,6X,F5.1,6X,A1,10X,A1,3X,A16)       
+REMARK 500                                                                      
+REMARK 500   M RES CSSEQI    IMPROPER   EXPECTED   FOUND DETAILS                
+REMARK 500     GLU A   7        23.0      L          L   OUTSIDE RANGE          
+REMARK 500                                                                      
+REMARK 500 REMARK: NULL                                                         
+REMARK 600                                                                      
+REMARK 600 HETEROGEN                                                            
+REMARK 600 HETATM UNX 324 IS PROBABLY A POTASSIUM ION IN A PARTIALLY            
+REMARK 600 OCCUPIED SITE.                                                       
+REMARK 800                                                                      
+REMARK 800 SITE                                                                 
+REMARK 800 SITE_IDENTIFIER: AC1                                                 
+REMARK 800 EVIDENCE_CODE: SOFTWARE                                              
+REMARK 800 SITE_DESCRIPTION: BINDING SITE FOR RESIDUE PO4 A 70                  
+REMARK 800 SITE_IDENTIFIER: AC2                                                 
+REMARK 800 EVIDENCE_CODE: SOFTWARE                                              
+REMARK 800 SITE_DESCRIPTION: BINDING SITE FOR RESIDUE UNX A 324                 
 DBREF  5PTI A    1    58  UNP    P00974   BPT1_BOVIN      36     93             
 SEQRES   1 A   58  ARG PRO ASP PHE CYS LEU GLU PRO PRO TYR THR GLY PRO          
 SEQRES   2 A   58  CYS LYS ALA ARG ILE ILE ARG TYR PHE TYR ASN ALA LYS          
 SEQRES   3 A   58  ALA GLY LEU CYS GLN THR PHE VAL TYR GLY GLY CYS ARG          
 SEQRES   4 A   58  ALA LYS ARG ASN ASN PHE LYS SER ALA GLU ASP CYS MET          
 SEQRES   5 A   58  ARG THR CYS GLY GLY ALA                                      
-FTNOTE   1 THE ATOMS IN THE SIDE CHAIN OF RESIDUES GLU 7 AND MET 52             
-FTNOTE   1  WERE FOUND TO OCCUPY TWO MAJOR SITES. THESE ATOMS ARE               
-FTNOTE   1  DENOTED WITH ALTERNATE LOCATION INDICATORS *A* AND *B*.             
-FTNOTE   2 HETATM UNK 324 IS PROBABLY A POTASSIUM ION IN A PARTIALLY            
-FTNOTE   2  OCCUPIED SITE.                                                      
-HET    PO4     70       5                                                       
+HET    PO4  A  70       5                                                       
+HET    UNX  A 324       1                                                       
 HETNAM     PO4 PHOSPHATE ION                                                    
+HETNAM     UNX UNKNOWN ATOM OR ION                                              
 HETNAM     DOD DEUTERATED WATER                                                 
 FORMUL   2  PO4    O4 P 3-                                                      
+FORMUL   3  UNX    X                                                            
 FORMUL   4  DOD    63(O)                                                        
 HELIX    1  H1 PRO A    2  GLU A    7  5ALL DONORS,ACCEPTORS INCLUDED      6    
 HELIX    2  H2 SER A   47  GLY A   56  1ALL DONORS,ACCEPTORS INCLUDED     10    
 SHEET    1  S1 3 LEU A  29  TYR A  35  0                                        
 SHEET    2  S1 3 ILE A  18  ASN A  24 -1  N  ILE A  18   O  TYR A  35           
 SHEET    3  S1 3 PHE A  45  PHE A  45 -1  N  PHE A  45   O  TYR A  21           
-SSBOND   1 CYS A    5    CYS A   55                                             
-SSBOND   2 CYS A   14    CYS A   38                                             
-SSBOND   3 CYS A   30    CYS A   51                                             
+SSBOND   1 CYS A    5    CYS A   55                          1555   1555  2.04  
+SSBOND   2 CYS A   14    CYS A   38                          1555   1555  2.03  
+SSBOND   3 CYS A   30    CYS A   51                          1555   1555  2.02  
+SITE     1 AC1  5 ARG A  20  TYR A  35  LYS A  41  DOD A 140                    
+SITE     2 AC1  5 DOD A 157                                                     
+SITE     1 AC2  3 TYR A  23  CYS A  30  MET A  52                               
 CRYST1   74.100   23.400   28.900  90.00  90.00  90.00 P 21 21 21    4          
 ORIGX1      0.013495  0.000000  0.000000        0.00000                         
 ORIGX2      0.000000  0.042735  0.000000        0.00000                         
@@ -317,21 +377,21 @@ ATOM      8  NE  ARG A   1      28.942  12.335 -12.945  1.00 33.51           N
 ATOM      9  CZ  ARG A   1      27.670  12.696 -13.050  1.00 34.29           C  
 ATOM     10  NH1 ARG A   1      26.901  12.777 -11.999  1.00 34.48           N  
 ATOM     11  NH2 ARG A   1      27.161  12.963 -14.255  1.00 35.44           N  
-ATOM     12  HA  ARG A   1      32.192  15.563 -11.115  1.00 26.97           H  
-ATOM     13  HB2 ARG A   1      30.392  14.428 -10.697  1.00 28.71           H  
-ATOM     14  HB3 ARG A   1      30.182  14.438 -12.437  1.00 28.97           H  
-ATOM     15  HG2 ARG A   1      31.369  12.359 -12.800  1.00 29.44           H  
-ATOM     16  HG3 ARG A   1      31.591  12.143 -11.105  1.00 29.52           H  
-ATOM     17  HD2 ARG A   1      29.656  10.965 -11.482  1.00 31.41           H  
-ATOM     18  HD3 ARG A   1      29.218  12.381 -10.794  1.00 31.29           H  
-ATOM     19  DE  ARG A   1      29.457  12.292 -13.843  1.00 34.62           D  
-ATOM     20 DH11 ARG A   1      25.930  13.038 -12.118  1.00 34.80           D  
-ATOM     21 DH12 ARG A   1      27.324  12.549 -11.100  1.00 34.71           D  
-ATOM     22 DH21 ARG A   1      27.786  12.886 -15.076  1.00 33.93           D  
-ATOM     23 DH22 ARG A   1      26.154  13.214 -14.269  1.00 34.53           D  
-ATOM     24  D1  ARG A   1      32.983  14.824 -13.703  1.00 27.71           D  
-ATOM     25  D2  ARG A   1      31.275  15.112 -13.535  1.00 28.50           D  
-ATOM     26  D3  ARG A   1      32.174  16.346 -13.050  1.00 28.23           D  
+ATOM     12  D1  ARG A   1      32.983  14.824 -13.703  1.00 27.71           D  
+ATOM     13  D2  ARG A   1      31.275  15.112 -13.535  1.00 28.50           D  
+ATOM     14  D3  ARG A   1      32.174  16.346 -13.050  1.00 28.23           D  
+ATOM     15  HA  ARG A   1      32.192  15.563 -11.115  1.00 26.97           H  
+ATOM     16  HB2 ARG A   1      30.392  14.428 -10.697  1.00 28.71           H  
+ATOM     17  HB3 ARG A   1      30.182  14.438 -12.437  1.00 28.97           H  
+ATOM     18  HG2 ARG A   1      31.369  12.359 -12.800  1.00 29.44           H  
+ATOM     19  HG3 ARG A   1      31.591  12.143 -11.105  1.00 29.52           H  
+ATOM     20  HD2 ARG A   1      29.656  10.965 -11.482  1.00 31.41           H  
+ATOM     21  HD3 ARG A   1      29.218  12.381 -10.794  1.00 31.29           H  
+ATOM     22  DE  ARG A   1      29.457  12.292 -13.843  1.00 34.62           D  
+ATOM     23 DH11 ARG A   1      25.930  13.038 -12.118  1.00 34.80           D  
+ATOM     24 DH12 ARG A   1      27.324  12.549 -11.100  1.00 34.71           D  
+ATOM     25 DH21 ARG A   1      27.786  12.886 -15.076  1.00 33.93           D  
+ATOM     26 DH22 ARG A   1      26.154  13.214 -14.269  1.00 34.53           D  
 ATOM     27  N   PRO A   2      33.738  14.173 -10.126  1.00 22.41           N  
 ATOM     28  CA  PRO A   2      34.897  13.603  -9.390  1.00 19.52           C  
 ATOM     29  C   PRO A   2      34.652  12.135  -9.374  1.00 17.70           C  
@@ -411,26 +471,26 @@ ATOM    102  N   GLU A   7      32.397   5.971  -6.128  1.00 12.79           N
 ATOM    103  CA  GLU A   7      32.663   4.924  -5.112  1.00 15.64           C  
 ATOM    104  C   GLU A   7      31.435   4.576  -4.301  1.00 12.90           C  
 ATOM    105  O   GLU A   7      30.565   5.427  -4.120  1.00 12.97           O  
-ATOM    106  CB AGLU A   7      33.865   5.265  -4.204  0.70 17.43           C  
-ATOM    107  CB BGLU A   7      34.000   4.971  -4.371  0.30 15.43           C  
-ATOM    108  CG AGLU A   7      34.117   6.694  -3.781  0.70 19.72           C  
-ATOM    109  CG BGLU A   7      35.189   5.031  -5.331  0.30 15.96           C  
-ATOM    110  CD AGLU A   7      34.935   7.120  -2.561  0.70 20.46           C  
-ATOM    111  CD BGLU A   7      35.814   3.742  -5.819  0.30 16.40           C  
-ATOM    112  OE1AGLU A   7      36.104   6.753  -2.502  0.70 22.37           O  
-ATOM    113  OE1BGLU A   7      35.348   2.965  -6.631  0.30 16.49           O  
-ATOM    114  OE2AGLU A   7      34.267   7.823  -1.815  0.70 18.99           O  
-ATOM    115  OE2BGLU A   7      35.846   2.854  -4.979  0.30 16.88           O  
+ATOM    106  CB AGLU A   7      33.865   5.265  -4.204  0.50 17.43           C  
+ATOM    107  CB BGLU A   7      34.000   4.971  -4.371  0.50 15.43           C  
+ATOM    108  CG AGLU A   7      34.117   6.694  -3.781  0.50 19.72           C  
+ATOM    109  CG BGLU A   7      35.189   5.031  -5.331  0.50 15.96           C  
+ATOM    110  CD AGLU A   7      34.935   7.120  -2.561  0.50 20.46           C  
+ATOM    111  CD BGLU A   7      35.814   3.742  -5.819  0.50 16.40           C  
+ATOM    112  OE1AGLU A   7      36.104   6.753  -2.502  0.50 22.37           O  
+ATOM    113  OE1BGLU A   7      35.348   2.965  -6.631  0.50 16.49           O  
+ATOM    114  OE2AGLU A   7      34.267   7.823  -1.815  0.50 18.99           O  
+ATOM    115  OE2BGLU A   7      35.846   2.854  -4.979  0.50 16.88           O  
 ATOM    116  D   GLU A   7      32.631   6.879  -5.916  1.00 13.33           D  
 ATOM    117  HA  GLU A   7      32.837   4.055  -5.770  1.00 14.63           H  
-ATOM    118  HB2AGLU A   7      33.913   4.637  -3.325  0.70 18.60           H  
-ATOM    119  HB2BGLU A   7      34.007   5.833  -3.693  0.30 15.91           H  
-ATOM    120  HB3AGLU A   7      34.757   4.929  -4.809  0.70 17.98           H  
-ATOM    121  HB3BGLU A   7      34.147   4.095  -3.748  0.30 15.98           H  
-ATOM    122  HG2AGLU A   7      34.689   7.248  -4.538  0.70 19.95           H  
-ATOM    123  HG2BGLU A   7      34.911   5.551  -6.241  0.30 15.98           H  
-ATOM    124  HG3AGLU A   7      33.221   7.296  -3.671  0.70 19.64           H  
-ATOM    125  HG3BGLU A   7      35.976   5.605  -4.862  0.30 16.05           H  
+ATOM    118  HB2AGLU A   7      33.913   4.637  -3.325  0.50 18.60           H  
+ATOM    119  HB2BGLU A   7      34.007   5.833  -3.693  0.50 15.91           H  
+ATOM    120  HB3AGLU A   7      34.757   4.929  -4.809  0.50 17.98           H  
+ATOM    121  HB3BGLU A   7      34.147   4.095  -3.748  0.50 15.98           H  
+ATOM    122  HG2AGLU A   7      34.689   7.248  -4.538  0.50 19.95           H  
+ATOM    123  HG2BGLU A   7      34.911   5.551  -6.241  0.50 15.98           H  
+ATOM    124  HG3AGLU A   7      33.221   7.296  -3.671  0.50 19.64           H  
+ATOM    125  HG3BGLU A   7      35.976   5.605  -4.862  0.50 16.05           H  
 ATOM    126  N   PRO A   8      31.351   3.333  -3.911  1.00 13.23           N  
 ATOM    127  CA  PRO A   8      30.224   2.852  -3.086  1.00 13.50           C  
 ATOM    128  C   PRO A   8      30.334   3.516  -1.707  1.00 12.26           C  
@@ -478,8 +538,8 @@ ATOM    169  HB3 TYR A  10      32.886   4.980   2.956  1.00 13.38           H
 ATOM    170  HD1 TYR A  10      33.815   1.318   2.852  1.00 15.57           H  
 ATOM    171  HD2 TYR A  10      34.400   5.053   4.955  1.00 15.82           H  
 ATOM    172  HE1 TYR A  10      35.521   0.270   4.282  1.00 17.01           H  
-ATOM    173  DE1 TYR A  10      37.454   0.912   5.573  1.00 18.49           D  
-ATOM    174  HE2 TYR A  10      36.108   3.926   6.391  1.00 16.44           H  
+ATOM    173  HE2 TYR A  10      36.108   3.926   6.391  1.00 16.44           H  
+ATOM    174  DH  TYR A  10      37.454   0.912   5.573  1.00 18.49           D  
 ATOM    175  N   THR A  11      30.520   2.576   5.235  1.00 10.38           N  
 ATOM    176  CA  THR A  11      30.045   2.720   6.641  1.00 12.46           C  
 ATOM    177  C   THR A  11      31.223   2.838   7.584  1.00 11.29           C  
@@ -662,8 +722,8 @@ ATOM    353  HB3 TYR A  21      23.593  12.133   0.220  1.00  9.35           H
 ATOM    354  HD1 TYR A  21      22.396  13.821   3.302  1.00 11.00           H  
 ATOM    355  HD2 TYR A  21      21.487  11.347  -0.072  1.00 10.53           H  
 ATOM    356  HE1 TYR A  21      19.977  14.203   3.642  1.00 10.87           H  
-ATOM    357  DE1 TYR A  21      17.713  13.930   2.654  1.00 14.85           D  
-ATOM    358  HE2 TYR A  21      19.073  11.749   0.247  1.00 11.44           H  
+ATOM    357  HE2 TYR A  21      19.073  11.749   0.247  1.00 11.44           H  
+ATOM    358  DH  TYR A  21      17.713  13.930   2.654  1.00 14.85           D  
 ATOM    359  N   PHE A  22      24.953   9.731   0.125  1.00  7.43           N  
 ATOM    360  CA  PHE A  22      25.997   9.344  -0.804  1.00  6.76           C  
 ATOM    361  C   PHE A  22      25.379   9.511  -2.224  1.00  7.20           C  
@@ -703,8 +763,8 @@ ATOM    394  HB3 TYR A  23      27.819  10.292  -5.414  1.00  9.27           H
 ATOM    395  HD1 TYR A  23      27.785   9.438  -7.850  1.00 10.63           H  
 ATOM    396  HD2 TYR A  23      24.614  11.894  -6.350  1.00 10.81           H  
 ATOM    397  HE1 TYR A  23      26.909   9.696 -10.142  1.00 11.58           H  
-ATOM    398  DE1 TYR A  23      24.638  12.063 -10.743  1.00 14.22           D  
-ATOM    399  HE2 TYR A  23      23.716  12.164  -8.754  1.00 11.77           H  
+ATOM    398  HE2 TYR A  23      23.716  12.164  -8.754  1.00 11.77           H  
+ATOM    399  DH  TYR A  23      24.638  12.063 -10.743  1.00 14.22           D  
 ATOM    400  N   ASN A  24      24.618   7.831  -5.550  1.00  7.53           N  
 ATOM    401  CA  ASN A  24      24.473   6.511  -6.126  1.00  8.25           C  
 ATOM    402  C   ASN A  24      24.533   6.730  -7.657  1.00  9.26           C  
@@ -883,8 +943,8 @@ ATOM    574  HB3 TYR A  35      27.271   7.909   8.560  1.00  9.74           H
 ATOM    575  HD1 TYR A  35      30.545   6.205   7.538  1.00  9.98           H  
 ATOM    576  HD2 TYR A  35      28.750   9.553   9.589  1.00 10.16           H  
 ATOM    577  HE1 TYR A  35      32.771   6.952   8.307  1.00 10.27           H  
-ATOM    578  DE1 TYR A  35      33.644   9.848   9.469  1.00 13.94           D  
-ATOM    579  HE2 TYR A  35      30.943  10.289  10.353  1.00  9.68           H  
+ATOM    578  HE2 TYR A  35      30.943  10.289  10.353  1.00  9.68           H  
+ATOM    579  DH  TYR A  35      33.644   9.848   9.469  1.00 13.94           D  
 ATOM    580  N   GLY A  36      29.181   4.741  10.152  1.00  9.59           N  
 ATOM    581  CA  GLY A  36      29.544   4.252  11.487  1.00  9.91           C  
 ATOM    582  C   GLY A  36      30.219   5.242  12.389  1.00  9.25           C  
@@ -1122,26 +1182,26 @@ ATOM    813  CA  MET A  52      23.975  16.860  -5.592  1.00 15.04           C
 ATOM    814  C   MET A  52      24.865  17.909  -6.259  1.00 15.23           C  
 ATOM    815  O   MET A  52      25.254  17.714  -7.432  1.00 16.42           O  
 ATOM    816  CB  MET A  52      22.481  17.237  -5.692  1.00 16.60           C  
-ATOM    817  CG AMET A  52      21.619  16.002  -5.527  0.65 16.58           C  
-ATOM    818  CG BMET A  52      21.536  16.149  -5.278  0.35 19.07           C  
-ATOM    819  SD AMET A  52      21.684  14.673  -6.752  0.65 17.21           S  
-ATOM    820  SD BMET A  52      19.845  16.563  -5.694  0.35 21.60           S  
-ATOM    821  CE AMET A  52      20.896  15.481  -8.152  0.65 17.25           C  
-ATOM    822  CE BMET A  52      19.639  18.241  -5.038  0.35 20.98           C  
+ATOM    817  CG AMET A  52      21.619  16.002  -5.527  0.50 16.58           C  
+ATOM    818  CG BMET A  52      21.536  16.149  -5.278  0.50 19.07           C  
+ATOM    819  SD AMET A  52      21.684  14.673  -6.752  0.50 17.21           S  
+ATOM    820  SD BMET A  52      19.845  16.563  -5.694  0.50 21.60           S  
+ATOM    821  CE AMET A  52      20.896  15.481  -8.152  0.50 17.25           C  
+ATOM    822  CE BMET A  52      19.639  18.241  -5.038  0.50 20.98           C  
 ATOM    823  D   MET A  52      23.741  16.776  -3.521  1.00 11.71           D  
 ATOM    824  HA  MET A  52      24.027  15.986  -6.232  1.00 14.64           H  
 ATOM    825  HB2 MET A  52      22.275  18.123  -5.117  1.00 16.08           H  
 ATOM    826  HB3 MET A  52      22.460  17.461  -6.770  1.00 15.52           H  
-ATOM    827  HG2AMET A  52      22.023  15.418  -4.676  0.65 16.82           H  
-ATOM    828  HG2BMET A  52      21.648  15.214  -5.841  0.35 19.25           H  
-ATOM    829  HG3AMET A  52      20.574  16.201  -5.322  0.65 16.79           H  
-ATOM    830  HG3BMET A  52      21.552  15.928  -4.213  0.35 19.04           H  
-ATOM    831  HE1AMET A  52      21.506  16.358  -8.341  0.65 17.36           H  
-ATOM    832  HE1BMET A  52      20.257  18.263  -4.174  0.35 20.84           H  
-ATOM    833  HE2AMET A  52      21.243  14.908  -9.046  0.65 16.78           H  
-ATOM    834  HE2BMET A  52      20.012  18.845  -5.860  0.35 20.71           H  
-ATOM    835  HE3AMET A  52      19.853  15.441  -8.108  0.65 17.36           H  
-ATOM    836  HE3BMET A  52      18.576  18.325  -4.893  0.35 20.87           H  
+ATOM    827  HG2AMET A  52      22.023  15.418  -4.676  0.50 16.82           H  
+ATOM    828  HG2BMET A  52      21.648  15.214  -5.841  0.50 19.25           H  
+ATOM    829  HG3AMET A  52      20.574  16.201  -5.322  0.50 16.79           H  
+ATOM    830  HG3BMET A  52      21.552  15.928  -4.213  0.50 19.04           H  
+ATOM    831  HE1AMET A  52      21.506  16.358  -8.341  0.50 17.36           H  
+ATOM    832  HE1BMET A  52      20.257  18.263  -4.174  0.50 20.84           H  
+ATOM    833  HE2AMET A  52      21.243  14.908  -9.046  0.50 16.78           H  
+ATOM    834  HE2BMET A  52      20.012  18.845  -5.860  0.50 20.71           H  
+ATOM    835  HE3AMET A  52      19.853  15.441  -8.108  0.50 17.36           H  
+ATOM    836  HE3BMET A  52      18.576  18.325  -4.893  0.50 20.87           H  
 ATOM    837  N   ARG A  53      25.206  18.931  -5.556  1.00 17.25           N  
 ATOM    838  CA  ARG A  53      26.111  19.970  -6.044  1.00 19.58           C  
 ATOM    839  C   ARG A  53      27.493  19.419  -6.400  1.00 19.14           C  
@@ -1216,201 +1276,201 @@ ATOM    907  HB1 ALA A  58      19.978  17.245 -14.640  1.00 46.47           H
 ATOM    908  HB2 ALA A  58      18.939  16.200 -15.586  1.00 46.26           H  
 ATOM    909  HB3 ALA A  58      18.454  16.576 -13.973  1.00 46.28           H  
 TER     910      ALA A  58                                                      
-HETATM  911  P   PO4    70      32.672  12.772  10.325  0.65 25.52           P  
-HETATM  912  O1  PO4    70      33.530  14.005  10.556  0.65 26.69           O  
-HETATM  913  O2  PO4    70      31.499  12.810  11.272  0.65 25.31           O  
-HETATM  914  O3  PO4    70      32.136  12.729   8.909  0.65 24.51           O  
-HETATM  915  O4  PO4    70      33.561  11.570  10.555  0.65 23.64           O  
-HETATM  916  UNK UNK   324      23.599  13.195  -7.043  1.00 45.42           U  
-HETATM  917  O   DOD    80      23.194  15.839   8.222  0.40 22.37           O  
-HETATM  918  D1  DOD    80      23.286  16.842   8.165  0.40 22.61           D  
-HETATM  919  D2  DOD    80      24.153  15.561   8.326  0.40 22.60           D  
-HETATM  920  O   DOD   101      22.510  21.082  -4.729  1.00 36.16           O  
-HETATM  921  D1  DOD   101      21.831  21.235  -5.370  1.00 35.79           D  
-HETATM  922  D2  DOD   101      23.104  20.367  -4.949  1.00 35.47           D  
-HETATM  923  O   DOD   102      32.400   2.989  17.428  0.80 18.44           O  
-HETATM  924  D1  DOD   102      33.257   2.902  16.959  0.80 19.80           D  
-HETATM  925  D2  DOD   102      32.345   2.270  18.071  0.80 19.39           D  
-HETATM  926  O   DOD   105      32.325  18.662  -7.849  1.00 32.19           O  
-HETATM  927  D1  DOD   105      31.835  17.834  -8.008  1.00 30.47           D  
-HETATM  928  D2  DOD   105      31.833  19.268  -8.402  1.00 30.09           D  
-HETATM  929  O   DOD   110      37.328   8.721  -0.765  0.85 24.80           O  
-HETATM  930  D1  DOD   110      37.884   7.962  -0.994  0.85 28.72           D  
-HETATM  931  D2  DOD   110      36.474   8.348  -1.051  0.85 28.38           D  
-HETATM  932  O   DOD   111      32.894   6.077  -0.473  1.00 17.11           O  
-HETATM  933  D1  DOD   111      33.120   6.673  -1.189  1.00 17.18           D  
-HETATM  934  D2  DOD   111      32.082   5.642  -0.714  1.00 18.37           D  
-HETATM  935  O   DOD   112      31.242   6.845   1.776  1.00 12.53           O  
-HETATM  936  D1  DOD   112      31.797   6.338   1.211  1.00 12.31           D  
-HETATM  937  D2  DOD   112      30.886   7.631   1.374  1.00 11.82           D  
-HETATM  938  O   DOD   113      32.081   7.266   4.248  1.00 10.62           O  
-HETATM  939  D1  DOD   113      31.885   7.136   3.273  1.00 10.81           D  
-HETATM  940  D2  DOD   113      31.780   6.400   4.490  1.00 10.32           D  
-HETATM  941  O   DOD   116      21.627   2.820   1.964  0.45 18.18           O  
-HETATM  942  D1  DOD   116      22.311   2.168   1.795  0.45 15.16           D  
-HETATM  943  D2  DOD   116      21.898   3.682   1.661  0.45 13.72           D  
-HETATM  944  O   DOD   117      23.450   1.914   4.826  0.85 21.21           O  
-HETATM  945  D1  DOD   117      24.325   1.628   5.014  0.85 18.34           D  
-HETATM  946  D2  DOD   117      22.978   2.382   5.498  0.85 16.27           D  
-HETATM  947  O   DOD   119      24.933   8.699 -12.566  1.00 26.51           O  
-HETATM  948  D1  DOD   119      25.519   9.416 -12.334  1.00 24.40           D  
-HETATM  949  D2  DOD   119      25.041   7.808 -12.205  1.00 23.04           D  
-HETATM  950  O   DOD   121      27.178   1.079  11.930  1.00 44.15           O  
-HETATM  951  D1  DOD   121      27.529   1.514  12.731  1.00 41.94           D  
-HETATM  952  D2  DOD   121      27.890   1.374  11.346  1.00 42.42           D  
-HETATM  953  O   DOD   122      32.824   4.006  10.705  1.00 11.08           O  
-HETATM  954  D1  DOD   122      32.037   4.312  10.212  1.00 14.93           D  
-HETATM  955  D2  DOD   122      33.527   4.614  10.375  1.00 12.63           D  
-HETATM  956  O   DOD   125      23.228  10.145  14.693  1.00 37.43           O  
-HETATM  957  D1  DOD   125      23.474  11.090  14.612  1.00 38.73           D  
-HETATM  958  D2  DOD   125      23.557   9.618  15.413  1.00 38.14           D  
-HETATM  959  O   DOD   126      21.709  13.163 -11.285  1.00 45.53           O  
-HETATM  960  D1  DOD   126      21.371  12.655 -10.542  1.00 40.21           D  
-HETATM  961  D2  DOD   126      22.643  12.914 -11.319  1.00 40.01           D  
-HETATM  962  O   DOD   127      25.304  13.841  10.064  1.00 31.39           O  
-HETATM  963  D1  DOD   127      24.713  13.795   9.294  1.00 29.74           D  
-HETATM  964  D2  DOD   127      24.901  13.162  10.650  1.00 30.13           D  
-HETATM  965  O   DOD   129      21.978  10.502  12.070  1.00 22.99           O  
-HETATM  966  D1  DOD   129      21.026  10.401  12.238  1.00 21.72           D  
-HETATM  967  D2  DOD   129      22.220  11.424  12.257  1.00 22.25           D  
-HETATM  968  O   DOD   133      37.476   9.724  11.502  0.75 22.01           O  
-HETATM  969  D1  DOD   133      37.584   9.982  12.425  0.75 19.51           D  
-HETATM  970  D2  DOD   133      36.539   9.976  11.345  0.75 19.51           D  
-HETATM  971  O   DOD   134      34.490  11.060 -13.079  0.70 44.32           O  
-HETATM  972  D1  DOD   134      34.746  11.987 -12.978  0.70 42.77           D  
-HETATM  973  D2  DOD   134      33.653  10.980 -12.612  0.70 42.52           D  
-HETATM  974  O   DOD   138      28.177  17.517   3.360  1.00 25.45           O  
-HETATM  975  D1  DOD   138      27.742  18.283   3.058  1.00 23.32           D  
-HETATM  976  D2  DOD   138      29.101  17.401   3.251  1.00 23.72           D  
-HETATM  977  O   DOD   140      30.541  15.267  12.774  1.00 36.43           O  
-HETATM  978  D1  DOD   140      29.677  15.607  12.991  1.00 36.77           D  
-HETATM  979  D2  DOD   140      31.088  15.976  12.426  1.00 36.78           D  
-HETATM  980  O   DOD   143      28.284   5.454  -6.397  1.00 27.22           O  
-HETATM  981  D1  DOD   143      28.234   4.659  -5.833  1.00 32.37           D  
-HETATM  982  D2  DOD   143      27.991   6.122  -5.773  1.00 31.67           D  
-HETATM  983  O   DOD   144      17.474  21.217   4.158  1.00 42.30           O  
-HETATM  984  D1  DOD   144      18.268  20.904   3.726  1.00 40.47           D  
-HETATM  985  D2  DOD   144      16.993  21.816   3.609  1.00 40.56           D  
-HETATM  986  O   DOD   145      38.592  14.977  -3.873  1.00 29.91           O  
-HETATM  987  D1  DOD   145      37.993  15.743  -3.880  1.00 31.95           D  
-HETATM  988  D2  DOD   145      38.520  14.611  -4.764  1.00 33.00           D  
-HETATM  989  O   DOD   146      39.369   6.894  -8.744  1.00 41.67           O  
-HETATM  990  D1  DOD   146      39.454   6.652  -9.672  1.00 36.52           D  
-HETATM  991  D2  DOD   146      40.233   6.697  -8.383  1.00 37.22           D  
-HETATM  992  O   DOD   156      30.562  -0.831  11.569  0.85 29.85           O  
-HETATM  993  D1  DOD   156      30.253   0.047  11.849  0.85 31.06           D  
-HETATM  994  D2  DOD   156      30.819  -0.652  10.650  0.85 30.89           D  
-HETATM  995  O   DOD   157      35.840  10.917   9.802  1.00 23.72           O  
-HETATM  996  D1  DOD   157      35.118  11.562   9.768  1.00 25.45           D  
-HETATM  997  D2  DOD   157      36.435  11.166   9.095  1.00 25.05           D  
-HETATM  998  O   DOD   158      32.417  -0.400   5.440  0.50 21.01           O  
-HETATM  999  D1  DOD   158      33.309  -0.402   5.914  0.50 20.94           D  
-HETATM 1000  D2  DOD   158      31.836  -0.783   6.158  0.50 20.72           D  
-HETATM 1001  O   DOD   159      30.427  -0.255   3.808  0.50 26.42           O  
-HETATM 1002  D1  DOD   159      30.982  -0.258   2.963  0.50 26.94           D  
-HETATM 1003  D2  DOD   159      31.146  -0.594   4.435  0.50 26.51           D  
-HETATM 1004  O   DOD   160      36.062   5.979  -8.634  1.00 41.31           O  
-HETATM 1005  D1  DOD   160      35.305   6.506  -8.327  1.00 40.68           D  
-HETATM 1006  D2  DOD   160      36.596   5.892  -7.843  1.00 40.44           D  
-HETATM 1007  O   DOD   200      19.702  17.251   3.159  1.00 19.29           O  
-HETATM 1008  D1  DOD   200      18.842  16.821   3.395  1.00 20.94           D  
-HETATM 1009  D2  DOD   200      20.251  16.690   3.724  1.00 21.48           D  
-HETATM 1010  O   DOD   201      38.290   5.419   5.139  0.45 14.23           O  
-HETATM 1011  D1  DOD   201      38.695   6.270   5.301  0.45 11.92           D  
-HETATM 1012  D2  DOD   201      38.934   4.728   5.353  0.45 12.39           D  
-HETATM 1013  O   DOD   202      20.841  18.058   5.892  1.00 42.73           O  
-HETATM 1014  D1  DOD   202      20.670  18.727   5.224  1.00 41.57           D  
-HETATM 1015  D2  DOD   202      20.910  17.173   5.525  1.00 41.34           D  
-HETATM 1016  O   DOD   203      35.858  -1.262   7.228  1.00 26.79           O  
-HETATM 1017  D1  DOD   203      36.279  -0.389   7.191  1.00 24.31           D  
-HETATM 1018  D2  DOD   203      36.182  -1.468   8.110  1.00 25.43           D  
-HETATM 1019  O   DOD   204      39.380   8.361   4.115  0.70 28.37           O  
-HETATM 1020  D1  DOD   204      39.408   7.760   3.358  0.70 29.87           D  
-HETATM 1021  D2  DOD   204      38.462   8.655   4.217  0.70 30.08           D  
-HETATM 1022  O   DOD   205      19.638   4.554   4.804  1.00 41.42           O  
-HETATM 1023  D1  DOD   205      18.798   4.746   4.362  1.00 41.56           D  
-HETATM 1024  D2  DOD   205      19.565   3.636   5.102  1.00 41.35           D  
-HETATM 1025  O   DOD   209      27.016  14.177  11.548  0.55 23.66           O  
-HETATM 1026  D1  DOD   209      26.247  13.668  11.322  0.55 23.22           D  
-HETATM 1027  D2  DOD   209      27.150  14.829  10.861  0.55 23.19           D  
-HETATM 1028  O   DOD   210      32.524   1.944  -8.668  0.55 28.00           O  
-HETATM 1029  D1  DOD   210      32.097   1.168  -8.326  0.55 24.83           D  
-HETATM 1030  D2  DOD   210      33.318   2.192  -8.183  0.55 24.43           D  
-HETATM 1031  O   DOD   211      30.420  20.407  -9.327  1.00 50.37           O  
-HETATM 1032  D1  DOD   211      30.380  19.438  -9.416  1.00 50.49           D  
-HETATM 1033  D2  DOD   211      29.504  20.587  -9.585  1.00 50.62           D  
-HETATM 1034  O   DOD   212      38.417  11.372  -7.271  1.00 37.18           O  
-HETATM 1035  D1  DOD   212      38.648  12.325  -7.203  1.00 35.24           D  
-HETATM 1036  D2  DOD   212      39.030  10.978  -6.635  1.00 35.81           D  
-HETATM 1037  O   DOD   214      15.928   7.068  -4.160  0.80 33.49           O  
-HETATM 1038  D1  DOD   214      15.833   6.849  -5.089  0.80 30.73           D  
-HETATM 1039  D2  DOD   214      15.838   7.998  -3.965  0.80 30.42           D  
-HETATM 1040  O   DOD   216      20.369   6.458  13.462  0.75 29.01           O  
-HETATM 1041  D1  DOD   216      20.426   6.571  14.416  0.75 29.73           D  
-HETATM 1042  D2  DOD   216      21.310   6.715  13.308  0.75 30.07           D  
-HETATM 1043  O   DOD   217      20.372   9.135  14.450  1.00 45.82           O  
-HETATM 1044  D1  DOD   217      20.014   9.262  13.565  1.00 47.54           D  
-HETATM 1045  D2  DOD   217      20.713   8.233  14.501  1.00 46.99           D  
-HETATM 1046  O   DOD   218      34.848  -2.506  13.144  0.60 23.45           O  
-HETATM 1047  D1  DOD   218      35.761  -2.257  13.315  0.60 24.59           D  
-HETATM 1048  D2  DOD   218      34.364  -1.952  13.777  0.60 23.86           D  
-HETATM 1049  O   DOD   219      18.689   3.099  -6.988  0.65 32.86           O  
-HETATM 1050  D1  DOD   219      18.183   2.627  -6.333  0.65 31.27           D  
-HETATM 1051  D2  DOD   219      19.292   2.483  -7.421  0.65 31.44           D  
-HETATM 1052  O   DOD   220      34.306  13.635   6.574  0.70 44.72           O  
-HETATM 1053  D1  DOD   220      34.435  13.156   7.403  0.70 43.71           D  
-HETATM 1054  D2  DOD   220      33.907  14.473   6.837  0.70 43.25           D  
-HETATM 1055  O   DOD   223      39.704   6.653  -0.920  0.70 27.12           O  
-HETATM 1056  D1  DOD   223      39.839   5.695  -0.886  0.70 27.44           D  
-HETATM 1057  D2  DOD   223      40.073   6.944  -0.069  0.70 26.30           D  
-HETATM 1058  O   DOD   225      35.835   1.799  -4.168  0.70 22.62           O  
-HETATM 1059  D1  DOD   225      35.195   1.203  -4.651  0.70 21.80           D  
-HETATM 1060  D2  DOD   225      35.838   1.670  -3.184  0.70 22.59           D  
-HETATM 1061  O   DOD   302      23.473  14.023   7.697  0.50 17.94           O  
-HETATM 1062  D1  DOD   302      23.104  13.994   6.796  0.50 18.22           D  
-HETATM 1063  D2  DOD   302      23.692  13.105   7.863  0.50 18.44           D  
-HETATM 1064  O   DOD   304      17.425  18.515   0.940  0.60 20.11           O  
-HETATM 1065  D1  DOD   304      16.690  18.065   1.361  0.60 20.79           D  
-HETATM 1066  D2  DOD   304      18.107  18.630   1.602  0.60 21.21           D  
-HETATM 1067  O   DOD   310      30.817  21.189  -4.297  0.75 33.44           O  
-HETATM 1068  D1  DOD   310      31.670  21.225  -4.770  0.75 33.45           D  
-HETATM 1069  D2  DOD   310      30.745  20.286  -3.971  0.75 33.90           D  
-HETATM 1070  O   DOD   311      29.101  21.433  -2.694  0.75 39.78           O  
-HETATM 1071  D1  DOD   311      28.810  20.773  -3.335  0.75 40.82           D  
-HETATM 1072  D2  DOD   311      29.404  20.908  -1.940  0.75 41.00           D  
-HETATM 1073  O   DOD   312      34.385   2.967  -0.675  0.75 49.17           O  
-HETATM 1074  D1  DOD   312      33.896   2.264  -0.231  0.75 49.99           D  
-HETATM 1075  D2  DOD   312      35.282   2.635  -0.820  0.75 50.11           D  
-HETATM 1076  O   DOD   313      22.760  12.894   9.757  0.75 34.76           O  
-HETATM 1077  D1  DOD   313      23.725  12.886   9.820  0.75 32.32           D  
-HETATM 1078  D2  DOD   313      22.695  12.328   8.975  0.75 32.33           D  
-HETATM 1079  O   DOD   314      29.184  16.951 -10.815  1.00 50.56           O  
-HETATM 1080  D1  DOD   314      28.486  16.392 -11.157  1.00 49.79           D  
-HETATM 1081  D2  DOD   314      29.843  17.006 -11.516  1.00 50.11           D  
-HETATM 1082  O   DOD   315      37.208  17.290  -2.722  0.75 35.00           O  
-HETATM 1083  D1  DOD   315      36.748  17.851  -2.066  0.75 33.32           D  
-HETATM 1084  D2  DOD   315      37.034  16.398  -2.381  0.75 33.28           D  
-HETATM 1085  O   DOD   316      39.924   5.096  15.153  0.75 91.84           O  
-HETATM 1086  D1  DOD   316      40.240   5.673  15.857  0.75 91.50           D  
-HETATM 1087  D2  DOD   316      39.075   4.751  15.456  0.75 91.50           D  
-HETATM 1088  O   DOD   317      24.792   1.584  -6.585  1.00 53.91           O  
-HETATM 1089  D1  DOD   317      24.014   2.025  -6.941  1.00 52.72           D  
-HETATM 1090  D2  DOD   317      25.404   2.307  -6.419  1.00 53.49           D  
-HETATM 1091  O   DOD   318      29.052  21.202   9.370  0.75 46.66           O  
-HETATM 1092  D1  DOD   318      28.463  20.601   9.828  0.75 44.03           D  
-HETATM 1093  D2  DOD   318      29.833  20.748   9.033  0.75 44.42           D  
-HETATM 1094  O   DOD   319      31.855   0.163   0.605  0.75 42.28           O  
-HETATM 1095  D1  DOD   319      30.944  -0.153   0.702  0.75 40.63           D  
-HETATM 1096  D2  DOD   319      31.809   1.074   0.885  0.75 40.72           D  
-HETATM 1097  O   DOD   320      17.490   9.671  -3.504  0.75 50.06           O  
-HETATM 1098  D1  DOD   320      17.844  10.566  -3.494  0.75 49.93           D  
-HETATM 1099  D2  DOD   320      16.796   9.717  -2.837  0.75 50.26           D  
-HETATM 1100  O   DOD   321      23.571  -0.806  13.870  0.50 28.53           O  
-HETATM 1101  D1  DOD   321      24.067  -1.107  14.640  0.50 28.83           D  
-HETATM 1102  D2  DOD   321      23.508  -1.626  13.366  0.50 27.58           D  
-HETATM 1103  O   DOD   322      30.284  21.588  -6.518  0.75 52.32           O  
-HETATM 1104  D1  DOD   322      30.165  22.574  -6.795  0.75 50.92           D  
-HETATM 1105  D2  DOD   322      29.362  21.275  -6.636  0.75 50.63           D  
+HETATM  911  P   PO4 A  70      32.672  12.772  10.325  0.65 25.52           P  
+HETATM  912  O1  PO4 A  70      33.530  14.005  10.556  0.65 26.69           O  
+HETATM  913  O2  PO4 A  70      31.499  12.810  11.272  0.65 25.31           O  
+HETATM  914  O3  PO4 A  70      32.136  12.729   8.909  0.65 24.51           O  
+HETATM  915  O4  PO4 A  70      33.561  11.570  10.555  0.65 23.64           O  
+HETATM  916 UNK  UNX A 324      23.599  13.195  -7.043  1.00 45.42           X  
+HETATM  917  O   DOD A  80      23.194  15.839   8.222  0.40 22.37           O  
+HETATM  918  D1  DOD A  80      23.286  16.842   8.165  0.40 22.61           D  
+HETATM  919  D2  DOD A  80      24.153  15.561   8.326  0.40 22.60           D  
+HETATM  920  O   DOD A 101      22.510  21.082  -4.729  1.00 36.16           O  
+HETATM  921  D1  DOD A 101      21.831  21.235  -5.370  1.00 35.79           D  
+HETATM  922  D2  DOD A 101      23.104  20.367  -4.949  1.00 35.47           D  
+HETATM  923  O   DOD A 102      32.400   2.989  17.428  0.80 18.44           O  
+HETATM  924  D1  DOD A 102      33.257   2.902  16.959  0.80 19.80           D  
+HETATM  925  D2  DOD A 102      32.345   2.270  18.071  0.80 19.39           D  
+HETATM  926  O   DOD A 105      32.325  18.662  -7.849  1.00 32.19           O  
+HETATM  927  D1  DOD A 105      31.835  17.834  -8.008  1.00 30.47           D  
+HETATM  928  D2  DOD A 105      31.833  19.268  -8.402  1.00 30.09           D  
+HETATM  929  O   DOD A 110      37.328   8.721  -0.765  0.85 24.80           O  
+HETATM  930  D1  DOD A 110      37.884   7.962  -0.994  0.85 28.72           D  
+HETATM  931  D2  DOD A 110      36.474   8.348  -1.051  0.85 28.38           D  
+HETATM  932  O   DOD A 111      32.894   6.077  -0.473  1.00 17.11           O  
+HETATM  933  D1  DOD A 111      33.120   6.673  -1.189  1.00 17.18           D  
+HETATM  934  D2  DOD A 111      32.082   5.642  -0.714  1.00 18.37           D  
+HETATM  935  O   DOD A 112      31.242   6.845   1.776  1.00 12.53           O  
+HETATM  936  D1  DOD A 112      31.797   6.338   1.211  1.00 12.31           D  
+HETATM  937  D2  DOD A 112      30.886   7.631   1.374  1.00 11.82           D  
+HETATM  938  O   DOD A 113      32.081   7.266   4.248  1.00 10.62           O  
+HETATM  939  D1  DOD A 113      31.885   7.136   3.273  1.00 10.81           D  
+HETATM  940  D2  DOD A 113      31.780   6.400   4.490  1.00 10.32           D  
+HETATM  941  O   DOD A 116      21.627   2.820   1.964  0.45 18.18           O  
+HETATM  942  D1  DOD A 116      22.311   2.168   1.795  0.45 15.16           D  
+HETATM  943  D2  DOD A 116      21.898   3.682   1.661  0.45 13.72           D  
+HETATM  944  O   DOD A 117      23.450   1.914   4.826  0.85 21.21           O  
+HETATM  945  D1  DOD A 117      24.325   1.628   5.014  0.85 18.34           D  
+HETATM  946  D2  DOD A 117      22.978   2.382   5.498  0.85 16.27           D  
+HETATM  947  O   DOD A 119      24.933   8.699 -12.566  1.00 26.51           O  
+HETATM  948  D1  DOD A 119      25.519   9.416 -12.334  1.00 24.40           D  
+HETATM  949  D2  DOD A 119      25.041   7.808 -12.205  1.00 23.04           D  
+HETATM  950  O   DOD A 121      27.178   1.079  11.930  1.00 44.15           O  
+HETATM  951  D1  DOD A 121      27.529   1.514  12.731  1.00 41.94           D  
+HETATM  952  D2  DOD A 121      27.890   1.374  11.346  1.00 42.42           D  
+HETATM  953  O   DOD A 122      32.824   4.006  10.705  1.00 11.08           O  
+HETATM  954  D1  DOD A 122      32.037   4.312  10.212  1.00 14.93           D  
+HETATM  955  D2  DOD A 122      33.527   4.614  10.375  1.00 12.63           D  
+HETATM  956  O   DOD A 125      23.228  10.145  14.693  1.00 37.43           O  
+HETATM  957  D1  DOD A 125      23.474  11.090  14.612  1.00 38.73           D  
+HETATM  958  D2  DOD A 125      23.557   9.618  15.413  1.00 38.14           D  
+HETATM  959  O   DOD A 126      21.709  13.163 -11.285  1.00 45.53           O  
+HETATM  960  D1  DOD A 126      21.371  12.655 -10.542  1.00 40.21           D  
+HETATM  961  D2  DOD A 126      22.643  12.914 -11.319  1.00 40.01           D  
+HETATM  962  O   DOD A 127      25.304  13.841  10.064  1.00 31.39           O  
+HETATM  963  D1  DOD A 127      24.713  13.795   9.294  1.00 29.74           D  
+HETATM  964  D2  DOD A 127      24.901  13.162  10.650  1.00 30.13           D  
+HETATM  965  O   DOD A 129      21.978  10.502  12.070  1.00 22.99           O  
+HETATM  966  D1  DOD A 129      21.026  10.401  12.238  1.00 21.72           D  
+HETATM  967  D2  DOD A 129      22.220  11.424  12.257  1.00 22.25           D  
+HETATM  968  O   DOD A 133      37.476   9.724  11.502  0.75 22.01           O  
+HETATM  969  D1  DOD A 133      37.584   9.982  12.425  0.75 19.51           D  
+HETATM  970  D2  DOD A 133      36.539   9.976  11.345  0.75 19.51           D  
+HETATM  971  O   DOD A 134      34.490  11.060 -13.079  0.70 44.32           O  
+HETATM  972  D1  DOD A 134      34.746  11.987 -12.978  0.70 42.77           D  
+HETATM  973  D2  DOD A 134      33.653  10.980 -12.612  0.70 42.52           D  
+HETATM  974  O   DOD A 138      28.177  17.517   3.360  1.00 25.45           O  
+HETATM  975  D1  DOD A 138      27.742  18.283   3.058  1.00 23.32           D  
+HETATM  976  D2  DOD A 138      29.101  17.401   3.251  1.00 23.72           D  
+HETATM  977  O   DOD A 140      30.541  15.267  12.774  1.00 36.43           O  
+HETATM  978  D1  DOD A 140      29.677  15.607  12.991  1.00 36.77           D  
+HETATM  979  D2  DOD A 140      31.088  15.976  12.426  1.00 36.78           D  
+HETATM  980  O   DOD A 143      28.284   5.454  -6.397  1.00 27.22           O  
+HETATM  981  D1  DOD A 143      28.234   4.659  -5.833  1.00 32.37           D  
+HETATM  982  D2  DOD A 143      27.991   6.122  -5.773  1.00 31.67           D  
+HETATM  983  O   DOD A 144      17.474  21.217   4.158  1.00 42.30           O  
+HETATM  984  D1  DOD A 144      18.268  20.904   3.726  1.00 40.47           D  
+HETATM  985  D2  DOD A 144      16.993  21.816   3.609  1.00 40.56           D  
+HETATM  986  O   DOD A 145      38.592  14.977  -3.873  1.00 29.91           O  
+HETATM  987  D1  DOD A 145      37.993  15.743  -3.880  1.00 31.95           D  
+HETATM  988  D2  DOD A 145      38.520  14.611  -4.764  1.00 33.00           D  
+HETATM  989  O   DOD A 146      39.369   6.894  -8.744  1.00 41.67           O  
+HETATM  990  D1  DOD A 146      39.454   6.652  -9.672  1.00 36.52           D  
+HETATM  991  D2  DOD A 146      40.233   6.697  -8.383  1.00 37.22           D  
+HETATM  992  O   DOD A 156      30.562  -0.831  11.569  0.85 29.85           O  
+HETATM  993  D1  DOD A 156      30.253   0.047  11.849  0.85 31.06           D  
+HETATM  994  D2  DOD A 156      30.819  -0.652  10.650  0.85 30.89           D  
+HETATM  995  O   DOD A 157      35.840  10.917   9.802  1.00 23.72           O  
+HETATM  996  D1  DOD A 157      35.118  11.562   9.768  1.00 25.45           D  
+HETATM  997  D2  DOD A 157      36.435  11.166   9.095  1.00 25.05           D  
+HETATM  998  O   DOD A 158      32.417  -0.400   5.440  0.50 21.01           O  
+HETATM  999  D1  DOD A 158      33.309  -0.402   5.914  0.50 20.94           D  
+HETATM 1000  D2  DOD A 158      31.836  -0.783   6.158  0.50 20.72           D  
+HETATM 1001  O   DOD A 159      30.427  -0.255   3.808  0.50 26.42           O  
+HETATM 1002  D1  DOD A 159      30.982  -0.258   2.963  0.50 26.94           D  
+HETATM 1003  D2  DOD A 159      31.146  -0.594   4.435  0.50 26.51           D  
+HETATM 1004  O   DOD A 160      36.062   5.979  -8.634  1.00 41.31           O  
+HETATM 1005  D1  DOD A 160      35.305   6.506  -8.327  1.00 40.68           D  
+HETATM 1006  D2  DOD A 160      36.596   5.892  -7.843  1.00 40.44           D  
+HETATM 1007  O   DOD A 200      19.702  17.251   3.159  1.00 19.29           O  
+HETATM 1008  D1  DOD A 200      18.842  16.821   3.395  1.00 20.94           D  
+HETATM 1009  D2  DOD A 200      20.251  16.690   3.724  1.00 21.48           D  
+HETATM 1010  O   DOD A 201      38.290   5.419   5.139  0.45 14.23           O  
+HETATM 1011  D1  DOD A 201      38.695   6.270   5.301  0.45 11.92           D  
+HETATM 1012  D2  DOD A 201      38.934   4.728   5.353  0.45 12.39           D  
+HETATM 1013  O   DOD A 202      20.841  18.058   5.892  1.00 42.73           O  
+HETATM 1014  D1  DOD A 202      20.670  18.727   5.224  1.00 41.57           D  
+HETATM 1015  D2  DOD A 202      20.910  17.173   5.525  1.00 41.34           D  
+HETATM 1016  O   DOD A 203      35.858  -1.262   7.228  1.00 26.79           O  
+HETATM 1017  D1  DOD A 203      36.279  -0.389   7.191  1.00 24.31           D  
+HETATM 1018  D2  DOD A 203      36.182  -1.468   8.110  1.00 25.43           D  
+HETATM 1019  O   DOD A 204      39.380   8.361   4.115  0.70 28.37           O  
+HETATM 1020  D1  DOD A 204      39.408   7.760   3.358  0.70 29.87           D  
+HETATM 1021  D2  DOD A 204      38.462   8.655   4.217  0.70 30.08           D  
+HETATM 1022  O   DOD A 205      19.638   4.554   4.804  1.00 41.42           O  
+HETATM 1023  D1  DOD A 205      18.798   4.746   4.362  1.00 41.56           D  
+HETATM 1024  D2  DOD A 205      19.565   3.636   5.102  1.00 41.35           D  
+HETATM 1025  O   DOD A 209      27.016  14.177  11.548  0.55 23.66           O  
+HETATM 1026  D1  DOD A 209      26.247  13.668  11.322  0.55 23.22           D  
+HETATM 1027  D2  DOD A 209      27.150  14.829  10.861  0.55 23.19           D  
+HETATM 1028  O   DOD A 210      32.524   1.944  -8.668  0.55 28.00           O  
+HETATM 1029  D1  DOD A 210      32.097   1.168  -8.326  0.55 24.83           D  
+HETATM 1030  D2  DOD A 210      33.318   2.192  -8.183  0.55 24.43           D  
+HETATM 1031  O   DOD A 211      30.420  20.407  -9.327  1.00 50.37           O  
+HETATM 1032  D1  DOD A 211      30.380  19.438  -9.416  1.00 50.49           D  
+HETATM 1033  D2  DOD A 211      29.504  20.587  -9.585  1.00 50.62           D  
+HETATM 1034  O   DOD A 212      38.417  11.372  -7.271  1.00 37.18           O  
+HETATM 1035  D1  DOD A 212      38.648  12.325  -7.203  1.00 35.24           D  
+HETATM 1036  D2  DOD A 212      39.030  10.978  -6.635  1.00 35.81           D  
+HETATM 1037  O   DOD A 214      15.928   7.068  -4.160  0.80 33.49           O  
+HETATM 1038  D1  DOD A 214      15.833   6.849  -5.089  0.80 30.73           D  
+HETATM 1039  D2  DOD A 214      15.838   7.998  -3.965  0.80 30.42           D  
+HETATM 1040  O   DOD A 216      20.369   6.458  13.462  0.75 29.01           O  
+HETATM 1041  D1  DOD A 216      20.426   6.571  14.416  0.75 29.73           D  
+HETATM 1042  D2  DOD A 216      21.310   6.715  13.308  0.75 30.07           D  
+HETATM 1043  O   DOD A 217      20.372   9.135  14.450  1.00 45.82           O  
+HETATM 1044  D1  DOD A 217      20.014   9.262  13.565  1.00 47.54           D  
+HETATM 1045  D2  DOD A 217      20.713   8.233  14.501  1.00 46.99           D  
+HETATM 1046  O   DOD A 218      34.848  -2.506  13.144  0.60 23.45           O  
+HETATM 1047  D1  DOD A 218      35.761  -2.257  13.315  0.60 24.59           D  
+HETATM 1048  D2  DOD A 218      34.364  -1.952  13.777  0.60 23.86           D  
+HETATM 1049  O   DOD A 219      18.689   3.099  -6.988  0.65 32.86           O  
+HETATM 1050  D1  DOD A 219      18.183   2.627  -6.333  0.65 31.27           D  
+HETATM 1051  D2  DOD A 219      19.292   2.483  -7.421  0.65 31.44           D  
+HETATM 1052  O   DOD A 220      34.306  13.635   6.574  0.70 44.72           O  
+HETATM 1053  D1  DOD A 220      34.435  13.156   7.403  0.70 43.71           D  
+HETATM 1054  D2  DOD A 220      33.907  14.473   6.837  0.70 43.25           D  
+HETATM 1055  O   DOD A 223      39.704   6.653  -0.920  0.70 27.12           O  
+HETATM 1056  D1  DOD A 223      39.839   5.695  -0.886  0.70 27.44           D  
+HETATM 1057  D2  DOD A 223      40.073   6.944  -0.069  0.70 26.30           D  
+HETATM 1058  O   DOD A 225      35.835   1.799  -4.168  0.70 22.62           O  
+HETATM 1059  D1  DOD A 225      35.195   1.203  -4.651  0.70 21.80           D  
+HETATM 1060  D2  DOD A 225      35.838   1.670  -3.184  0.70 22.59           D  
+HETATM 1061  O   DOD A 302      23.473  14.023   7.697  0.50 17.94           O  
+HETATM 1062  D1  DOD A 302      23.104  13.994   6.796  0.50 18.22           D  
+HETATM 1063  D2  DOD A 302      23.692  13.105   7.863  0.50 18.44           D  
+HETATM 1064  O   DOD A 304      17.425  18.515   0.940  0.60 20.11           O  
+HETATM 1065  D1  DOD A 304      16.690  18.065   1.361  0.60 20.79           D  
+HETATM 1066  D2  DOD A 304      18.107  18.630   1.602  0.60 21.21           D  
+HETATM 1067  O   DOD A 310      30.817  21.189  -4.297  0.75 33.44           O  
+HETATM 1068  D1  DOD A 310      31.670  21.225  -4.770  0.75 33.45           D  
+HETATM 1069  D2  DOD A 310      30.745  20.286  -3.971  0.75 33.90           D  
+HETATM 1070  O   DOD A 311      29.101  21.433  -2.694  0.75 39.78           O  
+HETATM 1071  D1  DOD A 311      28.810  20.773  -3.335  0.75 40.82           D  
+HETATM 1072  D2  DOD A 311      29.404  20.908  -1.940  0.75 41.00           D  
+HETATM 1073  O   DOD A 312      34.385   2.967  -0.675  0.75 49.17           O  
+HETATM 1074  D1  DOD A 312      33.896   2.264  -0.231  0.75 49.99           D  
+HETATM 1075  D2  DOD A 312      35.282   2.635  -0.820  0.75 50.11           D  
+HETATM 1076  O   DOD A 313      22.760  12.894   9.757  0.75 34.76           O  
+HETATM 1077  D1  DOD A 313      23.725  12.886   9.820  0.75 32.32           D  
+HETATM 1078  D2  DOD A 313      22.695  12.328   8.975  0.75 32.33           D  
+HETATM 1079  O   DOD A 314      29.184  16.951 -10.815  1.00 50.56           O  
+HETATM 1080  D1  DOD A 314      28.486  16.392 -11.157  1.00 49.79           D  
+HETATM 1081  D2  DOD A 314      29.843  17.006 -11.516  1.00 50.11           D  
+HETATM 1082  O   DOD A 315      37.208  17.290  -2.722  0.75 35.00           O  
+HETATM 1083  D1  DOD A 315      36.748  17.851  -2.066  0.75 33.32           D  
+HETATM 1084  D2  DOD A 315      37.034  16.398  -2.381  0.75 33.28           D  
+HETATM 1085  O   DOD A 316      39.924   5.096  15.153  0.75 91.84           O  
+HETATM 1086  D1  DOD A 316      40.240   5.673  15.857  0.75 91.50           D  
+HETATM 1087  D2  DOD A 316      39.075   4.751  15.456  0.75 91.50           D  
+HETATM 1088  O   DOD A 317      24.792   1.584  -6.585  1.00 53.91           O  
+HETATM 1089  D1  DOD A 317      24.014   2.025  -6.941  1.00 52.72           D  
+HETATM 1090  D2  DOD A 317      25.404   2.307  -6.419  1.00 53.49           D  
+HETATM 1091  O   DOD A 318      29.052  21.202   9.370  0.75 46.66           O  
+HETATM 1092  D1  DOD A 318      28.463  20.601   9.828  0.75 44.03           D  
+HETATM 1093  D2  DOD A 318      29.833  20.748   9.033  0.75 44.42           D  
+HETATM 1094  O   DOD A 319      31.855   0.163   0.605  0.75 42.28           O  
+HETATM 1095  D1  DOD A 319      30.944  -0.153   0.702  0.75 40.63           D  
+HETATM 1096  D2  DOD A 319      31.809   1.074   0.885  0.75 40.72           D  
+HETATM 1097  O   DOD A 320      17.490   9.671  -3.504  0.75 50.06           O  
+HETATM 1098  D1  DOD A 320      17.844  10.566  -3.494  0.75 49.93           D  
+HETATM 1099  D2  DOD A 320      16.796   9.717  -2.837  0.75 50.26           D  
+HETATM 1100  O   DOD A 321      23.571  -0.806  13.870  0.50 28.53           O  
+HETATM 1101  D1  DOD A 321      24.067  -1.107  14.640  0.50 28.83           D  
+HETATM 1102  D2  DOD A 321      23.508  -1.626  13.366  0.50 27.58           D  
+HETATM 1103  O   DOD A 322      30.284  21.588  -6.518  0.75 52.32           O  
+HETATM 1104  D1  DOD A 322      30.165  22.574  -6.795  0.75 50.92           D  
+HETATM 1105  D2  DOD A 322      29.362  21.275  -6.636  0.75 50.63           D  
 CONECT   78  880                                                                
 CONECT  215  599                                                                
 CONECT  487  807                                                                
@@ -1422,5 +1482,5 @@ CONECT  912  911
 CONECT  913  911                                                                
 CONECT  914  911                                                                
 CONECT  915  911                                                                
-MASTER      254    2    1    2    3    0    0    6 1104    1   11    5          
+MASTER      308    2    2    2    3    0    3    6 1104    1   11    5          
 END                                                                             

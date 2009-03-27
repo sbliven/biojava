@@ -35,27 +35,23 @@ import org.biojava.bio.structure.io.PDBParseException;
  * @author Jules Jacobsen
  * @since 1.4
  * @version %I% %G%
- * 
+ *
  */
-public class   AminoAcidImpl 
+public class   AminoAcidImpl
 extends    HetatomImpl
-implements AminoAcid 
+implements AminoAcid
 {
 	/** this is an Amino acid. type is "amino". */
-	public static final String type = "amino";
+	public static final String type = GroupType.AMINOACID;
 
-	
-	/* IUPAC amino acid residue names 
+	/* IUPAC amino acid residue names
 	 */
 	Character amino_char ;
 
 	Map<String,String>   secstruc;
-	
-	String recordType; // allows to distinguish between AAs that have been created from SEQRES records and ATOM records
-	
 
-	
-	
+	String recordType; // allows to distinguish between AAs that have been created from SEQRES records and ATOM records
+
 	/*
 	 * inherits most from Hetero and has just a few extensions.
 	 */
@@ -142,43 +138,43 @@ implements AminoAcid
 	}
 
     public void setRecordType(String recordName) {
-        recordType = recordName; 
+        recordType = recordName;
     }
 
     public String getRecordType() {
-        return recordType; 
-	}    
+        return recordType;
+	}
 
 	/** string representation. */
 	public String toString(){
-		
-		String str = "AminoAcid "+ recordType + ":"+ pdb_name + " " + amino_char + 
+
+		String str = "AminoAcid "+ recordType + ":"+ pdb_name + " " + amino_char +
 		" " + pdb_code +  " "+ pdb_flag + " " + recordType  ;
 		if (pdb_flag) {
-			str = str + "atoms: "+atoms.size();
+			str = str + " atoms: "+atoms.size();
 		}
 		return str ;
 
 	}
-	/** set three character name of AminoAcid. 
+	/** set three character name of AminoAcid.
 	 *
 	 * @param s  a String specifying the PDBName value
 	 * @see #getPDBName()
 	 * @throws PDBParseException ...
 	 */
-	public void setPDBName(String s) 
+	public void setPDBName(String s)
 	throws PDBParseException
 	{
 		if (s.length() != 3) {
 			throw new PDBParseException("amino acid name is not of length 3! (" + s +")");
 		}
 		pdb_name =s ;
-				
+
 	}
 
 
 	/** returns and identical copy of this Group object .
-	 * @return  and identical copy of this Group object 
+	 * @return  and identical copy of this Group object
 	 */
 	public Object clone(){
 		AminoAcidImpl n = new AminoAcidImpl();
@@ -191,7 +187,7 @@ implements AminoAcid
 		}
 		n.setAminoType(getAminoType());
 		n.setRecordType(recordType);
-		
+
 		// copy the atoms
 		for (int i=0;i<atoms.size();i++){
 			Atom atom = (Atom)atoms.get(i);

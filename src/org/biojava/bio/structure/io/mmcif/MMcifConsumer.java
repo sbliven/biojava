@@ -27,26 +27,37 @@ import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
 import org.biojava.bio.structure.io.mmcif.model.EntityPolySeq;
 import org.biojava.bio.structure.io.mmcif.model.Exptl;
+import org.biojava.bio.structure.io.mmcif.model.PdbxEntityNonPoly;
+import org.biojava.bio.structure.io.mmcif.model.PdbxNonPolyScheme;
 import org.biojava.bio.structure.io.mmcif.model.PdbxPolySeqScheme;
+import org.biojava.bio.structure.io.mmcif.model.Refine;
 import org.biojava.bio.structure.io.mmcif.model.StructAsym;
+import org.biojava.bio.structure.io.mmcif.model.StructKeywords;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 import org.biojava.bio.structure.io.mmcif.model.Struct;
 import org.biojava.bio.structure.io.mmcif.model.StructRef;
 
 /** An interface for the events triggered by a MMcifParser.
  * The Consumer listens to the events and builds up the protein structure.
- *  
+ *
  * @author Andreas Prlic
  *  @since 1.7
  *
  */
 public interface MMcifConsumer {
 	/** called at start of document
-	 * 
+	 *
 	 */
 	public void documentStart();
+
+	/** called at end of document
+	 *
+	 */
+	public void documentEnd();
+
+
 	/** A new AtomSite record has been read. Contains the Atom data
-	 * 
+	 *
 	 * @param atom
 	 */
 	public void newAtomSite(AtomSite atom);
@@ -60,10 +71,11 @@ public interface MMcifConsumer {
 	public void newStructRef(StructRef sref);
 	public void newStructRefSeq(StructRefSeq sref);
 	public void newPdbxPolySeqScheme(PdbxPolySeqScheme ppss);
-	/** called at end of document
-	 * 
-	 */
-	public void documentEnd();
-	
-	
+	public void newPdbxNonPolyScheme(PdbxNonPolyScheme ppss);
+	public void newPdbxEntityNonPoly(PdbxEntityNonPoly pen);
+	public void newStructKeywords(StructKeywords kw);
+	public void newRefine(Refine r);
+
+
+
 }

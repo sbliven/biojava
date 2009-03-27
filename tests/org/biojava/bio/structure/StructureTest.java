@@ -36,7 +36,7 @@ public class StructureTest extends TestCase {
 
 		assertNotNull(structure);
 
-		assertEquals("structure does not contain one chain ", 2 ,structure.size());	
+		assertEquals("structure does not contain one chain ", 2 ,structure.size());
 	}
 
 	public void testSeqResParsing() {
@@ -69,54 +69,54 @@ public class StructureTest extends TestCase {
 	}
 
 
-	/** test if a PDB file can be parsed 
+	/** test if a PDB file can be parsed
 	 * @throws Exception */
 	public void testReadPDBFile() throws Exception {
 
 		assertEquals("pdb code not set!","5PTI",structure.getPDBCode());
-		
+
 		Chain c = structure.getChain(0);
 		assertEquals("did not find the expected 58 amino acids!",58,c.getAtomGroups("amino").size());
 
 		assertTrue(c.getAtomGroups("hetatm").size()     == 0);
-		
+
 		Chain c2 = structure.getChain(1);
 		assertTrue(c2.getAtomGroups("hetatm").size()     == 65);
 		assertTrue(c2.getAtomGroups("nucleotide").size() == 0 );
 
 		List<Compound> compounds= structure.getCompounds();
 		assertTrue(compounds.size() == 1);
-		Compound mol = compounds.get(0);       
+		Compound mol = compounds.get(0);
 		assertTrue(mol.getMolName().startsWith("TRYPSIN INHIBITOR"));
 	}
-	
-	
+
+
 	public void testSSBondParsing() throws Exception {
 		assertNotNull(structure);
-		
+
 		List<SSBond> ssbonds = structure.getSSBonds();
 		assertEquals("did not find the correct nr of SSBonds ",3,ssbonds.size());
-			 
+
 		String pdb1 = "SSBOND   1 CYS A    5    CYS A   55";
-		String pdb2 = "SSBOND   2 CYS A   14    CYS A   38"; 
-	
+		String pdb2 = "SSBOND   2 CYS A   14    CYS A   38";
+
 		SSBond bond1 = ssbonds.get(0);
-		
+
 		String b1 = bond1.toPDB();
-		
-		assertTrue("PDB representation incorrect",pdb1.equals(b1.trim()));		
+
+		assertTrue("PDB representation incorrect",pdb1.equals(b1.trim()));
 		assertTrue("not right resnum1 " , bond1.getResnum1().equals("5"));
 		assertTrue("not right resnum2 " , bond1.getResnum2().equals("55"));
-		
+
 		SSBond bond2 = ssbonds.get(1);
 		String b2 = bond2.toPDB();
 		assertTrue("not right resnum1 " , bond2.getResnum1().equals("14"));
 		assertTrue("not right resnum2 " , bond2.getResnum2().equals("38"));
 		assertTrue("PDB representation incorrect",pdb2.equals(b2.trim()));
-		
+
 	}
 
-	/** Tests that standard amino acids are working properly 
+	/** Tests that standard amino acids are working properly
 	 * @throws Exception */
 	public void testStandardAmino() throws Exception {
 
@@ -159,10 +159,10 @@ public class StructureTest extends TestCase {
 		assertEquals("the number of chain ids and chains did not match!",chainIds.size(),chains.size());
 		assertEquals("the chain ID did not match", chainIds.get(0),chains.get(0).getName());
 
-	
+
 	}
 
-	
+
 	public void testPDBHeader(){
 		Map<String, Object> m = structure.getHeader();
 		PDBHeader header = structure.getPDBHeader();
@@ -171,21 +171,21 @@ public class StructureTest extends TestCase {
 
 		String idCode = (String)m.get("idCode");
 		assertTrue(idCode.equals(header.getIdCode()));
-		
+
 		Float resolution = (Float) m.get("resolution");
 		assertTrue(resolution.floatValue() == header.getResolution());
-		
+
 		String technique = (String) m.get("technique");
 		assertTrue(technique.equals(header.getTechnique()));
-				
+
 	}
-	
+
 	public void testCreateVirtualCBAtom(){
 
 		Group g1 = structure.getChain(0).getAtomGroup(11);
 
 		if ( g1.getPDBName().equals("GLY")){
-			if ( g1 instanceof AminoAcid){ 
+			if ( g1 instanceof AminoAcid){
 				try {
 					Atom cb = Calc.createVirtualCBAtom((AminoAcid)g1);
 					g1.addAtom(cb);
@@ -237,13 +237,10 @@ public class StructureTest extends TestCase {
 
 		Calc.rotate(newGroup,rotMatrix);
 
-		Calc.shift(newGroup,tran);   
+		Calc.shift(newGroup,tran);
 
-
-
-
-		Atom ca1    =       g1.getAtom("CA");	
-		Atom oldca2 =       g2.getAtom("CA");    
+		Atom ca1    =       g1.getAtom("CA");
+		Atom oldca2 =       g2.getAtom("CA");
 		Atom newca2 = newGroup.getAtom("CA");
 
 		// this also tests the cloning ...
@@ -252,7 +249,7 @@ public class StructureTest extends TestCase {
 
 		// final test check that the distance between the CA atoms is small ;
 
-		double newdistance = Calc.getDistance(ca1,newca2);	
+		double newdistance = Calc.getDistance(ca1,newca2);
 		assertTrue( newdistance < 0.1);
 
 

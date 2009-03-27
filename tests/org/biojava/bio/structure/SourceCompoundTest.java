@@ -47,7 +47,7 @@ public class SourceCompoundTest extends TestCase{
 
 
 	public void testCompoundSourceStructure(){
-		
+
 		Structure s2 = getStructure("/files/2gox.pdb");
 		assertEquals(2, s2.getCompounds().size());
 		for (Compound compound : s2.getCompounds()){
@@ -86,7 +86,7 @@ public class SourceCompoundTest extends TestCase{
 	public void testCOMPNDsectionFRAGMENT(){
 		Structure s2 = getStructure("/files/2gox.pdb");
 		Structure s4 = getStructure("/files/3cfy.pdb");
-		
+
 		// this file has a CHAIN: string in the value for the FRAGMENT: filed which breaks the version 1.4 parser
 
 		for (Compound compound : s2.getCompounds()) {
@@ -109,12 +109,12 @@ public class SourceCompoundTest extends TestCase{
 		Structure s3 = getStructure("/files/2pos.pdb");
 		assertEquals(1, s3.getCompounds().size());
 		for (Compound compound : s3.getCompounds()){
-			System.out.println(compound.getMolId());
+			/*System.out.println(compound.getMolId());
 			System.out.println(compound.getMolName());
 			System.out.println(compound.getChainId().toString());
 			System.out.println(compound.getOrganismScientific());
 			System.out.println(compound.getStrain());
-
+	*/
 			assertEquals("1", compound.getMolId());
 			assertEquals("SYLVATICIN", compound.getMolName());
 			assertEquals("[A, B, C, D]", compound.getChainId().toString());
@@ -128,7 +128,7 @@ public class SourceCompoundTest extends TestCase{
 		Structure s4 = getStructure("/files/3cfy.pdb");
 		for (Compound compound : s4.getCompounds()){
 			if (compound.getMolId().equals("1")) {
-				System.out.println(compound.getMolId());
+				/*System.out.println(compound.getMolId());
 				System.out.println(compound.getMolName());
 				System.out.println(compound.getChainId().toString());
 				System.out.println(compound.getFragment());
@@ -141,7 +141,7 @@ public class SourceCompoundTest extends TestCase{
 				System.out.println(compound.getExpressionSystemVectorType());
 				System.out.println(compound.getExpressionSystemVector());
 				System.out.println(compound.getExpressionSystemPlasmid());
-
+				 */
 				assertEquals("1", compound.getMolId());
 				assertEquals("PUTATIVE LUXO REPRESSOR PROTEIN", compound.getMolName());
 				assertEquals("[A]", compound.getChainId().toString());
@@ -164,7 +164,7 @@ public class SourceCompoundTest extends TestCase{
 		Structure s5 = getStructure("/files/3cdl.pdb");
 		for (Compound compound : s5.getCompounds()){
 			if (compound.getMolId().equals("1")) {
-				System.out.println(compound.getOrganismScientific());
+				//System.out.println(compound.getOrganismScientific());
 				assertEquals("PSEUDOMONAS SYRINGAE PV. TOMATO STR. DC3000", compound.getOrganismScientific());
 			}
 		}

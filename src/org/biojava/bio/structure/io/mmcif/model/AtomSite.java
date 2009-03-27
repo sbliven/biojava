@@ -45,8 +45,9 @@ public class AtomSite extends AbstractBean{
 	String auth_asym_id;
 	String auth_atom_id;
 	String pdbx_PDB_model_num;
-	String occupancy_esd; 
+	String occupancy_esd;
 	String B_iso_or_equiv_esd;
+	String pdbx_formal_charge;
 
 	public String getGroup_PDB() {
 		return group_PDB;
@@ -66,7 +67,7 @@ public class AtomSite extends AbstractBean{
 	public void setType_symbol(String type_symbol) {
 		this.type_symbol = type_symbol;
 	}
-	
+
 	public String getLabel_alt_id() {
 		return label_alt_id;
 	}
@@ -198,6 +199,12 @@ public class AtomSite extends AbstractBean{
 	}
 	public void setB_iso_or_equiv_esd(String b_iso_or_equiv_esd) {
 		B_iso_or_equiv_esd = b_iso_or_equiv_esd;
+	}
+	public String getPdbx_formal_charge() {
+		return pdbx_formal_charge;
+	}
+	public void setPdbx_formal_charge(String pdbx_formal_charge) {
+		this.pdbx_formal_charge = pdbx_formal_charge;
 	}
 
 

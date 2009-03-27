@@ -16,23 +16,23 @@
  * at:
  *
  *      http://www.biojava.org/
- * 
+ *
  * Created on Nov 14, 2007
- * 
+ *
  */
 
 package org.biojava.bio.structure;
 
 /** A simple bean to store disulfid bridge information, the SSBOND records in the PDB files.
- * 
- * The two residues specified here are CYS residues that form a Disulfid bridge.
- * 
  *
- * 
+ * The two residues specified here are CYS residues that form a Disulfid bridge.
+ *
+ *
+ *
  * @author Andreas Prlic
  *
  */
-public class SSBond {
+public class SSBond implements PDBRecord{
 
 	int serNum;
 	String chainID1;
@@ -41,13 +41,25 @@ public class SSBond {
 	String resnum2;
 	String insCode1;
 	String insCode2;
-	
+
 	public SSBond(){
 		serNum = 0;
 	}
-	
+
 	public String toPDB(){
-		
+
+
+		StringBuffer buf = new StringBuffer();
+		toPDB(buf);
+		return buf.toString();
+	}
+
+	/** append the PDB representation of this SSBOND to the provided StringBUffer
+	 *
+	 * @param buf a StringBuffer to print the PDB representation to
+	 */
+	public void toPDB(StringBuffer buf){
+
 		/*12 - 14        LString(3)      "CYS"        Residue name.
 		16             Character       chainID1     Chain identifier.
 		18 - 21        Integer         seqNum1      Residue sequence number.
@@ -60,21 +72,18 @@ public class SSBond {
 		67 - 72        SymOP           sym2         Symmetry oper for 2nd resid
 		*/
 		//01234567890123456789012345678901234567890123456789012345678901234567890123456789
-		//SSBOND   1 CYS      5    CYS     55                                     5PTI  67                                    
-		//SSBOND   2 CYS     14    CYS     38                                     
-		//SSBOND   3 CYS     30    CYS     51                                     
-		  
-		StringBuffer buf = new StringBuffer();
+		//SSBOND   1 CYS      5    CYS     55                                     5PTI  67
+		//SSBOND   2 CYS     14    CYS     38
+		//SSBOND   3 CYS     30    CYS     51
+
+
 		buf.append("SSBOND ");
 		buf.append(String.format("%3d", serNum));
 		buf.append(String.format(" CYS %s %4s%1s  ",chainID1,resnum1,insCode1));
 		buf.append(String.format(" CYS %s %4s%1s  ",chainID2,resnum2,insCode2));
-						
-		return buf.toString();
 	}
-	
-	
-	
+
+
 	public String getInsCode1() {
 		return insCode1;
 	}
@@ -92,7 +101,7 @@ public class SSBond {
 	}
 
 	/** set serial number of this SSBOND in PDB file
-	 * 
+	 *
 	 * @return the serial number
 	 */
 	public int getSerNum() {
@@ -100,7 +109,7 @@ public class SSBond {
 	}
 
 	/** get serial number of this SSBOND in PDB file
-	 * 
+	 *
 	 * @param serNum
 	 */
 	public void setSerNum(int serNum) {
@@ -115,7 +124,7 @@ public class SSBond {
 		nbond.setResnum2(resnum2);
 		return nbond;
 	}
-	
+
 	public String getChainID1() {
 		return chainID1;
 	}
@@ -128,12 +137,12 @@ public class SSBond {
 	public void setChainID2(String chainID2) {
 		this.chainID2 = chainID2;
 	}
-	
+
 	/** get residue number for first CYS.
 	 *  number and insertion code are joint together.
-	 * 
+	 *
 	 * @return the residue number of the first CYS.
-	 * 
+	 *
 	 */
 	public String getResnum1() {
 		return resnum1;
@@ -141,12 +150,12 @@ public class SSBond {
 	public void setResnum1(String resnum1) {
 		this.resnum1 = resnum1;
 	}
-	
+
 	/** get residue number for second CYS.
 	 *  number and insertion code are joint together.
-	 * 
+	 *
 	 * @return the residue number of the second CYS.
-	 * 
+	 *
 	 */
 	public String getResnum2() {
 		return resnum2;
@@ -154,7 +163,7 @@ public class SSBond {
 	public void setResnum2(String resnum2) {
 		this.resnum2 = resnum2;
 	}
-	
-	
-	
+
+
+
 }

@@ -377,6 +377,7 @@ public class PDBFileReader implements StructureIOFile {
 			return null;
 		}
 
+		//todo: change this to RCSB ftp site
 		String ftp = String.format("ftp://ftp.ebi.ac.uk/pub/databases/msd/pdb_uncompressed/pdb%s.ent", pdbId.toLowerCase());
 
 		System.out.println("Fetching " + ftp);

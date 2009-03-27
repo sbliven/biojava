@@ -27,21 +27,21 @@ import org.biojava.bio.structure.io.PDBParseException;
 
 /**
  *
- *  A nucleotide group is almost the same as a Hetatm group. 
+ *  A nucleotide group is almost the same as a Hetatm group.
  *  @see HetatomImpl
  *  @see AminoAcidImpl
  * @author Andreas Prlic
  * @since 1.4
  * @version %I% %G%
  */
-public class NucleotideImpl 
-    extends HetatomImpl 
-    implements Group			   
+public class NucleotideImpl
+    extends HetatomImpl
+    implements Group
 {
 
     /** this is a "nucleotide", a special occurance of a Hetatom. */
-    public static final String type = "nucleotide";
-   
+    public static final String type = GroupType.NUCLEOTIDE;
+
     /*
      * inherits most from Hetero and has just a few extensions.
      */
@@ -52,15 +52,15 @@ public class NucleotideImpl
 
     public String getType(){ return type;}
 
-    	
+
     public String toString(){
-		
+
 	String str = "PDB: "+ pdb_name + " " + pdb_code +  " "+ pdb_flag;
 	if (pdb_flag) {
 	    str = str + "atoms: "+atoms.size();
 	}
 	return str ;
-		
+
     }
 
 
@@ -75,7 +75,7 @@ public class NucleotideImpl
 	    e.printStackTrace();
 	}
 
-	
+
 	// copy the atoms
 	for (int i=0;i<atoms.size();i++){
 	    Atom atom = (Atom)atoms.get(i);
