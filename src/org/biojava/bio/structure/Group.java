@@ -160,14 +160,14 @@ public interface Group {
 	 */
 	public boolean hasAtom(String name);
 
-	/** set the PDB 3 character name for this group.
+	/** Get the PDB 3 character name for this group. (e.g. ALA)
 	 *
 	 * @return a String representing the PDBName value
 	 * @see #setPDBName
 	 */
 	public String getPDBName();
 
-	/** Get the PDB 3 letter name for this group. (e.g. ALA)
+	/** Set the PDB 3 letter name for this group. (e.g. ALA)
 	 *
 	 * @param s  a String specifying the PDBName value
 	 * @throws PDBParseException ...
