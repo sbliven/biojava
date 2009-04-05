@@ -58,7 +58,6 @@ import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RankedCrossRef;
 import org.biojavax.RankedDocRef;
-import org.biojavax.RichAnnotation;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.SimpleComment;
 import org.biojavax.SimpleCrossRef;
@@ -80,7 +79,8 @@ import org.biojavax.utils.StringTools;
 /**
  * Format reader for UniProt files. This version of UniProt format will generate
  * and write RichSequence objects. Loosely Based on code from the old, deprecated,
- * org.biojava.bio.seq.io.EMBLLikeFormat object.
+ * org.biojava.bio.seq.io.EMBLLikeFormat object. Since 1.7, the parser reads the
+ * International Protein Index (IPI) pseudo-Uniprot format.
  *
  * @author Richard Holland
  * @author Mark Schreiber
@@ -98,6 +98,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
      * The name of this format
      */
     public static final String UNIPROT_FORMAT = "UniProt";
+
+    private static final String SUBFORMAT_UNIPROT = "UniProt";
+    private static final String SUBFORMAT_IPI = "IPI";
     
     protected static final String LOCUS_TAG = "ID";
     protected static final String ACCESSION_TAG = "AC";
@@ -124,15 +127,21 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     protected static final String START_SEQUENCE_TAG = "SQ";
     protected static final String END_SEQUENCE_TAG = "//";
     
-    // locus line
-    protected static final Pattern lp = Pattern.compile("^((\\S+)_(\\S+))\\s+(\\S+);\\s+(PRT)?;?\\s*\\d+\\s+AA\\.$");
+    // locus line for uniprot format
+    protected static final Pattern lp_uniprot = Pattern.compile("^((\\S+)_(\\S+))\\s+(\\S+);\\s+(PRT)?;?\\s*\\d+\\s+AA\\.$");
+    // locus line for IPI format
+    protected static final Pattern lp_ipi = Pattern.compile("^((\\S+)\\.(\\d+))\\s+(IPI);\\s+(PRT)?;?\\s*\\d+\\s+AA\\.$");
     // RP line parser
     protected static final Pattern rppat = Pattern.compile("SEQUENCE OF (\\d+)-(\\d+)");
-    // date lineDT
+    // date lineDT for uniprot
     // date, integrated into UniProtKB/database_name.
     // date, sequence version x.
     // date, entry version x.
-    protected static final Pattern dp = Pattern.compile("([^,]+),([^\\d\\.]+)(\\d+)?\\.$");
+    protected static final Pattern dp_uniprot = Pattern.compile("([^,]+),([^\\d\\.]+)(\\d+)?\\.$");
+    // date lineDT for IPI
+    // date (xxx, Created)
+    // date (xxx, Last sequence update)
+    protected static final Pattern dp_ipi = Pattern.compile("([^\\(]+)\\(([^,]+),([^\\)]+)\\)$");
     // feature line
     protected static final Pattern fp = Pattern.compile("^\\s*([\\d?<]+\\s+[\\d?>]+)(\\s+(.*))?$");
     
@@ -179,7 +188,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
     public boolean canRead(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         String firstLine = br.readLine();
-        boolean readable = firstLine!=null && headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
+        boolean readable = firstLine!=null && headerLine.matcher(firstLine).matches() && 
+                (lp_uniprot.matcher(firstLine.substring(3).trim()).matches() ||
+                lp_ipi.matcher(firstLine.substring(3).trim()).matches());
         br.close();
         return readable;
     }
@@ -200,7 +211,9 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         stream.mark(2000); // some streams may not support this
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
         String firstLine = br.readLine();
-        boolean readable = firstLine!=null && headerLine.matcher(firstLine).matches() && lp.matcher(firstLine.substring(3).trim()).matches();
+        boolean readable = firstLine!=null && headerLine.matcher(firstLine).matches() && 
+                (lp_uniprot.matcher(firstLine.substring(3).trim()).matches()
+                || lp_ipi.matcher(firstLine.substring(3).trim()).matches());
         // don't close the reader as it'll close the stream too.
         // br.close();
         stream.reset();
@@ -239,6 +252,8 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
         
         boolean hasAnotherSequence = true;
         //boolean hasInternalWhitespace = false;
+
+        String subformat = SUBFORMAT_UNIPROT;
         
         rlistener.startSequence();
         
@@ -263,7 +278,7 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                 if (sectionKey.equals(LOCUS_TAG)) {
                     // entryname  dataclass; moltype; sequencelength AA.
                     String loc = ((String[])section.get(0))[1];
-                    Matcher m = lp.matcher(loc);
+                    Matcher m = lp_uniprot.matcher(loc);
                     if (m.matches()) {
                         rlistener.setName(m.group(2));
                         rlistener.setDivision(m.group(3));
@@ -275,8 +290,17 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                             rlistener.addSequenceProperty(Terms.getMolTypeTerm(), "");
                         }
                     } else {
-                        String message = ParseException.newMessage(this.getClass(),accession, "", "Bad ID line", sectionToString(section));
-                        throw new ParseException(message);
+                        m = lp_ipi.matcher(loc);
+                        if (m.matches()) {
+                            subformat = SUBFORMAT_IPI;
+                            rlistener.setName(m.group(2));
+                            rlistener.setVersion(Integer.parseInt(m.group(3)));
+                            rlistener.addSequenceProperty(Terms.getDataClassTerm(), m.group(4));
+                            rlistener.addSequenceProperty(Terms.getMolTypeTerm(),m.group(5));
+                        } else {
+                            String message = ParseException.newMessage(this.getClass(),accession, "", "Bad ID line", sectionToString(section));
+                            throw new ParseException(message);
+                        }
                     }
                 } else if (sectionKey.equals(DEFINITION_TAG)) {
                     String val = ((String[])section.get(0))[1];
@@ -337,37 +361,59 @@ public class UniProtFormat extends RichSequenceFormat.HeaderlessFormat {
                     }
                 } else if (sectionKey.equals(DATE_TAG)) {
                     String chunk = ((String[])section.get(0))[1];
-                    Matcher dm = dp.matcher(chunk);
-                    if (dm.matches()) {
-                        String date = dm.group(1).trim();
-                        String type = dm.group(2).trim();
-                        String rel = dm.group(3);
-                        if (rel!=null) rel = rel.trim();
-                        if (type.startsWith("integrated into UniProtKB")) {
-                            String dbname = type.split("/")[1];
-                            rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
-                            rlistener.addSequenceProperty(Terms.getUniProtDBNameTerm(), dbname);
-                        } else if (type.equalsIgnoreCase("sequence version")) {
-                            if (rel==null){
-                                String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
+                    if(subformat.equals(SUBFORMAT_UNIPROT)) {
+                        Matcher dm = dp_uniprot.matcher(chunk);
+                        if (dm.matches()) {
+                            String date = dm.group(1).trim();
+                            String type = dm.group(2).trim();
+                            String rel = dm.group(3);
+                            if (rel!=null) rel = rel.trim();
+                            if (type.startsWith("integrated into UniProtKB")) {
+                                String dbname = type.split("/")[1];
+                                rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
+                                rlistener.addSequenceProperty(Terms.getUniProtDBNameTerm(), dbname);
+                            } else if (type.equalsIgnoreCase("sequence version")) {
+                                if (rel==null){
+                                    String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
+                                    throw new ParseException(message);
+                                }
+                                rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
+                                rlistener.setVersion(Integer.parseInt(rel));
+                            } else if (type.equalsIgnoreCase("entry version")) {
+                                if (rel==null) {
+                                    String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
+                                    throw new ParseException(message);
+                                }
+                                rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), date);
+                                rlistener.addSequenceProperty(Terms.getRelAnnotatedTerm(), rel);
+                            } else {
+                                String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date type "+type, sectionToString(section));
                                 throw new ParseException(message);
                             }
-                            rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
-                            rlistener.setVersion(Integer.parseInt(rel));
-                        } else if (type.equalsIgnoreCase("entry version")) {
-                            if (rel==null) {
-                                String message = ParseException.newMessage(this.getClass(),accession, "", "Version missing for "+type, sectionToString(section));
-                                throw new ParseException(message);
-                            }
-                            rlistener.addSequenceProperty(Terms.getDateAnnotatedTerm(), date);
-                            rlistener.addSequenceProperty(Terms.getRelAnnotatedTerm(), rel);
                         } else {
-                            String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date type "+type, sectionToString(section));
+                            String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date line", sectionToString(section));
+                            throw new ParseException(message);
+                        }
+                    } else if(subformat.equals(SUBFORMAT_IPI)) {
+                        Matcher dm = dp_ipi.matcher(chunk);
+                        if (dm.matches()) {
+                            String date = dm.group(1).trim();
+                            String type = dm.group(3).trim();
+                            if(type.equals("Created")) {
+                                rlistener.addSequenceProperty(Terms.getDateCreatedTerm(), date);
+                            } else if(type.equals("Last sequence update")) {
+                                rlistener.addSequenceProperty(Terms.getDateUpdatedTerm(), date);
+                            } else {
+                                String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date type "+type, sectionToString(section));
+                                throw new ParseException(message);
+                            }
+                        } else {
+                            String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date line", sectionToString(section));
                             throw new ParseException(message);
                         }
                     } else {
-                        String message = ParseException.newMessage(this.getClass(),accession, "", "Bad date line", sectionToString(section));
-                        throw new ParseException(message);
+                            String message = ParseException.newMessage(this.getClass(),accession, "", "Unknown date line format", sectionToString(section));
+                            throw new ParseException(message);
                     }
                 } else if (sectionKey.equals(ACCESSION_TAG)) {
                     // if multiple accessions, store only first as accession,

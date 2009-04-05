@@ -1,13 +1,20 @@
 package org.biojavax.bio.seq.io;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.Set;
 import junit.framework.TestCase;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojavax.Namespace;
+import org.biojavax.Note;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichSequence;
+import org.biojavax.bio.seq.RichSequence.Terms;
+import org.biojavax.ontology.ComparableTerm;
 
 /**
  * Tests for UniProtFormat.
@@ -46,7 +53,7 @@ public class UniProtFormatTest extends TestCase {
     private RichSequence readFile(String filename) {
         InputStream inStream = this.getClass().getResourceAsStream(filename);
         BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
-        SymbolTokenization tokenization = RichSequence.IOTools.getDNAParser();
+        SymbolTokenization tokenization = RichSequence.IOTools.getProteinParser();
         Namespace namespace = RichObjectFactory.getDefaultNamespace();
         SimpleRichSequenceBuilder builder = new SimpleRichSequenceBuilder();
         RichSequence sequence = null;
@@ -59,4 +66,66 @@ public class UniProtFormatTest extends TestCase {
         }
 		return sequence;
 	}
+
+    public void testReadUniprotFormat() {
+        InputStream inStream = this.getClass().getResourceAsStream("/files/P05814.pro");
+        BufferedInputStream bis = new BufferedInputStream(inStream);
+        try {
+            assertTrue(unpFormat.canRead(bis));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            fail("Unexpected exception: "+ex);
+        }
+        RichSequence sequence = readFile("/files/P05814.pro");
+        assertNotNull(sequence);
+        assertEquals(sequence.getName(), "CASB");
+        assertEquals(sequence.getAccession(), "P05814");
+        assertEquals(sequence.getVersion(), 4);
+        assertEquals(sequence.getInternalSymbolList().length(), 226);
+
+        // data class
+        ComparableTerm term = Terms.getDataClassTerm();
+        Set notes = sequence.getNoteSet();
+        Iterator it = notes.iterator();
+        boolean found = false;
+        while(it.hasNext()) {
+            Note note = (Note)it.next();
+            if(note.getTerm()==term) {
+                found = true;
+                assertEquals(note.getValue(),"Reviewed");
+            }
+        }
+        assertTrue(found);
+    }
+
+    public void testReadIPIFormat() {
+        InputStream inStream = this.getClass().getResourceAsStream("/files/IPI00010849.pro");
+        BufferedInputStream bis = new BufferedInputStream(inStream);
+        try {
+            assertTrue(unpFormat.canRead(bis));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            fail("Unexpected exception: "+ex);
+        }
+        RichSequence sequence = readFile("/files/IPI00010849.pro");
+        assertNotNull(sequence);
+        assertEquals(sequence.getName(), "IPI00010849");
+        assertEquals(sequence.getAccession(), "IPI00010849");
+        assertEquals(sequence.getVersion(), 1);
+        assertEquals(sequence.getInternalSymbolList().length(), 226);
+
+        // data class
+        ComparableTerm term = Terms.getDataClassTerm();
+        Set notes = sequence.getNoteSet();
+        Iterator it = notes.iterator();
+        boolean found = false;
+        while(it.hasNext()) {
+            Note note = (Note)it.next();
+            if(note.getTerm()==term) {
+                found = true;
+                assertEquals(note.getValue(),"IPI");
+            }
+        }
+        assertTrue(found);
+    }
 }
