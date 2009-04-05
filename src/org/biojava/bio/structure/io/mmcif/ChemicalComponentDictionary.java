@@ -38,7 +38,7 @@ public class ChemicalComponentDictionary {
 	/** if ChemComp is replaced by another one, get the newer version
 	 * otherwise return the same ChemComp again.
 	 * @param c
-	 * @return
+	 * @return get the component that replaced ChemComp.
 	 */
 	public ChemComp getReplacer(ChemComp c){
 		return getReplacer(c.getId());
@@ -68,7 +68,7 @@ public class ChemicalComponentDictionary {
 	/** Get the parent of a component. If component has no parent, return null
 	 *
 	 * @param c
-	 * @return
+	 * @return get the parent component or null if ChemComp has no parent.
 	 */
 	public ChemComp getParent(ChemComp c){
 
