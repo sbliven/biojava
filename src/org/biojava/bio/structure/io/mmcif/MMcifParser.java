@@ -58,7 +58,7 @@ public interface MMcifParser {
 
 	/** Start the actual parsing. The parser will trigger events that are defined by the MMcifConsumer class.
 	 *
-	 * @param buf a BufferedReader.
+	 * @param inStream InputStream to parse from.
 	 */
 	public void parse(InputStream inStream) throws IOException;
 
