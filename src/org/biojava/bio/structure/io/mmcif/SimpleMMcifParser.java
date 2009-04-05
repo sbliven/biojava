@@ -23,6 +23,8 @@ package org.biojava.bio.structure.io.mmcif;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.MMCIFFileReader;
 import org.biojava.bio.structure.io.StructureIOFile;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
+import org.biojava.bio.structure.io.mmcif.model.ChemComp;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
@@ -123,6 +126,11 @@ public class SimpleMMcifParser implements MMcifParser {
 
 	}
 
+	public void parse(InputStream inStream) throws IOException {
+		parse(new BufferedReader(new InputStreamReader(inStream)));
+
+	}
+
 	public void parse(BufferedReader buf)
 	throws IOException {
 
@@ -186,7 +194,8 @@ public class SimpleMMcifParser implements MMcifParser {
 
 
 				} else {
-					// we found a data line
+					
+					// in loop and we found a data line
 					lineData = processLine(line, buf, loopFields.size());
 					if ( lineData.size() != loopFields.size()){
 						System.err.println("did not find enough data fields...");
@@ -194,8 +203,8 @@ public class SimpleMMcifParser implements MMcifParser {
 					}
 
 					endLineChecks(category, loopFields,lineData);
+					
 					lineData.clear();
-
 
 				}
 
@@ -222,6 +231,19 @@ public class SimpleMMcifParser implements MMcifParser {
 					//System.out.println("got a single line " + data);
 					String key = data.get(0);
 					int pos = key.indexOf(".");
+					if ( pos < 0 ) {
+						// looks like a chem_comp file
+						// line should start with data, otherwise something is wrong!
+						if (! line.startsWith("data_")){
+							System.err.println("this does not look like a valid MMcif file! The first line should be data_1XYZ, but is " + line);
+							triggerDocumentEnd();
+							return;
+						}
+						// ignore the first line...
+						category=null;
+						lineData.clear();
+						continue;
+					}
 					category = key.substring(0,pos);
 					String value = data.get(1);
 					loopFields.add(key.substring(pos+1,key.length()));
@@ -432,7 +454,7 @@ public class SimpleMMcifParser implements MMcifParser {
 		}*/
 		if ( loopFields.size() != lineData.size()){
 			System.err.println("looks like we got a problem with nested string quote characters:");
-			throw new IOException("data lenght ("+ lineData.size() +
+			throw new IOException("data length ("+ lineData.size() +
 					") != fields length ("+loopFields.size()+
 					") category: " +category + " fields: "+
 					loopFields + " DATA: " +
@@ -539,8 +561,17 @@ public class SimpleMMcifParser implements MMcifParser {
 					loopFields,lineData
 			);
 			triggerNewRefine(r);
+		} else if (category.equals("_chem_comp")){
+			ChemComp c = (ChemComp)buildObject(
+					"org.biojava.bio.structure.io.mmcif.model.ChemComp",
+					loopFields, lineData
+					);
+			triggerNewChemComp(c);
+		} else {
+			// trigger a generic bean that can deal with all missing data types...
+			triggerGeneric(category,loopFields,lineData);
 		}
-		//TODO: trigger a generic bean that can deal with all missing data types...
+
 
 	}
 
@@ -642,6 +673,12 @@ public class SimpleMMcifParser implements MMcifParser {
 		return o;
 	}
 
+	public void triggerGeneric(String category, List<String> loopFields, List<String> lineData){
+		for(MMcifConsumer c : consumers){
+			c.newGenericData(category,loopFields, lineData);
+		}
+	}
+
 	public void triggerNewEntity(Entity entity){
 		for(MMcifConsumer c : consumers){
 			c.newEntity(entity);
@@ -651,6 +688,11 @@ public class SimpleMMcifParser implements MMcifParser {
 	public void triggerNewEntityPolySeq(EntityPolySeq epolseq){
 		for(MMcifConsumer c : consumers){
 			c.newEntityPolySeq(epolseq);
+		}
+	}
+	public void triggerNewChemComp(ChemComp cc){
+		for(MMcifConsumer c : consumers){
+			c.newChemComp(cc);
 		}
 	}
 	public void triggerNewStructAsym(StructAsym sasym){

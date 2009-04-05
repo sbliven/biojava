@@ -48,6 +48,7 @@ import org.biojava.bio.structure.StructureTools;
 import org.biojava.bio.structure.io.PDBParseException;
 import org.biojava.bio.structure.io.SeqRes2AtomAligner;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
+import org.biojava.bio.structure.io.mmcif.model.ChemComp;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
@@ -63,6 +64,8 @@ import org.biojava.bio.structure.io.mmcif.model.StructKeywords;
 import org.biojava.bio.structure.io.mmcif.model.StructRef;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 import org.biojava.bio.symbol.IllegalSymbolException;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /** A MMcifConsumer implementation that build a in-memory representation of the
  * content of a mmcif file as a BioJava Structure object.
@@ -982,6 +985,18 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 	public void newPdbxEntityNonPoly(PdbxEntityNonPoly pen){
 		// TODO: do something with them...
+	}
+
+	public void newChemComp(ChemComp c) {
+		throw new NotImplementedException();
+
+	}
+
+	public void newGenericData(String category, List<String> loopFields,
+			List<String> lineData) {
+
+		System.err.println("unhandled category so far: " + category);
+
 	}
 
 }

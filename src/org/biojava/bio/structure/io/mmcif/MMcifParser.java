@@ -23,37 +23,44 @@ package org.biojava.bio.structure.io.mmcif;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 
 /** Interface that needs to be implemented by an MMcifParser
- * 
+ *
  * @author Andreas Prlic
- * @since 1.7 
+ * @since 1.7
  */
 public interface MMcifParser {
-	
+
 	/** Add a MMcifConsumer that listens to even being triggered by the parser and processes the data into a backend provided by the Consumer.
-	 * 
+	 *
 	 * @param consumer a consumer object.
 	 */
 	public void addMMcifConsumer(MMcifConsumer consumer);
-	
+
 	/** Remove all consumers from the parser.
-	 * 
+	 *
 	 */
 	public void clearConsumers();
-	
+
 	/** remove a single consumer from the parser
-	 * 
+	 *
 	 * @param consumer
 	 */
 	public void removeMMcifConsumer(MMcifConsumer consumer);
-	
-	
+
+
 	/** Start the actual parsing. The parser will trigger events that are defined by the MMcifConsumer class.
-	 * 
+	 *
 	 * @param buf a BufferedReader.
 	 */
 	public void parse(BufferedReader buf) throws IOException;
-	
+
+	/** Start the actual parsing. The parser will trigger events that are defined by the MMcifConsumer class.
+	 *
+	 * @param buf a BufferedReader.
+	 */
+	public void parse(InputStream inStream) throws IOException;
+
 
 }

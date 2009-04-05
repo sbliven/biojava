@@ -21,7 +21,10 @@
  */
 package org.biojava.bio.structure.io.mmcif;
 
+import java.util.List;
+
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
+import org.biojava.bio.structure.io.mmcif.model.ChemComp;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
 import org.biojava.bio.structure.io.mmcif.model.Entity;
@@ -75,6 +78,15 @@ public interface MMcifConsumer {
 	public void newPdbxEntityNonPoly(PdbxEntityNonPoly pen);
 	public void newStructKeywords(StructKeywords kw);
 	public void newRefine(Refine r);
+	public void newChemComp(ChemComp c);
+
+	/** This method is called if no particular handler for the provided cif category
+	 * has been implemented so far.
+	 * @param category The category that is being processed.
+	 * @param loopFields the fields of this category.
+	 * @param lineData the data that is being provided.
+	 */
+	public void newGenericData(String category, List<String> loopFields, List<String> lineData);
 
 
 

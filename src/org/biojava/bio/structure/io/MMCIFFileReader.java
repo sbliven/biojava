@@ -93,7 +93,7 @@ public class MMCIFFileReader implements StructureIOFile {
 	 * @return the Structure object
 	 * @throws IOException ...
 	 */
-	public Structure getStructure(String filename) 
+	public Structure getStructure(String filename)
 	throws IOException
 	{
 		File f = new File(filename);
@@ -102,7 +102,7 @@ public class MMCIFFileReader implements StructureIOFile {
 	}
 
 	/** opens filename, parses it and returns a Structure object
-	 * 
+	 *
 	 * @param filename a File object
 	 * @return the Structure object
 	 * @throws IOException ...
@@ -112,11 +112,11 @@ public class MMCIFFileReader implements StructureIOFile {
 		InputStreamProvider isp = new InputStreamProvider();
 
 		InputStream inStream = isp.getInputStream(filename);
-	
+
 		return parseFromInputStream(inStream);
 	}
-	
-	
+
+
 
 	private Structure parseFromInputStream(InputStream inStream) throws IOException{
 
@@ -125,7 +125,7 @@ public class MMCIFFileReader implements StructureIOFile {
 		SimpleMMcifConsumer consumer = new SimpleMMcifConsumer();
 
 		// The Consumer builds up the BioJava - structure object.
-		// you could also hook in your own and build up you own data model.          
+		// you could also hook in your own and build up you own data model.
 		parser.addMMcifConsumer(consumer);
 
 
@@ -183,12 +183,12 @@ public class MMCIFFileReader implements StructureIOFile {
 					break;
 				}
 
-				if ( pdbFile != null) break;        
+				if ( pdbFile != null) break;
 			}
 		}
 
 		if ( pdbFile == null ) {
-			if ( autoFetch) 
+			if ( autoFetch)
 				return downloadAndGetInputStream(pdbId);
 
 			String message = "no structure with PDB code " + pdbId + " found!" ;
@@ -198,7 +198,7 @@ public class MMCIFFileReader implements StructureIOFile {
 		return inputStream ;
 	}
 
-	
+
 	private InputStream downloadAndGetInputStream(String pdbId)
 		throws IOException{
 		//PDBURLReader reader = new PDBURLReader();
@@ -207,41 +207,41 @@ public class MMCIFFileReader implements StructureIOFile {
 		if ( tmp != null ) {
 			InputStreamProvider prov = new InputStreamProvider();
 			return prov.getInputStream(tmp);
-			
+
 
 		} else {
 			throw new IOException("could not find PDB " + pdbId + " in file system and also could not download");
 		}
 
 	}
-	
+
 	private File downloadPDB(String pdbId){
-		
-		File tempFile = new File(path+"/"+pdbId+".cif.gz");		
+
+		File tempFile = new File(path+"/"+pdbId+".cif.gz");
 		File pdbHome = new File(path);
-		
+
 		if ( ! pdbHome.canWrite() ){
 			System.err.println("can not write to " + pdbHome);
 			return null;
 		}
-		
-		String ftp = String.format("ftp://ftp.wwpdb.org/pub/pdb/data/structures/all/mmCIF/%s.cif.gz", pdbId.toLowerCase()); 
 
-		System.out.println("Fetching " + ftp); 
+		String ftp = String.format("ftp://ftp.wwpdb.org/pub/pdb/data/structures/all/mmCIF/%s.cif.gz", pdbId.toLowerCase());
+
+		System.out.println("Fetching " + ftp);
 		try {
 			URL url = new URL(ftp);
-			InputStream conn = url.openStream();			
+			InputStream conn = url.openStream();
 
 			// prepare destination
 			System.out.println("writing to " + tempFile);
-					
+
 			FileOutputStream outPut = new FileOutputStream(tempFile);
 			GZIPOutputStream gzOutPut = new GZIPOutputStream(outPut);
 			PrintWriter pw = new PrintWriter(gzOutPut);
-			
+
 			BufferedReader fileBuffer = new BufferedReader(new InputStreamReader(new GZIPInputStream(conn)));
 			String line;
-			while ((line = fileBuffer.readLine()) != null) {				
+			while ((line = fileBuffer.readLine()) != null) {
 				pw.println(line);
 			}
 			pw.flush();
@@ -250,12 +250,12 @@ public class MMCIFFileReader implements StructureIOFile {
 			conn.close();
 		} catch (Exception e){
 			e.printStackTrace();
-			return null; 
+			return null;
 		}
 		return tempFile;
 	}
-	
-	public boolean isAutoFetch() {		
+
+	public boolean isAutoFetch() {
 		return autoFetch;
 	}
 
