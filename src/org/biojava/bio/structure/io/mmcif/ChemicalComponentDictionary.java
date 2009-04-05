@@ -52,7 +52,7 @@ public class ChemicalComponentDictionary {
 
 	/** if ChemComp is replacing another one, get the old version
 	 * otherwise return the same ChemComp again.
-	 * @param comp
+	 * @param  c the ChemComp for which older versions should be looked up.
 	 */
 
 	public ChemComp getReplaced(ChemComp c){
