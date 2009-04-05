@@ -89,7 +89,7 @@ public class ArrowGlyph implements Glyph {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see org.biojava.bio.gui.glyph.Glyph#getBounds()
+	 * see org.biojava.bio.gui.glyph.Glyph#getBounds()
 	 */
 	public Rectangle2D.Float getBounds() {
 		return bounds;
@@ -98,7 +98,7 @@ public class ArrowGlyph implements Glyph {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see org.biojava.bio.gui.glyph.Glyph#setBounds(java.awt.geom.Rectangle2D.Float)
+	 * see org.biojava.bio.gui.glyph.Glyph#setBounds(java.awt.geom.Rectangle2D.Float)
 	 */
 	public void setBounds(Rectangle2D.Float r) {
 		if (bounds.equals(r)) return;
@@ -179,7 +179,7 @@ public class ArrowGlyph implements Glyph {
 	/**
 	 * Returns the paint properties of this glyph.
 	 *
-	 * @return the fillPaint 
+	 * @return the fillPaint
 	 */
 	public Paint getFillPaint() {
 		return fillPaint;
