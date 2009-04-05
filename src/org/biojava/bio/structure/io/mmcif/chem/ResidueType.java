@@ -1,15 +1,36 @@
+/*
+ *                    BioJava development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public Licence.  This should
+ * be distributed with the code.  If you do not have a copy,
+ * see:
+ *
+ *      http://www.gnu.org/copyleft/lesser.html
+ *
+ * Copyright for this code is held jointly by the individual
+ * authors.  These should be listed in @author doc comments.
+ *
+ * For more information on the BioJava project and its aims,
+ * or to join the biojava-l mailing list, visit the home page
+ * at:
+ *
+ *      http://www.biojava.org/
+ *
+ *
+ */
 package org.biojava.bio.structure.io.mmcif.chem;
 
 import java.io.Serializable;
 
 
-
 /**
- * Enumerates the possible classifications of the residues represented by a given {@link ResidueInfo}.
- * This information is derived from the mmcif dictionary
+ * Enumerates the possible classifications of residues.
+ * This information is derived from the mmcif dictionary.
  * @author mulvaney
- * @see Sequence#getPolymerType()
+ * @author Andreas Prlic
  * @see <a href="http://mmcif.rcsb.org/dictionaries/mmcif_pdbx.dic/Items/_chem_comp.type.html">link into mmCIF dictionary</a>
+ * @since 1.7
  */
 
 public enum ResidueType implements Serializable {
@@ -66,46 +87,3 @@ public enum ResidueType implements Serializable {
       return null;
    }
 }
-
-/* PRESENT IN DB:
-atomn
-D-peptide linking
-D-saccharide
-D-saccharide 1,4 and 1,4 linking
-DNA linking
-DNA OH 3 prime terminus
-dna-linking
-L-peptide linking
-L-saccharide
-L-saccharide 1,4 and 1,4 linking
-non-polymer
-RNA linking
-saccharide
-*/
-
-/* Enumerated in mmCIF dictionary
- * Item Value  Description
-D-peptide linking    n.a.
-L-peptide linking    n.a.
-D-peptide NH3 amino terminus  n.a.
-L-peptide NH3 amino terminus  n.a.
-D-peptide COOH carboxy terminus  n.a.
-L-peptide COOH carboxy terminus  n.a.
-DNA linking    n.a.
-RNA linking    n.a.
-DNA OH 5 prime terminus    n.a.
-RNA OH 5 prime terminus    n.a.
-DNA OH 3 prime terminus    n.a.
-RNA OH 3 prime terminus    n.a.
-D-saccharide 1,4 and 1,4 linking    n.a.
-L-saccharide 1,4 and 1,4 linking    n.a.
-D-saccharide 1,4 and 1,6 linking    n.a.
-L-saccharide 1,4 and 1,6 linking    n.a.
-L-saccharide   n.a.
-D-saccharide   n.a.
-saccharide  n.a.
-non-polymer    n.a.
-other    n.a.
- *
- *
- */
