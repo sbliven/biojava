@@ -37,7 +37,7 @@ import org.biojava.utils.ChangeVetoException;
 public class GlyphFeatureRenderer extends FilteringRenderer implements
     FeatureRenderer {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7005846487574725181L;
 
@@ -109,7 +109,7 @@ public class GlyphFeatureRenderer extends FilteringRenderer implements
 
 	/**
 	 * Allows setting another {@link Glyph } object to be painted for the given
-	 * {@see FeatureFilter}.
+	 * FeatureFilter.
 	 *
 	 * @param ff
 	 * @param glyph
