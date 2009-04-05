@@ -988,7 +988,7 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	}
 
 	public void newChemComp(ChemComp c) {
-		throw new NotImplementedException();
+		// TODO: do something with them...
 
 	}
 
