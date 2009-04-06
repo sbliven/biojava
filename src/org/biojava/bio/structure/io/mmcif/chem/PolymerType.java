@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Enumerates the possible classifications of the polymers represented by a given {@link Sequence}.
+ * Enumerates the classification of polymers.
  * This information is derived from the mmcif dictionary
  * @author mulvaney
  * @author Andreas Prlic
