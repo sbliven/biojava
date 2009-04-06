@@ -27,6 +27,8 @@ import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
+import org.biojava.bio.seq.StrandedFeature;
+
 /**
  * A Glyph that paints an arrow shape within the bounds. The
  * <code>setDirection</code> method allows the decision of the direction, to
@@ -108,7 +110,7 @@ public class ArrowGlyph implements Glyph {
 	/**
 	 * This method allows you to decide in which direction the arrow has to point.
 	 * The definition of directions is equal to the definition of
-	 * {@see StrandedFeature}.
+	 *  {@link StrandedFeature}.
 	 *
 	 * @param direction
 	 *          A +1 means to the right, -1 to the left an 0 (and any other value)
