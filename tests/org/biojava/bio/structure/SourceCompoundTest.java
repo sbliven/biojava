@@ -19,14 +19,19 @@
  *
  * created at Apr 5, 2008
  */
+
 package org.biojava.bio.structure;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.List;
+
 import org.biojava.bio.structure.io.PDBFileParser;
 
+
 import junit.framework.TestCase;
+
 
 public class SourceCompoundTest extends TestCase{
 
@@ -184,8 +189,43 @@ public class SourceCompoundTest extends TestCase{
         comp.showSource();
 
         assertEquals("10090", comp.getOrganismTaxId());
-
         assertEquals("9606", comp.getExpressionSystemTaxId());
 
 	}
+
+    /**
+     * 3.2 format includes PMID and DOI in the JRNL section.
+     */
+    public void testJournalRefs(){
+//        JRNL        AUTH   M.HAMMEL,G.SFYROERA,D.RICKLIN,P.MAGOTTI,
+//        JRNL        AUTH 2 J.D.LAMBRIS,B.V.GEISBRECHT
+//        JRNL        TITL   A STRUCTURAL BASIS FOR COMPLEMENT INHIBITION BY
+//        JRNL        TITL 2 STAPHYLOCOCCUS AUREUS.
+//        JRNL        REF    NAT.IMMUNOL.                  V.   8   430 2007
+//        JRNL        REFN                   ISSN 1529-2908
+//        JRNL        PMID   17351618
+//        JRNL        DOI    10.1038/NI1450
+        Structure structure = getStructure("/files/2gox_v315.pdb");
+        //check that there really is an publication
+        assertTrue(structure.hasJournalArticle());
+
+        if (structure.hasJournalArticle()) {
+            JournalArticle journal = structure.getJournalArticle();
+            List<Author> authorList = journal.getAuthorList();
+            Author firstAuthor = authorList.get(0);
+            //check the authors
+            assertEquals(6, authorList.size());
+            assertEquals("HAMMEL", firstAuthor.getSurname());
+            assertEquals("M.", firstAuthor.getInitials());
+            //check the other publication details
+            assertEquals("A STRUCTURAL BASIS FOR COMPLEMENT INHIBITION BY STAPHYLOCOCCUS AUREUS.", journal.getTitle());               
+            assertEquals("NAT.IMMUNOL.", journal.getJournalName());
+            assertEquals(2007, journal.getPublicationDate());
+            assertEquals("8", journal.getVolume());
+            assertEquals("430", journal.getStartPage());
+            assertEquals("ISSN 1529-2908", journal.getRefn());
+            assertEquals("17351618", journal.getPmid());
+            assertEquals("10.1038/NI1450", journal.getDoi());
+        }
+    }
 }

@@ -41,6 +41,7 @@ import java.util.StringTokenizer;
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.AminoAcidImpl;
 import org.biojava.bio.structure.AtomImpl;
+import org.biojava.bio.structure.Author;
 import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.ChainImpl;
 import org.biojava.bio.structure.DBRef;
@@ -48,6 +49,7 @@ import org.biojava.bio.structure.Group;
 import org.biojava.bio.structure.GroupIterator;
 import org.biojava.bio.structure.HetatomImpl;
 import org.biojava.bio.structure.Compound;
+import org.biojava.bio.structure.JournalArticle;
 import org.biojava.bio.structure.NucleotideImpl;
 import org.biojava.bio.structure.PDBHeader;
 import org.biojava.bio.structure.SSBond;
@@ -119,9 +121,10 @@ import org.biojava.bio.structure.StructureTools;
  */
 public class PDBFileParser  {
 
-	private final boolean DEBUG = false;
+	private final boolean DEBUG = true;
 
 	// required for parsing:
+    private String pdbId; //the actual id of the entry
 	private Structure     structure;
 	private List<Chain>   current_model; // contains the ATOM records for each model
 	private Chain         current_chain;
@@ -136,6 +139,7 @@ public class PDBFileParser  {
 
 	private Map <String,Object>  header ;
 	private PDBHeader pdbHeader;
+    private JournalArticle journalArticle;
 	private List<Map<String, Integer>> connects ;
 	private List<Map<String,String>> helixList;
 	private List<Map<String,String>> strandList;
@@ -149,6 +153,7 @@ public class PDBFileParser  {
 	private List<Compound> compounds = new ArrayList<Compound>();
 	private List<String> compndLines = new ArrayList<String>();
 	private List<String> sourceLines = new ArrayList<String>();
+    private List<String> journalLines = new ArrayList<String>();
 	private List<DBRef> dbrefs;
 
 	// for parsing COMPOUND and SOURCE Header lines
@@ -411,6 +416,10 @@ public class PDBFileParser  {
 		String deposition_date = line.substring (50, 59).trim() ;
 		String pdbCode         = line.substring (62, 66).trim() ;
 
+        pdbId = pdbCode;
+        if (DEBUG) {
+            System.out.println("Parsing entry " + pdbId);
+        }
 		header.put("idCode",pdbCode);
 		structure.setPDBCode(pdbCode);
 		header.put("classification",classification);
@@ -872,6 +881,39 @@ public class PDBFileParser  {
 		header.put("title",t);
 		pdbHeader.setTitle(t);
 	}
+
+     /**
+     * JRNL handler.
+     * The JRNL record contains the primary literature citation that describes the experiment which resulted
+     * in the deposited coordinate set. There is at most one JRNL reference per entry. If there is no primary
+     * reference, then there is no JRNL reference. Other references are given in REMARK 1.
+
+    Record Format
+
+    COLUMNS       DATA TYPE     FIELD         DEFINITION
+    -----------------------------------------------------------------------
+    1 -  6       Record name   "JRNL  "
+
+    13 - 70       LString        text         See Details below.
+
+     */
+    private void pdb_JRNL_Handler(String line) {
+        //add the strings to the journalLines
+        //the actual JournalArticle is then built when the whole entry is being
+        //finalized with triggerEndFileChecks()
+        //JRNL        TITL   NMR SOLUTION STRUCTURE OF RECOMBINANT TICK           1TAP  10
+        if (line.substring(line.length() - 8, line.length() - 4).equals(pdbId)) {
+            //trim off the trailing PDB id from legacy files.
+            //are we really trying to still cater for these museum pieces?
+            if (DEBUG) {
+                System.out.println("trimming legacy PDB id from end of JRNL section line");
+            }
+            line = line.substring(0, line.length() - 8);
+            journalLines.add(line);
+        } else {
+            journalLines.add(line);
+        }
+    }
 
 	/**
 	 * This should not be accessed directly, other than by </code>makeCompounds</code>. It still deals with the same
@@ -2029,6 +2071,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 						sourceLines.add(line); //pdb_SOURCE_Handler
 					else if (recordName.equals("COMPND"))
 						compndLines.add(line); //pdb_COMPND_Handler
+                    else if (recordName.equals("JRNL"))
+						pdb_JRNL_Handler(line);
 					else if (recordName.equals("EXPDTA"))
 						pdb_EXPDTA_Handler(line);
 					else if (recordName.equals("REMARK"))
@@ -2143,6 +2187,12 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 				current_model.add(current_chain);
 			}
 		}
+
+        //set the JournalArticle, if there is one
+        if (!journalLines.isEmpty()) {
+            buildjournalArticle();
+            structure.setJournalArticle(journalArticle);
+        }
 
 		structure.addModel(current_model);
 		structure.setHeader(header);
@@ -2296,6 +2346,285 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		}
 
 	}
+    private void buildjournalArticle() {
+        if (DEBUG) {
+            System.out.println("building new JournalArticle");
+//            for (String line : journalLines) {
+//                System.out.println(line);
+//            }
+        }
+        this.journalArticle = new JournalArticle();
+//        JRNL        AUTH   M.HAMMEL,G.SFYROERA,D.RICKLIN,P.MAGOTTI,
+//        JRNL        AUTH 2 J.D.LAMBRIS,B.V.GEISBRECHT
+//        JRNL        TITL   A STRUCTURAL BASIS FOR COMPLEMENT INHIBITION BY
+//        JRNL        TITL 2 STAPHYLOCOCCUS AUREUS.
+//        JRNL        REF    NAT.IMMUNOL.                  V.   8   430 2007
+//        JRNL        REFN                   ISSN 1529-2908
+//        JRNL        PMID   17351618
+//        JRNL        DOI    10.1038/NI1450
+        StringBuffer auth = new StringBuffer();
+        StringBuffer titl = new StringBuffer();
+        StringBuffer edit = new StringBuffer();
+        StringBuffer ref = new StringBuffer();
+        StringBuffer publ = new StringBuffer();
+        StringBuffer refn = new StringBuffer();
+        StringBuffer pmid = new StringBuffer();
+        StringBuffer doi = new StringBuffer();
+
+        for (String line : journalLines) {
+//            System.out.println("'" + line + "'");
+            String subField = line.substring(12, 16);
+//            System.out.println("'" + subField + "'");
+            if (subField.equals("AUTH")) {
+                auth.append(line.substring(19, line.length()).trim());
+                if (DEBUG) {
+                    System.out.println("AUTH '" + auth.toString() + "'");
+                }
+            }
+            if (subField.equals("TITL")) {
+                //add a space to the end of a line so that when wrapped the
+                //words on the join won't be concatenated
+                titl.append(line.substring(19, line.length()).trim() + " ");
+                if (DEBUG) {
+                    System.out.println("TITL '" + titl.toString() + "'");
+                }
+            }
+            if (subField.equals("EDIT")) {
+                edit.append(line.substring(19, line.length()).trim());
+                if (DEBUG) {
+                    System.out.println("EDIT '" + edit.toString() + "'");
+                }
+            }
+            //        JRNL        REF    NAT.IMMUNOL.                  V.   8   430 2007
+            if (subField.equals("REF ")) {
+                ref.append(line.substring(19, line.length()).trim() + " ");
+                if (DEBUG) {
+                    System.out.println("REF '" + ref.toString() + "'");
+                }
+            }
+            if (subField.equals("PUBL")) {
+                publ.append(line.substring(19, line.length()).trim() + " ");
+                if (DEBUG) {
+                    System.out.println("PUBL '" + publ.toString() + "'");
+                }
+            }
+            //        JRNL        REFN                   ISSN 1529-2908
+            if (subField.equals("REFN")) {
+                refn.append(line.substring(35, line.length()).trim());
+                if (DEBUG) {
+                    System.out.println("REFN '" + refn.toString() + "'");
+                }
+            }
+            //        JRNL        PMID   17351618
+            if (subField.equals("PMID")) {
+                pmid.append(line.substring(19, line.length()).trim());
+                if (DEBUG) {
+                    System.out.println("PMID '" + pmid.toString() + "'");
+                }
+            }
+            //        JRNL        DOI    10.1038/NI1450
+            if (subField.equals("DOI ")) {
+                doi.append(line.substring(19, line.length()).trim());
+                if (DEBUG) {
+                    System.out.println("DOI '" + doi.toString() + "'");
+                }
+            }
+        }
+
+        //now set the parts of the JournalArticle
+        journalArticle.setAuthorList(authorBuilder(auth.toString()));
+        journalArticle.setEditorList(authorBuilder(edit.toString()));
+        journalArticle.setRef(ref.toString());
+        JournalParser journalParser = new JournalParser(ref.toString());
+        journalArticle.setJournalName(journalParser.getJournalName());
+        if (!journalArticle.getJournalName().equals("TO BE PUBLISHED")) {
+            journalArticle.setIsPublished(true);
+        }
+        journalArticle.setVolume(journalParser.getVolume());
+        journalArticle.setStartPage(journalParser.getStartPage());
+        journalArticle.setPublicationDate(journalParser.getPublicationDate());
+        journalArticle.setPublisher(publ.toString().trim());
+        journalArticle.setTitle(titl.toString().trim());
+        journalArticle.setRefn(refn.toString().trim());
+        journalArticle.setPmid(pmid.toString().trim());
+        journalArticle.setDoi(doi.toString().trim());
+
+    }
+
+    //inner class to deal with all the journal info
+    private class JournalParser {
+
+        private String journalName;
+        private String volume;
+        private String startPage;
+        private int publicationDate;
+        private String ref;
+
+        public JournalParser(String ref) {
+            if (DEBUG) {
+                System.out.println("JournalParser init '" + ref + "'");
+            }
+
+            this.ref = ref;
+            if (ref.equals("TO BE PUBLISHED ")) {
+                journalName = ref.trim();
+                return;
+            }
+
+
+            //REF    NUCLEIC ACIDS RES.                         2009
+            //REF    MOL.CELL                                   2009
+            //REF    NAT.STRUCT.MOL.BIOL.          V.  16   238 2009
+            //REF    ACTA CRYSTALLOGR.,SECT.F      V.  65   199 2009
+            //check if the date is present at the end of the line.
+            //                             09876543210987654321
+            //'J.AM.CHEM.SOC.                V. 130 16011 2008 '
+            //'NAT.STRUCT.MOL.BIOL.          V.  16   238 2009'
+            String dateString = ref.substring(ref.length() - 5 , ref.length() - 1).trim();
+            String startPageString = ref.substring(ref.length() - 11 , ref.length() - 6).trim();
+            String volumeString = ref.substring(ref.length() - 14 , ref.length() - 12).trim();
+            String journalString = ref.substring(0 , ref.length() - 18).trim();
+            if (DEBUG) {
+                System.out.println("JournalParser found volumeString " + volumeString);
+                System.out.println("JournalParser found startPageString " + startPageString);
+                System.out.println("JournalParser found dateString " + dateString);
+            }
+
+            if (!dateString.equals("    ")) {
+                publicationDate = Integer.valueOf(dateString);
+                if (DEBUG) {
+                    System.out.println("JournalParser set date " + publicationDate);
+                }
+            }
+
+            if (!startPageString.equals("    ")) {
+                startPage = startPageString;
+                if (DEBUG) {
+                    System.out.println("JournalParser set startPage " + startPage);
+                }
+            }
+
+            if (!volumeString.equals("    ")) {
+                volume = volumeString;
+                if (DEBUG) {
+                    System.out.println("JournalParser set volume " + volume);
+                }
+            }
+
+            if (!journalString.equals("    ")) {
+                journalName = journalString;
+                if (DEBUG) {
+                    System.out.println("JournalParser set journalName " + journalName);
+                }
+            }
+        }
+
+        private String getJournalName() {
+            return journalName;
+        }
+
+        private int getPublicationDate() {
+            return publicationDate;
+        }
+
+        private String getStartPage() {
+            return startPage;
+        }
+
+        private String getVolume() {
+            return volume;
+        }
+    }
+
+    private List<Author> authorBuilder(String authorString) {
+        ArrayList<Author> authorList = new ArrayList<Author>();
+
+        if (authorString.equals("")) {
+            return authorList;
+        }
+
+        String[] authors = authorString.split(",");
+//        if (DEBUG) {
+//            for (int i = 0; i < authors.length; i++) {
+//                String string = authors[i];
+//                System.out.println("authorBuilder author: '" + string + "'");
+//            }
+//        }
+//        AUTH   SEATTLE STRUCTURAL GENOMICS CENTER FOR INFECTIOUS
+//        AUTH 2 DISEASE (SSGCID)
+//        or
+//        AUTH   E.DOBROVETSKY,A.DONG,A.SEITOVA,B.DUNCAN,L.CROMBET,
+//        AUTH 2 M.SUNDSTROM,C.H.ARROWSMITH,A.M.EDWARDS,C.BOUNTRA,
+//        AUTH 3 A.BOCHKAREV,D.COSSAR,
+//        AUTH 4 STRUCTURAL GENOMICS CONSORTIUM (SGC)
+//        or
+//        AUTH   T.-C.MOU,S.R.SPRANG,N.MASADA,D.M.F.COOPER
+        if (authors.length == 1) {
+            //only one element means it's a consortium only
+            Author author = new Author();
+            author.setSurname(authors[0]);
+            if (DEBUG) {
+                System.out.println("Set consortium author name " + author.getSurname());
+            }
+            authorList.add(author);
+        } else {
+            for (int i = 0; i < authors.length; i++) {
+                String authorFullName = authors[i];
+                if (DEBUG) {
+                    System.out.println("Building author " + authorFullName);
+                }
+                Author author = new Author();
+                String regex = "\\.";
+                String[] authorNames = authorFullName.split(regex);
+//                if (DEBUG) {
+//                    System.out.println("authorNames size " + authorNames.length);
+//                    for (int j = 0; j < authorNames.length; j++) {
+//                        String name = authorNames[j];
+//                        System.out.println("split authName '" + name + "'");
+//
+//                    }
+//                }
+                if (authorNames.length == 0) {
+                    author.setSurname(authorFullName);
+                    if (DEBUG) {
+                        System.out.println("Unable to split using '" + regex + "' Setting whole name " + author.getSurname());
+                    }
+                }
+                //again there might be a consortium name so there may be no elements
+                else if (authorNames.length == 1) {
+                    author.setSurname(authorNames[0]);
+                    if (DEBUG) {
+                        System.out.println("Set consortium author name in multiple author block " + author.getSurname
+());
+                    }
+                } else {
+                    String initials = "";
+                    for (int j = 0; j < authorNames.length - 1; j++) {
+                        String initial = authorNames[j];
+//                        if (DEBUG) {
+//                            System.out.println("adding initial '" + initial + "'");
+//                        }
+                        //build the initials back up again
+                        initials += initial + ".";
+                    }
+                    if (DEBUG) {
+                        System.out.println("built initials '" + initials + "'");
+                    }
+                    author.setInitials(initials);
+                    //surname is always last
+                    int lastName = authorNames.length - 1;
+                    String surname = authorNames[lastName];
+                    if (DEBUG) {
+                        System.out.println("built author surname " + surname);
+                    }
+                    author.setSurname(surname);
+
+                }
+                authorList.add(author);
+            }
+        }
+        return authorList;
+    }
 
 
 }

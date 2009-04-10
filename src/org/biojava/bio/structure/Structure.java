@@ -513,8 +513,29 @@ public interface Structure extends Cloneable{
      * @return the PDBHeader object
      */
     public PDBHeader getPDBHeader();
-    
-    
+
+    /**
+     * return whether or not the entry has an associated journal article
+     * or publication. The JRNL section is not mandatory and thus may not be
+     * present.
+     * @return
+     */
+    public boolean hasJournalArticle();
+
+    /**
+     * get the associated publication as defined by the JRNL records in a PDB
+     * file.
+     * @return a JournalArticle
+     */
+    public JournalArticle getJournalArticle();
+
+    /**
+     * set the associated publication as defined by the JRNL records in a PDB
+     * file.
+     * @param journalArticle
+     */
+    public void setJournalArticle(JournalArticle journalArticle);
+
     /** get the list of SSBonds as they have been defined in the PDB files
      * 
      * @return a list of SSBonds
