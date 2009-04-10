@@ -53,6 +53,7 @@ public class StructureImpl implements Structure {
     List<DBRef> dbrefs;
     List<SSBond> ssbonds;
 	String name ;
+    private JournalArticle journalArticle;
 	private PDBHeader pdbHeader;
 	boolean nmrflag ;
 	private Long id;
@@ -272,6 +273,9 @@ public class StructureImpl implements Structure {
 	 * @see #setHeader
 	 */
 	public Map<String,Object> getHeader()         { return header ;}
+
+
+
 
 	/** @see Structure interface.
 	 *
@@ -640,6 +644,38 @@ public class StructureImpl implements Structure {
     	ssbonds.add(ssbond);
     	ssbond.setSerNum(ssbonds.size());
     }
+
+    /**
+     * return whether or not the entry has an associated journal article
+     * or publication. The JRNL section is not mandatory and thus may not be
+     * present.
+     * @return
+     */
+    public boolean hasJournalArticle() {
+        if (this.journalArticle != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * get the associated publication as defined by the JRNL records in a PDB
+     * file.
+     * @return a JournalArticle
+     */
+    public JournalArticle getJournalArticle() {
+        return this.journalArticle;
+    }
+
+    /**
+     * set the associated publication as defined by the JRNL records in a PDB
+     * file.
+     * @param journalArticle
+     */
+    public void setJournalArticle(JournalArticle journalArticle) {
+        this.journalArticle = journalArticle;
+    }
+    
 
 
 
