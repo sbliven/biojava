@@ -121,7 +121,7 @@ import org.biojava.bio.structure.StructureTools;
  */
 public class PDBFileParser  {
 
-	private final boolean DEBUG = true;
+	private final boolean DEBUG = false;
 
 	// required for parsing:
     private String pdbId; //the actual id of the entry
