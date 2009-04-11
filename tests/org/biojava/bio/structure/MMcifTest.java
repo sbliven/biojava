@@ -180,7 +180,7 @@ public class MMcifTest extends TestCase {
 
 	private void checkGroups(Group g1, Group g2){
 
-		System.out.println("comparing " +g1 + " " + g2);
+	   //System.out.println("comparing " +g1 + " " + g2);
 
 		assertEquals(g1.getType(),g2.getType());
 		assertEquals(g1.getPDBCode(),g2.getPDBCode());
