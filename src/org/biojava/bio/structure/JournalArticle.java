@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * PDB-specific
  * @author Jules Jacobsen
+ * @since 1.7
  */
 public class JournalArticle {
 
@@ -111,7 +112,7 @@ public class JournalArticle {
     /**
      * Set the value of the ref.
      *
-     * @param refn new value of ref
+     * @param ref new value of ref
      */
     public void setRef(String ref) {
         this.ref = ref;
@@ -121,7 +122,7 @@ public class JournalArticle {
      * Get the value of REFN field.
      * For example: ISSN 0969-2126
      *
-     * @return the value of refn
+     * @return the value of ref
      */
     public String getRefn() {
         return refn;
