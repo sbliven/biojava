@@ -106,7 +106,7 @@ public class MMCIFFileReader implements StructureIOFile {
 		extensions.clear();
 	}
 
-	/** opens filename, parses it and returns
+	/** Opens filename, parses it and returns
 	 * a Structure object .
 	 * @param filename  a String
 	 * @return the Structure object
@@ -120,7 +120,7 @@ public class MMCIFFileReader implements StructureIOFile {
 
 	}
 
-	/** opens filename, parses it and returns a Structure object
+	/** Opens filename, parses it and returns a Structure object.
 	 *
 	 * @param filename a File object
 	 * @return the Structure object
