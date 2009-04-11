@@ -33,9 +33,9 @@ import org.biojava.bio.structure.NucleotideImpl;
 
 
 /**
- * 
+ *
  * Interface for a structure object. Provides access to the data of a PDB file.
- * 
+ *
  * A structure object allows to access the PDB header information as well
  * as to the data from the ATOM records. The header information is
  * currently available through the following objects:
@@ -44,7 +44,7 @@ import org.biojava.bio.structure.NucleotideImpl;
  * <li>{@link DBRef}</li>
  * <li>{@link Compound}</li>
  * </ul>
- * 
+ *
  * The structure object provides access to the data from the ATOM records through
  * a hierarchy of sub-object:
  * <pre>
@@ -56,13 +56,13 @@ import org.biojava.bio.structure.NucleotideImpl;
  *                 |
  *                 {@link Atom}
  * </pre>
- * 
+ *
  * For more documentation on how to work with the Structure API please
  * see <a href="http://biojava.org/wiki/BioJava:CookBook#Protein_Structure" target="_top">
  * http://biojava.org/wiki/BioJava:CookBook#Protein_Structure</a>
- * 
- * 
- * 
+ *
+ *
+ *
  *
 <hr/>
 </hr>
@@ -107,7 +107,7 @@ public void calcPhiPsi({@link Structure} structure){
 		// {@link AminoAcid}, {@link HetatomImpl Hetatom} or {@link NucleotideImpl Nucleotide} groups.
 		//
 		// Note: BioJava provides access to both the ATOM and SEQRES data in a PDB file.
-		// since we are interested in doing calculations here, we only request the groups 
+		// since we are interested in doing calculations here, we only request the groups
 		// from the ATOM records
 
 		//  get the Groups of the chain that are AminoAcids.
@@ -134,8 +134,8 @@ public void calcPhiPsi({@link Structure} structure){
 					// the Calc class provides utility methods for various calculations on
 					// structures, groups and atoms
 
-					phi = {@link Calc}.getPhi(a,b);	   			   
-				} catch ({@link StructureException} e){		    
+					phi = {@link Calc}.getPhi(a,b);
+				} catch ({@link StructureException} e){
 					e.printStackTrace();
 					phi = 360.0 ;
 				}
@@ -157,24 +157,24 @@ public void calcPhiPsi({@link Structure} structure){
 		}
 </pre>
 <hr>
-</hr> 
+</hr>
 
  *
- * 
+ *
  *
  * @author Andreas Prlic
  * @since 1.4
  * @version %I% %G%
  */
 public interface Structure extends Cloneable{
-	
-    
+
+
 	/** returns an identical copy of this Structure object
-	 * 
+	 *
 	 * @return identical copy of this Structure object
 	 */
 	public Structure clone();
-	
+
     /**
      * String representation of object.
      */
@@ -206,7 +206,7 @@ public interface Structure extends Cloneable{
      */
     public void setName(String name);
 
-    /** get biological name of Structure. 
+    /** get biological name of Structure.
      *
      * @return a String representing the biological name of the Structure
      * @see #setName
@@ -229,7 +229,7 @@ public interface Structure extends Cloneable{
      */
     public Map<String,Object> getHeader() ;
 
-    /** 
+    /**
        sets/gets an List of  Maps which corresponds to the CONECT lines in the PDB file:
 
        <pre>
@@ -263,7 +263,7 @@ public interface Structure extends Cloneable{
        <li> salt1 .. salt2 (optional): Serial number of salt bridged atom</li>
 
        *
-       * @param connections  a List object specifying the connections 
+       * @param connections  a List object specifying the connections
        * @see #getConnections
     */
     public void setConnections(List<Map<String,Integer>> connections);
@@ -280,7 +280,7 @@ public interface Structure extends Cloneable{
      */
     public int size() ;
 
-    /** return number of chains of model.	
+    /** return number of chains of model.
     *
     * @param modelnr  an int specifying the number of the Model that should be used
     * @return an int representing the number of Chains in this Model
@@ -302,13 +302,13 @@ public interface Structure extends Cloneable{
      * @return true if this Structure has been resolved by NMR
      */
     public boolean isNmr() ;
-    
+
     /** set NMR flag.
      *
      * @param nmr  true to declare that this Structure has been solved by NMR.
      */
     public void setNmr(boolean nmr);
-    
+
 
     /** add a new model.
      *
@@ -316,15 +316,15 @@ public interface Structure extends Cloneable{
      */
     public void addModel(List<Chain> model);
 
-    
+
     /** a convenience function if one wants to edit and replace the
-     * models in a structure. allows to set (replace) the model at position 
+     * models in a structure. allows to set (replace) the model at position
      * with the new List of Chains.
      * @param position starting at 0
      * @param model
      */
     public void setModel(int position, List<Chain> model);
-    
+
     /** retrieve all Chains belonging to a model .
      * @see #getChains(int modelnr)
      *
@@ -338,21 +338,21 @@ public interface Structure extends Cloneable{
      * This is the same as getChains(0);
      * @see #getModel(int modelnr)
      * @see #getChains(int modelnr)
-     *     
+     *
      * @return a List object containing the Chains of Model nr. modelnr
      */
     public List<Chain> getChains();
-    
-    
+
+
     /** set the chains of a structure, if this is a NMR structure,
      * this will only set model 0.
-     * 
+     *
      * @see #setChains(int, List)
-     * 
+     *
      * @param chains the list of chains for this structure.
      */
     public void setChains(List<Chain> chains);
-    
+
     /** retrieve all chains of a model.
      * @see #getModel
      *
@@ -362,11 +362,11 @@ public interface Structure extends Cloneable{
     public List<Chain> getChains(int modelnr);
 
     /** set the chains for a model
-     * @param chains       
+     * @param chains
      * @param modelnr
      */
     public void setChains( int modelnr, List<Chain> chains);
-    
+
     /** add a new chain.
      *
      * @param chain  a Chain object
@@ -381,7 +381,7 @@ public interface Structure extends Cloneable{
     public void addChain(Chain chain, int modelnr);
 
     /** retrieve a chain by it's position within the Structure .
-     * 
+     *
      * @param pos  an int for the position in the List of Chains.
      * @return a Chain object
     */
@@ -396,7 +396,7 @@ public interface Structure extends Cloneable{
     public Chain getChain(int pos, int modelnr);
 
 
-    
+
     /** request a particular chain from a structure.
      * by default considers only the first model.
      * @param chainId the ID of a chain that should be returned
@@ -405,20 +405,20 @@ public interface Structure extends Cloneable{
      */
     public Chain findChain(String chainId)
     throws StructureException;
-    
-    
+
+
     /** check if a chain with the id chainId is contained in this structure.
-     * 
+     *
      * @param chainId the name of the chain
      * @return true if a chain with the id (name) chainId is found
      */
     public boolean hasChain(String chainId);
-    
+
     /** request a particular chain from a particular model
      * @param modelnr the number of the model to use
      * @param chainId the ID of a chain that should be returned
      * @return Chain the requested chain
-     * @throws StructureException 
+     * @throws StructureException
      */
     public Chain findChain(String chainId, int modelnr)
     throws StructureException;
@@ -428,88 +428,88 @@ public interface Structure extends Cloneable{
     * @param chainId the ID of the chain to use
     * @param pdbResnum the PDB residue number of the requested group
     * @return Group the requested Group
-    * @throws StructureException 
-    * 
+    * @throws StructureException
+    *
     */
     public  Group findGroup(String chainId, String pdbResnum)
     throws StructureException;
-    
+
     /** request a particular group from a structure.
      * considers only model nr X. count starts with 0.
      * @param chainId the ID of the chain to use
      * @param pdbResnum the PDB residue number of the requested group
      * @param modelnr the number of the model to use
      * @return Group the requested Group
-     * @throws StructureException  
+     * @throws StructureException
      */
      public  Group findGroup(String chainId, String pdbResnum, int modelnr)
      throws StructureException;
-     
-    
+
+
      /** request a chain by it's PDB code
       * by default takes only the first model
-      * 
-      * @param chainId the chain identifier 
+      *
+      * @param chainId the chain identifier
       * @return the Chain that matches the chainID
-      * @throws StructureException 
+      * @throws StructureException
       */
      public Chain getChainByPDB(String chainId)
          throws StructureException;
-     
+
      /** request a chain by it's PDB code
       * by default takes only the first model
-      * 
+      *
       * @param chainId the chain identifier
-      * @param modelnr request a particular model; 
+      * @param modelnr request a particular model;
       * @return the Chain that matches the chainID in the model
-      * @throws StructureException 
+      * @throws StructureException
       */
      public Chain getChainByPDB(String chainId, int modelnr)
          throws StructureException;
-     
-     
+
+
     /** create a String that contains the contents of a PDB file .
      *
      * @return a String that looks like a PDB file
      * @see FileConvert
      */
     public String toPDB();
-    
+
     /** set the compounts
-     * 
+     *
      * @param molList
      */
     public void setCompounds(List<Compound>molList);
-    
+
     /** get all the Compounds that are defined in the PDB Header
-     * 
+     *
      * @return a list of compound
      */
     public List<Compound> getCompounds();
-    
+
     /** set the list of database references for this structure
      * @param dbrefs list of DBRef objects
-     * 
+     *
      *
      */
     public void setDBRefs(List<DBRef> dbrefs);
-    
+
     /** get the list of database references
-     * 
+     *
      * @return list of DBRef objects
      */
     public List<DBRef> getDBRefs();
-    
+
     /** request a particular compound by its id
-     * 
+     *
      * @param molId
      * @return a compound
      */
     public Compound getCompoundById(String molId);
-    
-    
+
+
     /** return the header information for this PDB file
-     * 
+     *
      * @return the PDBHeader object
      */
     public PDBHeader getPDBHeader();
@@ -518,7 +518,7 @@ public interface Structure extends Cloneable{
      * return whether or not the entry has an associated journal article
      * or publication. The JRNL section is not mandatory and thus may not be
      * present.
-     * @return
+     * @return flag if a JournalArticle has been found.
      */
     public boolean hasJournalArticle();
 
@@ -537,40 +537,40 @@ public interface Structure extends Cloneable{
     public void setJournalArticle(JournalArticle journalArticle);
 
     /** get the list of SSBonds as they have been defined in the PDB files
-     * 
+     *
      * @return a list of SSBonds
      */
     public List<SSBond> getSSBonds();
 
     /** set the list of SSBonds for this structure
-     * 
+     *
      * @param ssbonds
      */
     public void setSSBonds(List<SSBond> ssbonds);
-    
+
     /** add a single SSBond to this structure
-     * 
+     *
      * @param ssbond
      */
     public void addSSBond(SSBond ssbond);
-    
+
     /** the the header information for this PDB file
-     * 
+     *
      * @param header the PDBHeader object
      */
     public void setPDBHeader(PDBHeader header);
-    
+
     /** get the ID used by Hibernate
-     * 
+     *
      * @return the ID used by Hibernate
      */
     public Long getId() ;
 
     /** set the ID used by Hibernate
-     * 
+     *
      * @param id
-     */ 
+     */
     public void setId(Long id) ;
-    	
-    
+
+
 }
