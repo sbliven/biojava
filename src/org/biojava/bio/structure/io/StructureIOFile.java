@@ -34,30 +34,30 @@ import org.biojava.bio.structure.Structure;
  * @author Andreas Prlic
  */
 public interface StructureIOFile extends StructureIO {
-    
+
     /** Set path to file / connection string to db.
      * This is for installations of PDB/mmCif where all files are located in one directory.
-     * 
+     *
      * @param path  a String specifying the path value
      */
     public void setPath(String path) ;
 
     /** get the directory path to the files
-     * 
+     *
      * @return path
      */
     public String getPath();
-    
+
     /** add a known File extension.
      * @param ext  a String ...
      */
     public void addExtension(String ext);
 
     /** clear all file extensions
-     * 
+     *
      */
     public void clearExtensions();
-    
+
     /** open filename and returns
      * a Structure object.
      * @param filename  a String
@@ -65,7 +65,7 @@ public interface StructureIOFile extends StructureIO {
      * @throws IOException ...
      */
     public Structure getStructure(String filename) throws IOException ;
-    
+
     /** read file from File and returns
      * a Structure object.
      * @param file file containing a PDB or mmcif file
@@ -73,19 +73,19 @@ public interface StructureIOFile extends StructureIO {
      * @throws IOException ...
      */
     public Structure getStructure(File file) throws IOException ;
-    
-    /** Fetch files automatically from RCSB FTP server. Default: false
-     * 
+
+    /** Fetch files automatically from FTP server. Default: false
+     *
      * @return flag is true or false.
      */
     public boolean isAutoFetch();
-    
-    /** tell the parser to fetch missing PDB files from the EBI FTP server automatically.
-	 * 
+
+    /** Tell the parser to fetch missing PDB files from the FTP server automatically.
+	 *
 	 * default is false. If true, new PDB files will be automatically stored in the Path and gzip compressed.
-	 * 
+	 *
 	 * @param autoFetch flag.
 	 */
 	public void setAutoFetch(boolean autoFetch);
-    
+
 }
