@@ -2466,14 +2466,13 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
         private String volume;
         private String startPage;
         private int publicationDate;
-        private String ref;
+
 
         public JournalParser(String ref) {
             if (DEBUG) {
                 System.out.println("JournalParser init '" + ref + "'");
             }
 
-            this.ref = ref;
             if (ref.equals("TO BE PUBLISHED ")) {
                 journalName = ref.trim();
                 return;
