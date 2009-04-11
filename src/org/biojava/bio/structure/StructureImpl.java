@@ -638,7 +638,7 @@ public class StructureImpl implements Structure {
 
     /** add a single SSBond to this structure
      *
-     * @param ssbond
+     * @param ssbond the SSBond.
      */
     public void addSSBond(SSBond ssbond){
     	ssbonds.add(ssbond);
@@ -646,10 +646,10 @@ public class StructureImpl implements Structure {
     }
 
     /**
-     * return whether or not the entry has an associated journal article
+     * Return whether or not the entry has an associated journal article
      * or publication. The JRNL section is not mandatory and thus may not be
      * present.
-     * @return
+     * @return flag if a JournalArticle could be found.
      */
     public boolean hasJournalArticle() {
         if (this.journalArticle != null) {
@@ -670,12 +670,12 @@ public class StructureImpl implements Structure {
     /**
      * set the associated publication as defined by the JRNL records in a PDB
      * file.
-     * @param journalArticle
+     * @param journalArticle the article
      */
     public void setJournalArticle(JournalArticle journalArticle) {
         this.journalArticle = journalArticle;
     }
-    
+
 
 
 
