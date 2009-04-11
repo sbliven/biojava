@@ -2372,6 +2372,10 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
         StringBuffer doi = new StringBuffer();
 
         for (String line : journalLines) {
+           if ( line.length() < 19 ) {
+              System.err.println("can not process Journal line: " + line);
+              continue;
+           }
 //            System.out.println("'" + line + "'");
             String subField = line.substring(12, 16);
 //            System.out.println("'" + subField + "'");
@@ -2410,6 +2414,10 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
             }
             //        JRNL        REFN                   ISSN 1529-2908
             if (subField.equals("REFN")) {
+               if ( line.length() < 35 ) {
+                  System.err.println("can not process Journal REFN line: " + line);
+                  continue;
+               }
                 refn.append(line.substring(35, line.length()).trim());
                 if (DEBUG) {
                     System.out.println("REFN '" + refn.toString() + "'");
