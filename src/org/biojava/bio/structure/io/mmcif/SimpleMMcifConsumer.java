@@ -65,8 +65,6 @@ import org.biojava.bio.structure.io.mmcif.model.StructRef;
 import org.biojava.bio.structure.io.mmcif.model.StructRefSeq;
 import org.biojava.bio.symbol.IllegalSymbolException;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 /** A MMcifConsumer implementation that build a in-memory representation of the
  * content of a mmcif file as a BioJava Structure object.
  *  @author Andreas Prlic
@@ -995,8 +993,9 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 	public void newGenericData(String category, List<String> loopFields,
 			List<String> lineData) {
 
-		System.err.println("unhandled category so far: " + category);
-
+	   if (DEBUG) {
+	      System.err.println("unhandled category so far: " + category);
+	   }
 	}
 
 }
