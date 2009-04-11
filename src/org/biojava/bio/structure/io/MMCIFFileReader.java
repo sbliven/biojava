@@ -41,7 +41,26 @@ import org.biojava.bio.structure.io.mmcif.SimpleMMcifConsumer;
 import org.biojava.bio.structure.io.mmcif.SimpleMMcifParser;
 import org.biojava.utils.io.InputStreamProvider;
 
+/** How to parse an mmCif file:
+ * <pre>
+  public static void main(String[] args){
+        String filename =  "/path/to/something.cif.gz" ;
 
+        StructureIOFile reader = new MMCIFFileReader();
+
+        try{
+            Structure struc = reader.getStructure(filename);
+            System.out.println(struc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    </pre>
+ *
+ * @author Andreas Prlic
+ * @since 1.7
+ *
+ */
 public class MMCIFFileReader implements StructureIOFile {
 
 	String path;
@@ -147,6 +166,10 @@ public class MMCIFFileReader implements StructureIOFile {
 		return path;
 	}
 
+	/** Get a structure by PDB code. This works if a PATH has been set via setPath, or if setAutoFetch has been set to true.
+	 *
+	 * @param pdbId a 4 letter PDB code.
+	 */
 	public Structure getStructureById(String pdbId) throws IOException {
 		InputStream inStream = getInputStream(pdbId);
 
