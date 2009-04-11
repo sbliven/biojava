@@ -28,14 +28,17 @@ public class DatabasePDBrev {
 	String replaces;
 	String mod_type;
 	String num;
-	
+
 	public String toString(){
 		StringBuffer buf = new StringBuffer();
 		buf.append("DatabasePDBrev ");
+		buf.append("mod_type :");
+		buf.append(mod_type);
+		buf.append(" ");
 		buf.append(this.getDate());
 		buf.append( " ");
 		buf.append( this.getDate_original());
-		
+
 		return buf.toString();
 	}
 	public String getNum() {
@@ -74,6 +77,6 @@ public class DatabasePDBrev {
 	public void setMod_type(String mod_type) {
 		this.mod_type = mod_type;
 	}
-	
-	
+
+
 }
