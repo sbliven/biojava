@@ -29,6 +29,7 @@ public class ChemComp {
 	String pdbx_model_coordinates_db_code;
 	String pdbx_subcomponent_list;
 	String pdbx_processing_site;
+	String mon_nstd_flag;
 
 	// and some derived data for easier processing...
 	ResidueType residueType;
@@ -260,6 +261,16 @@ public class ChemComp {
 	public void setStandard(boolean standard) {
 		this.standard = standard;
 	}
+
+   public String getMon_nstd_flag()
+   {
+      return mon_nstd_flag;
+   }
+
+   public void setMon_nstd_flag(String mon_nstd_flag)
+   {
+      this.mon_nstd_flag = mon_nstd_flag;
+   }
 
 
 }
