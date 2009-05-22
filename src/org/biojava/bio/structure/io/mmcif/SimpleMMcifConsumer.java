@@ -542,7 +542,6 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 
 		// fix the chain IDS in the current model:
 
-		//TODO: test this with NMR structures!
 		Set<String> asymIds = asymStrandId.keySet();
 
 		for (int i =0; i< structure.nrModels() ; i++){
