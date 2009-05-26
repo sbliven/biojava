@@ -22,6 +22,7 @@
  *
  */
 package org.biojava.bio.structure;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,9 +40,14 @@ import org.biojava.bio.structure.io.PDBParseException;
  */
 public class   AminoAcidImpl
 extends    HetatomImpl
-implements AminoAcid
+implements AminoAcid, Serializable
 {
-	/** this is an Amino acid. type is "amino". */
+	/**
+    *
+    */
+   private static final long serialVersionUID = -6018854413829044230L;
+
+   /** this is an Amino acid. type is "amino". */
 	public static final String type = GroupType.AMINOACID;
 
 	/* IUPAC amino acid residue names

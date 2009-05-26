@@ -4,6 +4,7 @@
  */
 package org.biojava.bio.structure;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +13,13 @@ import java.util.List;
  * @author Jules Jacobsen
  * @since 1.7
  */
-public class JournalArticle {
+public class JournalArticle implements Serializable{
 
-    private List<Author> authorList = new ArrayList<Author>();
+    /**
+    *
+    */
+   private static final long serialVersionUID = 5062668226159515468L;
+   private List<Author> authorList = new ArrayList<Author>();
     private List<Author> editorList = new ArrayList<Author>();
     private String title = "";
     private String ref = "";

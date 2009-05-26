@@ -23,6 +23,7 @@
  */
 package org.biojava.bio.structure;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,9 +42,13 @@ import org.biojava.bio.structure.io.FileConvert;
  * @since 1.4
  * @version %I% %G%
  */
-public class StructureImpl implements Structure {
+public class StructureImpl implements Structure, Serializable {
 
-	String pdb_id ;
+	/**
+    *
+    */
+   private static final long serialVersionUID = -8344837138032851347L;
+   String pdb_id ;
 	/* models is an ArrayList of ArrayLists */
 	List<List<Chain>> models;
 	//List<Chain> seqResList;

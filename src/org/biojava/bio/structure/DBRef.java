@@ -22,6 +22,7 @@
  */
 package org.biojava.bio.structure;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Formatter;
 import java.util.Locale;
@@ -34,9 +35,13 @@ import java.util.Locale;
  * @since 4:56:14 PM
  * @version %I% %G%
  */
-public class DBRef implements PDBRecord{
+public class DBRef implements PDBRecord, Serializable{
 
-	Structure parent;
+	/**
+    *
+    */
+   private static final long serialVersionUID = -1050178577542224379L;
+   Structure parent;
 	String idCode;
     Character chainId;
     int seqbegin;
@@ -121,7 +126,7 @@ public class DBRef implements PDBRecord{
     	 StringBuilder build = new StringBuilder();
 
     	Formatter form = new Formatter(build,Locale.UK);
-    	
+
         form.format("DBREF %4s %1s %4d%1s %4d%1s %6s %8s %12s %5d%1c %5d%1c ",
                 idCode, chainId,seqbegin,insertBegin,seqEnd,insertEnd,
                 database,dbAccession,dbIdCode,

@@ -16,32 +16,33 @@
  * at:
  *
  *      http://www.biojava.org/
- * 
+ *
  * Created on Mar 1, 2006
  *
  */
 package org.biojava.bio.structure.align.helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 
-/** A utility class that defines which set of atoms are considered 
+/** A utility class that defines which set of atoms are considered
  * to be on equivalent positions.
- * 
+ *
  *
  */
 public class JointFragments {
 
-    
+
         double rms;
         List<int[]> idxlist;
         public JointFragments(){
             idxlist = new ArrayList<int[]>();
             rms = 999;
         }
-        
+
         public void setIdxlist(List<int[]> idxs) {
             Iterator<int[]> iter = idxs.iterator();
             while (iter.hasNext()){
@@ -49,9 +50,9 @@ public class JointFragments {
                 idxlist.add(e);
             }
         }
-        
-        
-        
+
+
+
         public double getRms() {
             return rms;
         }
@@ -69,23 +70,26 @@ public class JointFragments {
                 //e = (f[0]+k,f[1]+k)
                 //e = (f[0]+k,f[1]+k);
                 int[] e = new int[] {p1+k,p2+k};
-                
+
                 // check if already known ...
                 Iterator<int[]> iter = idxlist.iterator();
                 while (iter.hasNext()){
                     int[] kno = (int[])iter.next();
                     if ((kno[0] == e[0]) && ( kno[1] == e[1])){
-                        System.err.println("already known index pair!! how is this possible?" + e[0] + " " + e[1]);
+                        System.err.println("already known index pair, not adding a 2nd time." + e[0] + " " + e[1]);
+                        return;
                     }
                 }
                 idxlist.add(e);
+                Collections.sort(idxlist, new IdxComparator());
             }
         }
-        
+
+
         public String toString(){
             String s = "Joint Fragment idxlist len: " +idxlist.size();
             return s;
         }
-    
-    
+
+
 }

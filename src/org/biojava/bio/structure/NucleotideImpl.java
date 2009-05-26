@@ -22,6 +22,8 @@
  *
  */
 package org.biojava.bio.structure;
+import java.io.Serializable;
+
 import org.biojava.bio.structure.io.PDBParseException;
 
 
@@ -36,10 +38,14 @@ import org.biojava.bio.structure.io.PDBParseException;
  */
 public class NucleotideImpl
     extends HetatomImpl
-    implements Group
+    implements Group, Serializable
 {
 
-    /** this is a "nucleotide", a special occurance of a Hetatom. */
+    /**
+    *
+    */
+   private static final long serialVersionUID = -7467726932980288712L;
+   /** this is a "nucleotide", a special occurance of a Hetatom. */
     public static final String type = GroupType.NUCLEOTIDE;
 
     /*

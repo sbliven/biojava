@@ -22,6 +22,7 @@
  *
  */
 package org.biojava.bio.structure;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,9 +42,14 @@ import org.biojava.bio.structure.io.PDBParseException;
  * @version %I% %G%
  * @since 1.4
  */
-public class HetatomImpl implements Group {
+public class HetatomImpl implements Group,Serializable {
 
-    /** this is a "hetatm".
+    /**
+    *
+    */
+   private static final long serialVersionUID = 4491470432023820382L;
+
+   /** this is a "hetatm".
      *
      */
     public static final String type = GroupType.HETATM ;

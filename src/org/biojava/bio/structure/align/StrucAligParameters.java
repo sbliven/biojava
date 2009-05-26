@@ -16,7 +16,7 @@
  * at:
  *
  *      http://www.biojava.org/
- * 
+ *
  * Created on May 21, 2006
  *
  */
@@ -25,44 +25,45 @@ package org.biojava.bio.structure.align;
 import org.biojava.bio.structure.StructureTools;
 
 /** A class that contains all the parameters of the structure alignment algorithm.
- * 
+ *
  * @author Andreas Prlic
  * @since 1.5
  * @version %I% %G%
  */
 public class StrucAligParameters {
 
- 
+
     int initialK;
     String[] usedAtomNames = { StructureTools.caAtomName, } ;
-    
+
     // step 1
 
     int seedFragmentLength; // seed fragment length
-    float seedRmsdCutoff;   
-    
+    float seedRmsdCutoff;
+
     int fragmentLength;
     int diagonalDistance;
     int diagonalDistance2; // set to < 1 if not used.
     boolean reduceInitialFragments;
-    
-    // step 2 
+
+    // step 2
     float fragmentMiniDistance;
     float fragCompat;   // fragment compatibility cutoff
     int maxrefine;      // max number of JointFragments to be refined
-    
+
     boolean joinPlo; // joining according to BioPython variant
-    
+    boolean joinFast; // apply a fast procedure for extending the alignments
+
     // joininf of fragments - checks
-    boolean doAngleCheck  ;          
-    boolean doDistanceCheck;         
-    boolean doDensityCheck;          
-    boolean doRMSCheck;  
+    boolean doAngleCheck  ;
+    boolean doDistanceCheck;
+    boolean doDensityCheck;
+    boolean doRMSCheck;
     float densityCutoff;
-    
+
     int angleDiff;      // directional difference
     double joinRMSCutoff; // rms cutoff to be applied during joining of fragments.
- 
+
     // step 4
     float create_co; //  alignment generation cutoff
     int maxIter; //  # max number of iterations in refinement
@@ -70,46 +71,48 @@ public class StrucAligParameters {
     float gapExtension; // gap extensionpenalty
     int permutationSize; // minimal size for a permutated fragment ( -1 means no circular permutation search)
     float evalCutoff; //  alignment evaluation cutoff
-    
+
     public StrucAligParameters() {
         super();
         setDefault();
     }
-    
+
     public static StrucAligParameters getDefaultParameters(){
         StrucAligParameters n = new StrucAligParameters();
         return n;
     }
-    
+
     private void setDefault() {
         initialK = 6;
-        
+
         // step 1
         seedFragmentLength      = 8;
         seedRmsdCutoff          = 3.0f; // orig 2.0 - better?
         fragmentLength          = 10;
-        diagonalDistance        = 3; 
-        diagonalDistance2       = 9; // this helps a lot in 1buz vs 1aua 
+        diagonalDistance        = 3;
+        diagonalDistance2       = 9; // this helps a lot in 1buz vs 1aua
         fragmentMiniDistance    = 3.5f; // orig 2
         angleDiff               = 10;
         fragCompat              = 6.0f; // orig 4.0
         maxrefine               = 20; // orig 20
-        
+
         // step 2
         reduceInitialFragments  =  true; // if this is disabled, you might want to also disable doRMSCheck for large structures...
         joinRMSCutoff           = 5.0; // orig 4
         joinPlo                 = false;
+        joinFast                = false;
+
 
         // 3 joint fragments
         doAngleCheck            = true;
-        doDistanceCheck         = true;        
+        doDistanceCheck         = true;
         doRMSCheck              = true;
-        
+
         doDensityCheck          = false; // hm this one needs improvements before being used
         densityCutoff           = 7.0f;
-        
+
         //  step 3
-        create_co           = 6.0f; 
+        create_co           = 6.0f;
         maxIter             = 4;  // number of times dynamic programming is run. set to zero for quick search (but imprecise)
         gapOpen             = 20.0f;
         gapExtension        = 0.0f;
@@ -119,38 +122,38 @@ public class StrucAligParameters {
     public String toString() {
         StringBuffer buf = new StringBuffer();
         String t = " ";
-        	
+
         Object[] params = new Object[]{new Integer(initialK) ,new Integer(seedFragmentLength),
         		new Float(seedRmsdCutoff),
         		new Integer(fragmentLength),
                 new Integer(diagonalDistance), new Integer(diagonalDistance2), new Float(fragmentMiniDistance),
-                new Integer(angleDiff), 
-                new Float(fragCompat), new Integer(maxrefine), 
+                new Integer(angleDiff),
+                new Float(fragCompat), new Integer(maxrefine),
                 new Boolean(reduceInitialFragments), new Double(joinRMSCutoff), new Boolean(joinPlo),
-                new Boolean(doAngleCheck), new Boolean(doDistanceCheck), new Boolean(doRMSCheck), 
+                new Boolean(doAngleCheck), new Boolean(doDistanceCheck), new Boolean(doRMSCheck),
                 new Boolean(doDensityCheck), new Float(densityCutoff), new Float(create_co), new Integer(maxIter),
                 new Float(gapOpen), new Float(gapExtension), new Integer(permutationSize), new Float(evalCutoff)};
-        
+
         for (int i=0 ; i< params.length ; i++){
             buf.append(params[i]);
             buf.append(t);
         }
-        
-        
+
+
         return buf.toString();
 
     }
-    
+
     public static StrucAligParameters getDBSearchParameters(){
         StrucAligParameters params = new StrucAligParameters();
-        
+
         params.setMaxIter(0); // not so nice alignments, but significant similarities should already be found,
         // one could do a second interation later over the top ranking hits and make a nicer alignment.
-        
-        
+
+
         return params;
     }
-    
+
     public float getDensityCutoff() {
         return densityCutoff;
     }
@@ -171,7 +174,13 @@ public class StrucAligParameters {
         return seedFragmentLength;
     }
 
+    public boolean isJoinFast(){
+       return joinFast;
+    }
 
+    public void setJoinFast(boolean fastJoin){
+       joinFast = fastJoin;
+    }
 
     public boolean isJoinPlo() {
         return joinPlo;
@@ -251,9 +260,9 @@ public class StrucAligParameters {
         this.evalCutoff = evalCutoff;
     }
 
-    
 
-    
+
+
     public int getPermutationSize() {
         return permutationSize;
     }
@@ -297,7 +306,7 @@ public class StrucAligParameters {
     /** if this is set to false, the time spent to joint the initial fragments (step 2)
      * is increased. - particular for large structures this increases calc. time a lot.
      * advantage: more combinations of fragments are used.
-     * 
+     *
      * @return a flag if the inital fragments should be reduced
      */
     public boolean reduceInitialFragments() {
@@ -355,8 +364,8 @@ public class StrucAligParameters {
     public void setDiagonalDistance(int diagonalDistance) {
         this.diagonalDistance = diagonalDistance;
     }
-    
-    
+
+
 
     public int getDiagonalDistance2() {
         return diagonalDistance2;
@@ -373,8 +382,8 @@ public class StrucAligParameters {
     public void setFragmentMiniDistance(float fragmentMiniDistance) {
         this.fragmentMiniDistance = fragmentMiniDistance;
     }
-    
-    
-    
-    
+
+
+
+
 }

@@ -238,7 +238,7 @@ public class MMCIFFileReader implements StructureIOFile {
 
 	}
 
-	private File downloadPDB(String pdbId){
+	public File downloadPDB(String pdbId){
 
 		File tempFile = new File(path+"/"+pdbId+".cif.gz");
 		File pdbHome = new File(path);

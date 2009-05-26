@@ -25,6 +25,7 @@
 package org.biojava.bio.structure;
 
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +45,13 @@ import java.util.List;
  * Date: 22-Jan-2007
  * Time: 18:14:25
  */
-public class Compound implements Cloneable {
+public class Compound implements Cloneable, Serializable {
 
-	private List<Chain> chainList = new ArrayList<Chain>();
+	/**
+    *
+    */
+   private static final long serialVersionUID = 2991897825657586356L;
+   private List<Chain> chainList = new ArrayList<Chain>();
 	private List<String> chainId = null;
 	private String refChainId = null;
 	private String molId = "0";
@@ -119,7 +124,7 @@ public class Compound implements Cloneable {
 			Method[] methods  = c.getMethods();
 
 			for (int i = 0; i < methods.length; i++) {
-				Method m = methods[i];     
+				Method m = methods[i];
 
 				String name = m.getName();
 				if ( name.substring(0,3).equals("get")) {
@@ -134,7 +139,7 @@ public class Compound implements Cloneable {
 							buf.append(name.substring(3, name.length())+": "+ o + " ");
 					}
 					if ( o instanceof List){
-						if ( o != null)                        	
+						if ( o != null)
 							buf.append(name.substring(3,name.length())+": ");
 
 						List<Object>lst = (List<Object>)o;
@@ -163,7 +168,7 @@ public class Compound implements Cloneable {
 	}
 
 	/** get the ID used by Hibernate
-	 * 
+	 *
 	 * @return the ID used by Hibernate
 	 */
 	public Long getId() {
@@ -171,16 +176,16 @@ public class Compound implements Cloneable {
 	}
 
 	/** set the ID used by Hibernate
-	 * 
+	 *
 	 * @param id
-	 */ 
+	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
 
 	/**
 	 * Print some debug statements to System.out
-	 * 
+	 *
 	 *
 	 */
 	public void showHeader(){
@@ -740,11 +745,11 @@ public class Compound implements Cloneable {
 	}
 
 	/** get the chains that are part of this Compound
-	 * 
+	 *
 	 * @return a List of Chain objects
 	 */
 	 public List<Chain> getChains(){
-		return this.chainList;   
+		return this.chainList;
 	}
 
 	public void addChain(Chain chain){

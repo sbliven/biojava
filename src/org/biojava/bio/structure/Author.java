@@ -5,13 +5,19 @@
 
 package org.biojava.bio.structure;
 
+import java.io.Serializable;
+
 /**
  * Describes author attributes for author information in a PDB file.
  * @author Jules Jacobsen
  */
-public class Author {
+public class Author implements Serializable{
 
-    private String surname = "";
+    /**
+    *
+    */
+   private static final long serialVersionUID = 4840370515056666418L;
+   private String surname = "";
     private String initials = "";
 
 

@@ -23,6 +23,8 @@
  */
 package org.biojava.bio.structure;
 
+import java.io.Serializable;
+
 
 /**
  * Implementation of an Atom of a PDB file.
@@ -31,33 +33,37 @@ package org.biojava.bio.structure;
  * @since 1.4
  * @version %I% %G%
  */
-public class AtomImpl implements Atom {
-    
-    String name     ;
+public class AtomImpl implements Atom,Serializable {
+
+    /**
+    *
+    */
+   private static final long serialVersionUID = -2258364127420562883L;
+   String name     ;
     String fullName ;
     double[] coords ;
     String pdbline  ;
     int pdbserial   ;
-    
+
     double occupancy ;
     double tempfactor;
-    
+
     Character altLoc ;
     Group parent;
     long id;
-    
+
     public AtomImpl () {
         name     = null        ;
         fullName = null        ;
         coords   = new double[3];
-        pdbline  = ""          ;  
+        pdbline  = ""          ;
         occupancy  = 0.0       ;
         tempfactor = 0.0       ;
         altLoc = new Character(' ');
         parent = null;
     }
     /** Get the Hibernate database ID.
-     * 
+     *
      * @return the id
      * @see #setId(long)
      */
@@ -66,58 +72,58 @@ public class AtomImpl implements Atom {
 	}
 
 	/** Set the Hibernate database ID.
-     * 
+     *
      * @param id the hibernate id
      * @see #getId()
      */
 	public void setId(long id) {
 		this.id = id;
 	}
-    
-    /** trimmed version of atom name, e.g. "CA" 
+
+    /** trimmed version of atom name, e.g. "CA"
      * @see #getName
      */
     public void   setName(String s) { name = s ;}
-    
+
     /**
      * Gets this object's name.
      * @return a String representing the name value
      * @see #setName
      */
     public String getName()         { return name ;}
-    
+
     /** set full name of atom e.g. " CA " .
      * @see #getFullName
      */
     public void   setFullName( String s ) { fullName =s ; }
-    
-    /** get full name of atom e.g. " CA ". 
+
+    /** get full name of atom e.g. " CA ".
      * @return a String representing the full name value
      * @see #setFullName
      */
     public String getFullName()           { return fullName; }
-    
-    /** set PDB atom number. 
+
+    /** set PDB atom number.
      * @see #getPDBserial
      */
     public void setPDBserial(int i) { pdbserial = i    ; }
-    
+
     /** get PDB atom number.
      * @see #setPDBserial
      */
     public int  getPDBserial()      { return pdbserial ; }
-    
+
     /** the coordinates.
-     * @see #getCoords 
-     */    
-    public void     setCoords( double[] c ) { coords = c   ; } 
-    
+     * @see #getCoords
+     */
+    public void     setCoords( double[] c ) { coords = c   ; }
+
     /** get the coordinates as a double[3] array .
      * @return an array of doubles representing the coords value
-     * @see #setCoords     
+     * @see #setCoords
      */
     public double[] getCoords()            { return coords ; }
-    
+
     public void setX(double x) {
         coords[0] = x ;
     }
@@ -127,24 +133,24 @@ public class AtomImpl implements Atom {
     public void setZ(double z) {
         coords[2] = z ;
     }
-    
-    /** Get the X coordinate. 
+
+    /** Get the X coordinate.
      * @see #setX(double)
      * */
     public double getX() { return coords[0]; }
-    
-    /** Get the Y coordinate. 
+
+    /** Get the Y coordinate.
      * @see #setY(double)
      * */
     public double getY() { return coords[1]; }
-    
-    /** Get the Z coordinate. 
+
+    /** Get the Z coordinate.
      * @see #setZ(double)
-     * 
+     *
      * */
     public double getZ() { return coords[2]; }
-    
-    /** set alternate Location. 
+
+    /** set alternate Location.
      * @see #getAltLoc
      */
     public void setAltLoc(Character c) {
@@ -157,40 +163,40 @@ public class AtomImpl implements Atom {
     public Character getAltLoc() {
         return altLoc ;
     }
-    
-    
-    /** store the whole line. 
+
+
+    /** store the whole line.
      * @see #getPDBline
      */
     public void   setPDBline(String s) { pdbline = s;}
-    
+
     /** get the whole line .
      * @return a String representing the PDBline value
      * @see #setPDBline
      */
     public String getPDBline() { return pdbline ;}
-    
+
     /** string representation. */
     public String toString() {
         String str = name +" "+ pdbserial + " " + coords[0] + " " + coords[1] + " " + coords[2];
         return str ;
     }
-    
+
     public void   setOccupancy(double occu){ occupancy = occu ;} ;
     public double getOccupancy(){ return occupancy; } ;
-    
+
     public void   setTempFactor(double temp){ tempfactor = temp ;} ;
     public double getTempFactor(){ return tempfactor; } ;
-    
+
     /** returns and identical copy of this  object .
-     * @return  and identical copy of this  object 
+     * @return  and identical copy of this  object
      */
     public Object clone() {
         AtomImpl n = new AtomImpl();
         n.setOccupancy(getOccupancy());
         n.setTempFactor(getTempFactor());
         n.setAltLoc(getAltLoc());
-        double[] coords = getCoords();     
+        double[] coords = getCoords();
         n.setX(coords[0]);
         n.setY(coords[1]);
         n.setZ(coords[2]);
@@ -199,16 +205,16 @@ public class AtomImpl implements Atom {
         n.setName(getName());
         return n ;
     }
-    
+
     public void setParent(Group parent) {
-        
+
         this.parent = parent;
     }
-  
+
     public Group getParent() {
         return parent;
-       
-    }   
-    
-    
+
+    }
+
+
 }

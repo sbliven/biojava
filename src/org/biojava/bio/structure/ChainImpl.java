@@ -24,6 +24,7 @@
 package org.biojava.bio.structure;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,9 +44,14 @@ import org.biojava.bio.symbol.IllegalSymbolException;
  * @author Jules Jacobsen
  * @since 1.4
  */
-public class ChainImpl implements Chain {
+public class ChainImpl implements Chain, Serializable {
 
-	/** The default chain identifier is an empty space.
+	/**
+    *
+    */
+   private static final long serialVersionUID = 1990171805277911840L;
+
+   /** The default chain identifier is an empty space.
 	 *
 	 */
 	public static String DEFAULT_CHAIN_ID = "A";

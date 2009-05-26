@@ -1,13 +1,12 @@
 package org.biojava.bio.structure;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 
 
 /** A class that contains PDB Header information.
@@ -16,8 +15,12 @@ import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
  * @since 1.6
  *
  */
-public class PDBHeader implements PDBRecord{
-	String method;
+public class PDBHeader implements PDBRecord, Serializable{
+	/**
+    *
+    */
+   private static final long serialVersionUID = -5834326174085429508L;
+   String method;
 	String title;
 	String description;
 	String idCode;
