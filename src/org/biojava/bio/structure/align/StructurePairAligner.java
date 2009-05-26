@@ -34,9 +34,11 @@ import java.util.List;
 import org.biojava.bio.structure.Atom;
 import org.biojava.bio.structure.AtomImpl;
 import org.biojava.bio.structure.Calc;
+import org.biojava.bio.structure.Chain;
 import org.biojava.bio.structure.SVDSuperimposer;
 import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
+import org.biojava.bio.structure.StructureImpl;
 import org.biojava.bio.structure.StructureTools;
 import org.biojava.bio.structure.align.helper.AlignTools;
 import org.biojava.bio.structure.align.helper.JointFragments;
@@ -46,7 +48,6 @@ import org.biojava.bio.structure.align.pairwise.AlternativeAlignment;
 import org.biojava.bio.structure.align.pairwise.FragmentJoiner;
 import org.biojava.bio.structure.align.pairwise.FragmentPair;
 import org.biojava.bio.structure.gui.BiojavaJmol;
-import org.biojava.bio.structure.gui.events.AlignmentPositionListener;
 import org.biojava.bio.structure.io.PDBFileParser;
 import org.biojava.bio.structure.io.PDBFileReader;
 import org.biojava.bio.structure.jama.Matrix;
@@ -375,7 +376,7 @@ public class StructurePairAligner {
 
 
 
-	/** calculate the alignment between the two full structures with default parameters
+	/** Calculate the alignment between the two full structures with default parameters
 	 *
 	 * @param s1
 	 * @param s2
@@ -387,8 +388,11 @@ public class StructurePairAligner {
 		align(s1,s2,params);
 	}
 
+	
+	
+	
 
-	/** calculate the alignment between the two full structures with user provided parameters
+	/** Calculate the alignment between the two full structures with user provided parameters
 	 *
 	 * @param s1
 	 * @param s2
@@ -408,6 +412,53 @@ public class StructurePairAligner {
 	}
 
 
+	/** Align two chains from the structures. Uses default parameters.
+	 * 
+	 * @param s1
+	 * @param chainId1
+	 * @param s2
+	 * @param chainId2
+	 */
+	public void align(Structure s1, String chainId1, Structure s2, String chainId2) 
+	throws StructureException{
+		align(s1,chainId1,s2,chainId2, params);
+	}
+	
+	/** Aligns two chains from the structures using user provided parameters.
+	 * 
+	 * @param s1
+	 * @param chainId1
+	 * @param s2
+	 * @param chainId2
+	 * @param params
+	 * @throws StructureException
+	 */
+	public void align(Structure s1, String chainId1, Structure s2, String chainId2, StrucAligParameters params)
+	throws StructureException{
+		reset();
+		this.params = params;
+		
+		Chain c1 = s1.getChainByPDB(chainId1);
+		Chain c2 = s2.getChainByPDB(chainId2);
+		
+		Structure s3 = new StructureImpl();
+		s3.addChain(c1);
+		
+		Structure s4 = new StructureImpl();
+		s4.addChain(c2);
+		
+		Atom[] ca1 = getAlignmentAtoms(s3);
+		Atom[] ca2 = getAlignmentAtoms(s4); 
+				
+		notifyStartingAlignment(s1.getName(),ca1,s2.getName(),ca2);
+		align(ca1,ca2,params);
+	}
+	
+	/** Returns the atoms that are being used for the alignment. (E.g. Calpha only, etc.)
+	 * 
+	 * @param s
+	 * @return
+	 */
 	public  Atom[] getAlignmentAtoms(Structure s){
 		String[] atomNames = params.getUsedAtomNames();
 		return StructureTools.getAtomArray(s,atomNames);
@@ -427,7 +478,8 @@ public class StructurePairAligner {
 
 
 		reset();
-
+		this.params = params;
+		
 		long timeStart = System.currentTimeMillis();
 
 //		step 1 get all Diagonals of length X that are similar between both structures
@@ -566,9 +618,7 @@ public class StructurePairAligner {
 
 		if ( debug )
 			System.out.println(" number joint fragments:"+frags.length);
-
-
-
+		
 		if ( debug )
 			System.out.println("step 3 - refine alignments");
 
