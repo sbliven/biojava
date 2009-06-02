@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import java.util.logging.Logger;
 import org.biojava.bio.structure.AminoAcid;
 import org.biojava.bio.structure.AminoAcidImpl;
 import org.biojava.bio.structure.AtomImpl;
@@ -122,6 +123,8 @@ import org.biojava.bio.structure.StructureTools;
 public class PDBFileParser  {
 
 	private final boolean DEBUG = false;
+
+        private Logger logger = Logger.getLogger(PDBFileParser.class.getName());
 
 	// required for parsing:
     private String pdbId; //the actual id of the entry
@@ -1813,6 +1816,9 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
                                                     the reference.
 	 */
 	private void pdb_DBREF_Handler(String line){
+            if (DEBUG) {
+                logger.info("Parsing DBREF " + line);
+            }
 		DBRef dbref = new DBRef();
 		String idCode      = line.substring(7,11);
 		String chainId     = line.substring(12,13);
@@ -2478,6 +2484,13 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
                 return;
             }
 
+             //check the line is the correct length
+            if (ref.length() != 48) {
+                logger.warning(pdbId + " REF line not of correct length. Found " + ref.length() + ", should be 48. Returning dummy JRNL object.");
+                journalName = "TO BE PUBLISHED";
+                return;
+            }
+            
 
             //REF    NUCLEIC ACIDS RES.                         2009
             //REF    MOL.CELL                                   2009
