@@ -162,12 +162,10 @@ public class SVDSuperimposer {
         double[][] centBcoords = new double[][]{{cenb.getX(),cenb.getY(),cenb.getZ()}};
         centroidB = new Matrix(centBcoords);
 
-
-
         //      center at centroid
 
-        Atom[] ats1 = Calc.centerAtoms(atomSet1);
-        Atom[] ats2 = Calc.centerAtoms(atomSet2);
+        Atom[] ats1 = Calc.centerAtoms(atomSet1,cena);
+        Atom[] ats2 = Calc.centerAtoms(atomSet2,cenb);
 
         double[][] coordSet1 = new double[ats1.length][3];
         double[][] coordSet2 = new double[ats2.length][3];
