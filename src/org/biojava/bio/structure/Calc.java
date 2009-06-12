@@ -605,6 +605,18 @@ public class Calc {
     public static Atom getCenterVector(Atom[] atomSet){
         Atom centroid = getCentroid(atomSet);
         
+       return getCenterVector(atomSet,centroid);
+        
+    }
+    
+    /** Returns the Vector that needs to be applied to shift a set of atoms
+     * to the Centroid, if the centroid is already known
+     * @param atomSet array of Atoms  
+     * @return the vector needed to shift the set of atoms to its geometric center
+     */
+    public static Atom getCenterVector(Atom[] atomSet, Atom centroid){
+        
+        
         double[] coords = new double[3];
         coords[0] = 0 - centroid.getX();
         coords[1] = 0 - centroid.getY();
@@ -616,6 +628,7 @@ public class Calc {
         
     }
     
+   
     /** Center the atoms at the Centroid. 
      * @param atomSet a set of Atoms
      * @return an Atom representing the Centroid of the set of atoms
@@ -623,7 +636,18 @@ public class Calc {
      * */
     public static Atom[] centerAtoms(Atom[] atomSet) throws StructureException {
        
-        Atom shiftVector = getCenterVector(atomSet);
+    	Atom centroid = getCentroid(atomSet);
+    	return centerAtoms(atomSet, centroid);
+    }
+    
+    /** Center the atoms at the Centroid, if the centroid is already know.
+     * @param atomSet a set of Atoms
+     * @return an Atom representing the Centroid of the set of atoms
+     * @throws StructureException 
+     * */
+    public static Atom[] centerAtoms(Atom[] atomSet, Atom centroid) throws StructureException {
+       
+        Atom shiftVector = getCenterVector(atomSet, centroid);
         
         Atom[] newAtoms = new AtomImpl[atomSet.length];
         
@@ -635,6 +659,8 @@ public class Calc {
         return newAtoms;
     }
     
+    
+   
     
     /** creates a virtual C-beta atom. this might be needed when working with GLY
      * 
