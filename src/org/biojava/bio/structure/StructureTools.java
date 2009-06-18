@@ -203,7 +203,62 @@ public class StructureTools {
 
     }
 
+    /** Returns an array of the requested Atoms from the Structure object. Iterates over all groups
+     * and checks if the requested atoms are in this group, no matter if this is a AminoAcid or Hetatom group.
+     *
+     *
+     * @param c the Chain to get the atoms from
+     *
+     * @param atomNames  contains the atom names to be used.
+     * @return an Atom[] array
+     */
+    public static Atom[] getAtomArray(Chain c, String[] atomNames){
+        
+       List<Group> groups = c.getAtomGroups();
+       
+        List<Atom> atoms = new ArrayList<Atom>();
+        
+       for (Group g : groups){
 
+            // a temp container for the atoms of this group
+            List<Atom> thisGroupAtoms = new ArrayList<Atom>();
+            // flag to check if this group contains all the requested atoms.
+            boolean thisGroupAllAtoms = true;
+            for ( int i = 0 ; i < atomNames.length; i++){
+                String atomName = atomNames[i];
+                try {
+                    Atom a = g.getAtom(atomName);
+                    thisGroupAtoms.add(a);
+                } catch (StructureException e){
+                    // this group does not have a required atom, skip it...
+                    thisGroupAllAtoms = false;
+                    break;
+                }
+            }
+            if ( thisGroupAllAtoms){
+                // add the atoms of this group to the array.
+                Iterator<Atom> aIter = thisGroupAtoms.iterator();
+                while(aIter.hasNext()){
+                    Atom a = (Atom) aIter.next();
+                    atoms.add(a);
+                }
+            }
+
+        }
+        return (Atom[]) atoms.toArray(new Atom[atoms.size()]);
+
+    }
+    
+    /** Returns an Atom array of the CA atoms.
+     * @param s the structure object
+     * @return an Atom[] array
+     */
+    public static Atom[] getAtomCAArray(Chain c){
+        String[] atomNames = {caAtomName};
+        return getAtomArray(c,atomNames);
+    }
+    
+    
 
 
     /** Returns an Atom array of the CA atoms.
