@@ -35,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.biojava.bio.structure.AminoAcid;
@@ -377,13 +378,14 @@ public class PDBFileReader implements StructureIOFile {
 			return null;
 		}
 
-		//todo: change this to RCSB ftp site
-		String ftp = String.format("ftp://ftp.ebi.ac.uk/pub/databases/msd/pdb_uncompressed/pdb%s.ent", pdbId.toLowerCase());
+
+		String ftp = String.format("ftp://ftp.wwpdb.org/pub/pdb/data/structures/all/pdb/pdb%s.ent.gz", pdbId.toLowerCase());
 
 		System.out.println("Fetching " + ftp);
+		
 		try {
 			URL url = new URL(ftp);
-			InputStream conn = url.openStream();
+			InputStream conn = new GZIPInputStream(url.openStream());
 
 			// prepare destination
 			System.out.println("writing to " + tempFile);
