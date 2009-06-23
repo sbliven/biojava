@@ -1048,7 +1048,13 @@ public class PDBFileParser  {
 			if (DEBUG)
 				System.out.println("molTypeCounter " + molTypeCounter + " "
 						+ value);
-			if (molTypeCounter != Integer.valueOf(value)) {
+			int i = -1;
+			try {
+			   i = Integer.valueOf(value);
+			} catch (NumberFormatException e){
+			   e.printStackTrace();
+			}
+			if (molTypeCounter != i) {
 				molTypeCounter++;
 
 				compounds.add(current_compound);
