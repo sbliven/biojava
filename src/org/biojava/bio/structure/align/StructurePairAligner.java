@@ -457,7 +457,7 @@ public class StructurePairAligner {
 	/** Returns the atoms that are being used for the alignment. (E.g. Calpha only, etc.)
 	 * 
 	 * @param s
-	 * @return
+	 * @return an array of Atoms objects
 	 */
 	public  Atom[] getAlignmentAtoms(Structure s){
 		String[] atomNames = params.getUsedAtomNames();

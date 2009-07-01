@@ -250,7 +250,7 @@ public class StructureTools {
     }
     
     /** Returns an Atom array of the CA atoms.
-     * @param s the structure object
+     * @param c the structure object
      * @return an Atom[] array
      */
     public static Atom[] getAtomCAArray(Chain c){
