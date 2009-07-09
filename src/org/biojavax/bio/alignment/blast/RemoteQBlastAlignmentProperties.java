@@ -28,7 +28,7 @@ import org.biojavax.bio.alignment.RemotePairwiseAlignmentProperties;
 
 /**
  * 
- * This class extends RemotePairwiseAlignmentProperties by specifying several
+ * This class implements RemotePairwiseAlignmentProperties by specifying several
  * convenient methods used to wrap the addition of Blast alignment parameters.
  * 
  * @author Sylvain Foisy, Diploide BioIT

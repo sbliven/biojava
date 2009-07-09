@@ -28,10 +28,10 @@ import org.biojava.bio.BioException;
 import org.biojavax.bio.alignment.RemotePairwiseAlignmentOutputProperties;
 
 /**
- * RemoteQBlastOutputProperties: the actual implementation of the RemotePairwiseAlignmentOutputProperties 
+ * The actual implementation of the RemotePairwiseAlignmentOutputProperties 
  * interface for the QBlast service.
  * 
- * The constructor for this class builds a an object with default format values. Any modification will 
+ * The constructor for this class builds an object with default format values. Any modification will 
  * either use the generic method setOutputOption method or use the wrapper methods that are actually 
  * build around the generic method.
 

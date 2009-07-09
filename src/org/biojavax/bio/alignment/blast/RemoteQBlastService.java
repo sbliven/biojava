@@ -115,13 +115,11 @@ public class RemoteQBlastService implements RemotePairwiseAlignmentService {
 	 * used as is but any method wanting to send a Blast request should manage
 	 * to use it by feeding it the right parameters.
 	 * 
-	 * @param str
-	 *            :a String representation of a sequence from either of the
-	 *            three wrapper methods
-	 * @param rpa
-	 *            :a <code>RemotePairwiseAlignmentProperties</code> object
+	 * @param str : a <code>String</code> representation of a sequence from either of the
+	 *              three wrapper methods
+	 * @param rpa :a <code>RemotePairwiseAlignmentProperties</code> object
 	 * @return rid : the ID of this request on the NCBI QBlast server
-	 * @throws BioException
+	 * @throws BioException if unable to connect to the NCBI QBlast service
 	 */
 	private String sendActualAlignementRequest(String str,
 			RemotePairwiseAlignmentProperties rpa) throws BioException {
@@ -191,13 +189,10 @@ public class RemoteQBlastService implements RemotePairwiseAlignmentService {
 	 * the actual results after completion.
 	 * </p>
 	 * 
-	 * @param str
-	 *            :a string with a sequence
-	 * @param rpa
-	 *            :a <code>RemotePairwiseAlignmentProperties</code> object
-	 * @return rid : a String with the request ID for this sequence
-	 * @throws BioException
-	 *             if it is not possible to sent the BLAST command
+	 * @param str : a <code>String</code> with a sequence
+	 * @param rpa : a <code>RemotePairwiseAlignmentProperties</code> object
+	 * @return rid : a <code>String</code> with the request ID for this sequence
+	 * @throws BioException if it is not possible to sent the BLAST command
 	 */
 	public String sendAlignmentRequest(String str,
 			RemotePairwiseAlignmentProperties rpa) throws BioException {
@@ -220,14 +215,11 @@ public class RemoteQBlastService implements RemotePairwiseAlignmentService {
 	 * the actual results after completion.
 	 * </p>
 	 * 
-	 * @param rs
-	 *            :a RichSequence object
-	 * @param rpa
-	 *            :a <code>RemotePairwiseAlignmentProperties</code> object
-	 * @return rid : a String with the request ID for this sequence
+	 * @param rs :a <code>RichSequence</code> object
+	 * @param rpa :a <code>RemotePairwiseAlignmentProperties</code> object
+	 * @return rid : a <code>String</code> with the request ID for this sequence
 	 * 
-	 * @throws BioException
-	 *             if it is not possible to sent the BLAST command
+	 * @throws BioException if it is not possible to sent the BLAST command
 	 */
 	public String sendAlignmentRequest(RichSequence rs,
 			RemotePairwiseAlignmentProperties rpa) throws BioException {
@@ -249,13 +241,10 @@ public class RemoteQBlastService implements RemotePairwiseAlignmentService {
 	 * the actual results after completion.
 	 * </p>
 	 * 
-	 * @param gid
-	 *            :an integer with a Genbank GID
-	 * @param rpa
-	 *            :a <code>RemotePairwiseAlignmentProperties</code> object
+	 * @param gid :an integer with a Genbank GID
+	 * @param rpa :a <code>RemotePairwiseAlignmentProperties</code> object
 	 * @return rid : a String with the request ID for this sequence
-	 * @throws BioException
-	 *             if it is not possible to sent the BLAST command
+	 * @throws BioException if it is not possible to sent the BLAST command
 	 */
 	public String sendAlignmentRequest(int gid,
 			RemotePairwiseAlignmentProperties rpa) throws BioException {
@@ -270,11 +259,9 @@ public class RemoteQBlastService implements RemotePairwiseAlignmentService {
 	 * completion of request using the NCBI specified RTOE variable
 	 * </p>
 	 * 
-	 * @param id
-	 *            : a valid request ID
-	 * @param present
-	 *            : a representation of "now" using System.currentTimeMillis().
-	 * @return boolean value telling if the request has been completed or not
+	 * @param id : a valid request ID
+	 * @param present : a representation of "now" using System.currentTimeMillis().
+	 * @return a boolean value telling if the request has been completed or not.
 	 */
 	public boolean isReady(String id, long present) throws BioException {
 		boolean ready = false;
@@ -338,14 +325,12 @@ public class RemoteQBlastService implements RemotePairwiseAlignmentService {
 	 * interface which will specify output formatting options.
 	 * </p>
 	 * 
-	 * @param id
-	 *            :a valid request ID
-	 * @param rb
-	 *            : a <code>RemotePairwiseAlignmentOutputProperties</code> that
-	 *            will specify specific output formatting commands
+	 * @param id :a valid request ID
+	 * @param rb : a <code>RemotePairwiseAlignmentOutputProperties</code> that
+	 *             will specify specific output formatting commands
 	 * @return an <code>InputStream</code> that can be use any way one might
 	 *         desire
-	 * @throws BioException
+	 * @throws BioException if it is not possible to recover the results.
 	 */
 	public InputStream getAlignmentResults(String id,
 			RemotePairwiseAlignmentOutputProperties rb) throws BioException {
@@ -379,7 +364,7 @@ public class RemoteQBlastService implements RemotePairwiseAlignmentService {
 	/**
 	 * A simple method to check the availability of the QBlast service
 	 * 
-	 * @throws BioException
+	 * @throws BioException if unable to connect to the NCBI QBlast service
 	 */
 	public void printRemoteBlastInfo() throws BioException {
 		try {
