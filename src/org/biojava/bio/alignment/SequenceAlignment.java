@@ -54,7 +54,7 @@ public abstract class SequenceAlignment {
 	 * @throws NoSuchElementException
 	 * @throws Exception
 	 */
-	public abstract List alignAll(SequenceIterator source, SequenceDB subjectDB)
+	public abstract List<Alignment> alignAll(SequenceIterator source, SequenceDB subjectDB)
 	    throws Exception;
 
 	/**
@@ -118,7 +118,7 @@ public abstract class SequenceAlignment {
 	 * @return formated String.
 	 */
 	public static StringBuffer formatOutput(String queryName, String targetName,
-	    String[] align, String path, int queryStart, int queryEnd,
+	    StringBuffer[] align, StringBuffer path, int queryStart, int queryEnd,
 	    long queryLength, int targetStart, int targetEnd, long targetLength,
 	    int editdistance, long time) {
 		final String newLine = System.getProperty("line.separator");
@@ -145,16 +145,16 @@ public abstract class SequenceAlignment {
 
 		int currline = Math.min(60, align[0].length()), i, j, k, l;
 		// counts the absolute position within the String
-		String space = "  ", kspace = "", jspace = "";
+		StringBuffer space = new StringBuffer("  "), kspace = new StringBuffer(), jspace = new StringBuffer();
 		for (k = 0; k < new Integer(Math.max(queryEnd, targetEnd)).toString()
 		    .length(); k++)
-			space += " ";
+			space.append(' ');
 		for (k = new Integer(queryStart + 1).toString().length(); k <= new Integer(
 		    Math.max(queryEnd, targetEnd)).toString().length(); k++)
-			kspace += " ";
+			kspace.append(' ');
 		for (k = new Integer(targetStart + 1).toString().length(); k <= new Integer(
 		    Math.max(queryEnd, targetEnd)).toString().length(); k++)
-			jspace += " ";
+			jspace.append(' ');
 
 		i = k = queryStart;
 		j = l = targetStart;
@@ -189,13 +189,14 @@ public abstract class SequenceAlignment {
 
 		for (; currline + 60 < path.length(); currline += 60) {
 			l = Math.min(j + 1, targetEnd);
-			kspace = jspace = "";
+			kspace = new StringBuffer();
+			jspace = new StringBuffer();
 			for (int n = new Integer(k + 1).toString().length() - 1; n < new Integer(
 			    Math.max(queryEnd, targetEnd)).toString().length(); n++)
-				kspace += " ";
+				kspace.append(' ');
 			for (int n = new Integer(j).toString().length() - 1; n < new Integer(Math
 			    .max(queryEnd, targetEnd)).toString().length(); n++)
-				jspace += " ";
+				jspace.append(' ');
 			output.append(' ');
 			output.append(newLine);
 			output.append("Query:\t");
@@ -226,16 +227,19 @@ public abstract class SequenceAlignment {
 			output.append(' ');
 			output.append(newLine);
 		}
-		align[0] += " " + queryEnd;
-		align[1] += " " + targetEnd;
+		align[0].append(' ');
+		align[0].append(queryEnd);
+		align[1].append(' ');
+		align[1].append(targetEnd);
 		if (currline + 1 < path.length()) {
-			kspace = jspace = "";
+			kspace = new StringBuffer();
+			jspace = new StringBuffer();
 			for (int n = new Integer(k).toString().length() - 1; n < new Integer(Math
 			    .max(queryEnd, targetEnd)).toString().length(); n++)
-				kspace += " ";
+				kspace.append(' ');
 			for (int n = new Integer(j).toString().length() - 1; n < new Integer(Math
 			    .max(queryEnd, targetEnd)).toString().length(); n++)
-				jspace += " ";
+				jspace.append(' ');
 			output.append(' ');
 			output.append(newLine);
 			output.append("Query:\t");

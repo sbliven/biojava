@@ -205,8 +205,8 @@ public class SmithWaterman extends NeedlemanWunsch {
 			/*
 			 * Variables needed for traceback
 			 */
-			String[] align = new String[] {"", ""};
-			String path = "";
+			StringBuffer[] align = {new StringBuffer(), new StringBuffer()};
+			StringBuffer path = new StringBuffer();
 			SymbolTokenization st;
 			try {
 				st = squery.getAlphabet().getTokenization("default");
@@ -270,11 +270,11 @@ public class SmithWaterman extends NeedlemanWunsch {
 							    + matchReplace(squery, ssubject, i, j))
 							    && !(gap_extend[0] || gap_extend[1])) {
 								if (squery.symbolAt(i) == ssubject.symbolAt(j))
-									path = '|' + path;
-								else path = ' ' + path;
+									path.insert(0, '|');
+								else path.insert(0, ' ');
 
-								align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
-								align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
+								align[0].insert(0, st.tokenizeSymbol(squery.symbolAt(i--)));
+								align[1].insert(0, st.tokenizeSymbol(ssubject.symbolAt(j--)));
 
 								// Insert || finish gap if extended gap is opened
 							} else if (scoreMatrix[i][j] == E[i][j] || gap_extend[0]) {
@@ -282,9 +282,9 @@ public class SmithWaterman extends NeedlemanWunsch {
 								gap_extend[0] = (E[i][j] != scoreMatrix[i][j - 1] + insert
 								    + gapExt);
 
-								align[0] = '-' + align[0];
-								align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
-								path = ' ' + path;
+								align[0].insert(0, '-');
+								align[1].insert(0, st.tokenizeSymbol(ssubject.symbolAt(j--)));
+								path.insert(0, ' ');
 
 								// Delete || finish gap if extended gap is opened
 							} else {
@@ -292,9 +292,9 @@ public class SmithWaterman extends NeedlemanWunsch {
 								gap_extend[1] = (F[i][j] != scoreMatrix[i - 1][j] + delete
 								    + gapExt);
 
-								align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
-								align[1] = '-' + align[1];
-								path = ' ' + path;
+								align[0].insert(0, st.tokenizeSymbol(squery.symbolAt(i--)));
+								align[1].insert(0, '-');
+								path.insert(0, ' ');
 							}
 						} while (j > 0);
 					}
@@ -342,23 +342,23 @@ public class SmithWaterman extends NeedlemanWunsch {
 							} else if (scoreMatrix[i][j] == scoreMatrix[i - 1][j - 1]
 							    + matchReplace(squery, ssubject, i, j)) {
 								if (squery.symbolAt(i) == ssubject.symbolAt(j))
-									path = '|' + path;
-								else path = ' ' + path;
+									path.insert(0, '|');
+								else path.insert(0, ' ');
 
-								align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
-								align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
+								align[0].insert(0, st.tokenizeSymbol(squery.symbolAt(i--)));
+								align[1].insert(0, st.tokenizeSymbol(ssubject.symbolAt(j--)));
 
 								// Insert
 							} else if (scoreMatrix[i][j] == scoreMatrix[i][j - 1] + insert) {
-								align[0] = '-' + align[0];
-								align[1] = st.tokenizeSymbol(ssubject.symbolAt(j--)) + align[1];
-								path = ' ' + path;
+								align[0].insert(0, '-');
+								align[1].insert(0, st.tokenizeSymbol(ssubject.symbolAt(j--)));
+								path.insert(0, ' ');
 
 								// Delete
 							} else {
-								align[0] = st.tokenizeSymbol(squery.symbolAt(i--)) + align[0];
-								align[1] = '-' + align[1];
-								path = ' ' + path;
+								align[0].insert(0, st.tokenizeSymbol(squery.symbolAt(i--)));
+								align[1].insert(0, '-');
+								path.insert(0, ' ');
 							}
 						} while (j > 0);
 					}
@@ -380,11 +380,11 @@ public class SmithWaterman extends NeedlemanWunsch {
 
 				squery = new SimpleGappedSequence(new SimpleSequence(
 				    new SimpleSymbolList(squery.getAlphabet().getTokenization("token"),
-				        align[0]), squery.getURN(), squery.getName(), squery
+				        align[0].toString()), squery.getURN(), squery.getName(), squery
 				        .getAnnotation()));
 				ssubject = new SimpleGappedSequence(new SimpleSequence(
 				    new SimpleSymbolList(ssubject.getAlphabet()
-				        .getTokenization("token"), align[1]), ssubject.getURN(),
+				        .getTokenization("token"), align[1].toString()), ssubject.getURN(),
 				    ssubject.getName(), ssubject.getAnnotation()));
 				Map<String, Sequence> m = new HashMap<String, Sequence>();
 				m.put(squery.getName(), squery);
