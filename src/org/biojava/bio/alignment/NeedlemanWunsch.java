@@ -409,6 +409,13 @@ public class NeedlemanWunsch extends SequenceAlignment {
 					new SimpleAnnotation());
 		}
 
+		  SymbolTokenization st = null;
+		  try {
+		     st = subMatrix.getAlphabet().getTokenization("default");
+		  } catch (BioException e){
+		     throw new  BioRuntimeException(e);
+		  }
+		
 		if (squery.getAlphabet().equals(ssubject.getAlphabet())
 				&& squery.getAlphabet().equals(subMatrix.getAlphabet())) {
 
@@ -467,8 +474,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
 				try {
 					boolean[] gap_extend = { false, false };
 					j = this.CostMatrix[CostMatrix.length - 1].length - 1;
-					SymbolTokenization st = subMatrix.getAlphabet()
-							.getTokenization("default");
+				
 
 					for (i = this.CostMatrix.length - 1; i > 0;) {
 						do {
@@ -557,8 +563,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
 
 				try {
 					j = this.CostMatrix[CostMatrix.length - 1].length - 1;
-					SymbolTokenization st = subMatrix.getAlphabet()
-							.getTokenization("default");
+				
 					// System.out.println(printCostMatrix(CostMatrix,
 					// query.seqString().toCharArray(),
 					// subject.seqString().toCharArray()));
@@ -656,7 +661,9 @@ public class NeedlemanWunsch extends SequenceAlignment {
 						CostMatrix[0].length - 1, // length of the target
 						// sequence
 						getEditDistance(), // the edit distance
-						System.currentTimeMillis() - time)
+						System.currentTimeMillis() - time,
+						subMatrix,
+						st)
 						+ System.getProperty("line.separator"); // time
 				// consumption
 

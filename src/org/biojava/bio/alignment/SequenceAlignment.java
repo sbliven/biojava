@@ -25,9 +25,13 @@
 package org.biojava.bio.alignment;
 
 import java.util.List;
+
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.bio.seq.db.SequenceDB;
+import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 
 /**
@@ -112,6 +116,8 @@ public abstract class SequenceAlignment {
 	 * @param targetEnd
 	 * @param targetLength
 	 * @param editdistance
+	 * @param subMatrix the subsitution Matrix used for calculating the alignment
+	 * @param st symbolTokenization of the alignment
 	 * @param time
 	 *          The time in milliseconds, which was needed to generate the
 	 *          alignment.
@@ -120,8 +126,50 @@ public abstract class SequenceAlignment {
 	public static StringBuffer formatOutput(String queryName, String targetName,
 	    StringBuffer[] align, StringBuffer path, int queryStart, int queryEnd,
 	    long queryLength, int targetStart, int targetEnd, long targetLength,
-	    int editdistance, long time) {
+	    int editdistance, long time,SubstitutionMatrix subMatrix, SymbolTokenization st) {
 		final String newLine = System.getProperty("line.separator");
+		
+		 /// calc %ID and similars:
+	      int identicals = 0;
+	      int similars   = 0;
+	      int nrGaps     = 0;
+	      for ( int i = 0 ; i< align[0].length(); i++){
+	         if ( align[0].charAt(i) == align[1].charAt(i)){
+	            identicals++;
+	         }
+	         char a = align[0].charAt(i);
+	         char b = align[1].charAt(i);
+
+	         // get score for this pair. if it is positive, they are similar...
+	         if (a == '-') {
+	            nrGaps++;
+	            continue;
+	         }
+	         if (b == '-') {
+	            nrGaps++;
+	            continue;
+	         }
+	         if ( a == '~')
+	            continue;
+	         if ( b == '~')
+	            continue;
+
+
+
+	         try {
+
+	            Symbol s1 = st.parseToken(a+"");         
+	            Symbol s2 = st.parseToken(b+""); 
+	            short score = subMatrix.getValueAt(s1, s2);
+	            if ( score > 0 ){
+	               similars++;
+	            }
+	         } catch (BioException e){
+	            System.err.println(e.getMessage() + " a:"+ a + " b:" + b);
+	         }
+	      }
+		
+		
 		StringBuffer output = new StringBuffer(newLine);
 		output.append(" Time (ms):\t");
 		output.append(time);

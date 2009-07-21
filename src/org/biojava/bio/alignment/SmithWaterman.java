@@ -406,7 +406,8 @@ public class SmithWaterman extends NeedlemanWunsch {
 				    // sequence
 				    maxJ, // End position of the alignment in the target sequence
 				    scoreMatrix[0].length - 1, // length of the target sequence
-				    getEditDistance(), System.currentTimeMillis() - time)
+				    getEditDistance(), System.currentTimeMillis() - time, subMatrix,st)
+				    
 				    + System.getProperty("line.separator"); // time consumption
 
 				// Don't waste any memory.
