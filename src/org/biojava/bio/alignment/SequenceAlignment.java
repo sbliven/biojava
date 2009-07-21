@@ -41,6 +41,11 @@ import org.biojava.bio.symbol.SymbolList;
  * @author Mark Schreiber
  */
 public abstract class SequenceAlignment {
+   
+   
+   // holds the alignment sequences...
+     protected StringBuffer[] align = {new StringBuffer(), new StringBuffer()};
+   
 	/**
 	 * @return a string representation of the alignment
 	 * @throws BioException
@@ -313,4 +318,10 @@ public abstract class SequenceAlignment {
 		return output;
 	}
 
+	public String getAlignedSeq1(){
+	   return align[0].toString();
+	}
+	public String getAlignedSeq2(){
+       return align[1].toString();
+    }
 }

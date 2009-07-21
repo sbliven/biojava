@@ -427,7 +427,7 @@ public class NeedlemanWunsch extends SequenceAlignment {
 			/*
 			 * Variables for the traceback
 			 */
-			StringBuffer[] align = { new StringBuffer(), new StringBuffer() };
+		
 			StringBuffer path = new StringBuffer();
 
 			// construct the matrix:

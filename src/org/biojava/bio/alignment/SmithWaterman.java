@@ -205,7 +205,7 @@ public class SmithWaterman extends NeedlemanWunsch {
 			/*
 			 * Variables needed for traceback
 			 */
-			StringBuffer[] align = {new StringBuffer(), new StringBuffer()};
+			
 			StringBuffer path = new StringBuffer();
 			SymbolTokenization st;
 			try {
