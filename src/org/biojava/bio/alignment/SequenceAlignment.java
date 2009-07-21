@@ -137,7 +137,8 @@ public abstract class SequenceAlignment {
 		 /// calc %ID and similars:
 	      int identicals = 0;
 	      int similars   = 0;
-	      int nrGaps     = 0;
+	      int nrGaps1    = 0;
+	      int nrGaps2    = 0;
 	      for ( int i = 0 ; i< align[0].length(); i++){
 	         if ( align[0].charAt(i) == align[1].charAt(i)){
 	            identicals++;
@@ -147,11 +148,11 @@ public abstract class SequenceAlignment {
 
 	         // get score for this pair. if it is positive, they are similar...
 	         if (a == '-') {
-	            nrGaps++;
+	            nrGaps1++;
 	            continue;
 	         }
 	         if (b == '-') {
-	            nrGaps++;
+	            nrGaps2++;
 	            continue;
 	         }
 	         if ( a == '~')
@@ -193,6 +194,32 @@ public abstract class SequenceAlignment {
 		output.append(targetName);
 		output.append(",\tLength:\t");
 		output.append(targetLength);
+		
+		output.append(newLine);
+		output.append("  Nr. Identicals:\t" );
+		output.append(identicals);
+		output.append(" Query: ");
+		output.append(Math.round(identicals/(float)queryLength * 100) );
+		output.append("% Target: ");
+		output.append(Math.round(identicals/(float)targetLength * 100) );
+		output.append("%");       
+		output.append(newLine);
+		
+		output.append("  Nr. Similars:\t");
+		output.append(similars);
+		output.append(" Query: ");
+		output.append(Math.round(similars/(float)queryLength  * 100));
+		output.append("% Target: ");
+		output.append(Math.round(similars/(float)targetLength * 100) );
+		output.append("%");
+
+		output.append("  Nr. Gaps:\t");        
+        output.append(" Query: ");
+        output.append(Math.round(nrGaps1/(float)queryLength  * 100));
+        output.append("% Target: ");
+        output.append(Math.round(nrGaps2/(float)targetLength * 100) );
+        output.append("%");
+		
 		output.append(newLine);
 		output.append(newLine);
 
