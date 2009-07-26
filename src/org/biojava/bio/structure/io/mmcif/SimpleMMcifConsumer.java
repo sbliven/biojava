@@ -48,6 +48,7 @@ import org.biojava.bio.structure.StructureTools;
 import org.biojava.bio.structure.io.PDBParseException;
 import org.biojava.bio.structure.io.SeqRes2AtomAligner;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
+import org.biojava.bio.structure.io.mmcif.model.AuditAuthor;
 import org.biojava.bio.structure.io.mmcif.model.ChemComp;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
@@ -668,6 +669,42 @@ public class SimpleMMcifConsumer implements MMcifConsumer {
 		header.put("resolution",pdbHeader.getResolution());
 	}
 
+
+	public void newAuditAuthor(AuditAuthor aa){
+
+	   String name =  aa.getName();
+
+	   StringBuffer famName = new StringBuffer();
+	   StringBuffer initials = new StringBuffer();
+	   boolean afterComma = false;
+	   for ( char c: name.toCharArray()) {
+	      if ( c == ' ')
+	         continue;
+	      if ( c == ','){
+	         afterComma = true;
+	         continue;
+	      }
+
+	      if ( afterComma)
+	         initials.append(c);
+	      else
+	         famName.append(c);
+	   }
+
+	   StringBuffer newaa = new StringBuffer();
+	   newaa.append(initials);
+	   newaa.append(famName);
+
+	   PDBHeader header = structure.getPDBHeader();
+	   String auth = header.getAuthors();
+	   if (auth == null) {
+	      header.setAuthors(newaa.toString());
+	   }else {
+	      auth += "," + newaa.toString();
+	      header.setAuthors(auth);
+
+	   }
+	}
 
 	@SuppressWarnings("deprecation")
 	public void newExptl(Exptl exptl) {
