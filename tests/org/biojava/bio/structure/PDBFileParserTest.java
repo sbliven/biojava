@@ -131,15 +131,19 @@ public class PDBFileParserTest extends TestCase {
 			"TITLE     CRYSTAL STRUCTURES OF THROMBIN WITH THIAZOLE-CONTAINING  "+newline+
 			"TITLE    2 INHIBITORS: PROBES OF THE S1' BINDING SITE              "+newline+
 			"EXPDTA    X-RAY DIFFRACTION                                        "+newline+
+			"AUTHOR    J.H.MATTHEWS,R.KRISHNAN,M.J.COSTANZO,B.E.MARYANOFF,      "+newline+
+			"AUTHOR   2 A.TULINSKY                                              "+newline+
 			"REMARK   2 RESOLUTION. 2.00 ANGSTROMS.                             "+newline;
 
 		BufferedReader br = new BufferedReader(new StringReader(t));
 		try {
 			Structure s = parser.parsePDBFile(br);
 			String pdb = s.toPDB();
+
 			//compareString(t, pdb);
 			// we ignore the case here, since the month FEB is written as Feb, which should be ok...
 			assertTrue("the created header does not match the PDB file" ,pdb.equalsIgnoreCase(t));
+
 		} catch (Exception e){
 			fail(e.getMessage());
 		}
