@@ -24,6 +24,7 @@ package org.biojava.bio.structure.io.mmcif;
 import java.util.List;
 
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
+import org.biojava.bio.structure.io.mmcif.model.AuditAuthor;
 import org.biojava.bio.structure.io.mmcif.model.ChemComp;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
@@ -79,6 +80,7 @@ public interface MMcifConsumer {
 	public void newStructKeywords(StructKeywords kw);
 	public void newRefine(Refine r);
 	public void newChemComp(ChemComp c);
+	public void newAuditAuthor(AuditAuthor aa);
 
 	/** This method is called if no particular handler for the provided cif category
 	 * has been implemented so far.
