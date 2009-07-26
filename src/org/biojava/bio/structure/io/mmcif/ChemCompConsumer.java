@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.biojava.bio.structure.io.mmcif.chem.ResidueType;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
+import org.biojava.bio.structure.io.mmcif.model.AuditAuthor;
 import org.biojava.bio.structure.io.mmcif.model.ChemComp;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
@@ -137,5 +138,12 @@ public class ChemCompConsumer implements MMcifConsumer {
 		//System.out.println("unhandled category: " + category);
 
 	}
+
+   @Override
+   public void newAuditAuthor(AuditAuthor aa)
+   {
+      // TODO Auto-generated method stub
+
+   }
 
 }
