@@ -77,6 +77,8 @@ public class MMcifTest extends TestCase {
 		} catch (IOException e){
 			fail(e.getMessage());
 		}
+		// remove to avoid memory leaks
+		parser.clearConsumers();
 		Structure cifStructure = consumer.getStructure();
 		assertNotNull(cifStructure);
 
@@ -94,9 +96,6 @@ public class MMcifTest extends TestCase {
 		}
 
 		assertNotNull(pdbStructure);
-
-		//System.out.println(pdbStructure.toPDB());
-		//System.out.println(cifStructure.toPDB());
 
 		// now compare the results
 		try {
@@ -165,6 +164,11 @@ public class MMcifTest extends TestCase {
 			//compareString(h1.toPDB() ,h2.toPDB());
 			//System.out.println(h1.toPDB());
 			//System.out.println(h2.toPDB());
+			if ( ! h1.toPDB().toUpperCase().equals(h2.toPDB().toUpperCase()) ){
+			   System.err.println(h1.toPDB());
+			   System.err.println(h2.toPDB());
+			  compareString(h1.toPDB(), h2.toPDB());
+			}
 			assertEquals("the PDBHeader.toPDB representation is not equivalent", h1.toPDB().toUpperCase(),h2.toPDB().toUpperCase());
 
 			// and the ultimate test!
@@ -240,7 +244,7 @@ public class MMcifTest extends TestCase {
 		for (int i =0 ; i < t.length() ; i++){
 			System.out.println(">"+t.charAt(i)+":"+ pdb.charAt(i)+"<");
 			if ( Character.toUpperCase(t.charAt(i)) != Character.toUpperCase(pdb.charAt(i))){
-
+			   System.out.println("Mismatch!");
 				break;
 			}
 		}
