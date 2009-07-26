@@ -35,6 +35,7 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.io.MMCIFFileReader;
 import org.biojava.bio.structure.io.StructureIOFile;
 import org.biojava.bio.structure.io.mmcif.model.AtomSite;
+import org.biojava.bio.structure.io.mmcif.model.AuditAuthor;
 import org.biojava.bio.structure.io.mmcif.model.ChemComp;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBremark;
 import org.biojava.bio.structure.io.mmcif.model.DatabasePDBrev;
@@ -194,7 +195,7 @@ public class SimpleMMcifParser implements MMcifParser {
 
 
 				} else {
-					
+
 					// in loop and we found a data line
 					lineData = processLine(line, buf, loopFields.size());
 					if ( lineData.size() != loopFields.size()){
@@ -203,7 +204,7 @@ public class SimpleMMcifParser implements MMcifParser {
 					}
 
 					endLineChecks(category, loopFields,lineData);
-					
+
 					lineData.clear();
 
 				}
@@ -567,7 +568,13 @@ public class SimpleMMcifParser implements MMcifParser {
 					loopFields, lineData
 					);
 			triggerNewChemComp(c);
+		} else if (category.equals("_audit_author")) {
+		   AuditAuthor aa = (AuditAuthor)buildObject(
+		         "org.biojava.bio.structure.io.mmcif.model.AuditAuthor",
+		         loopFields, lineData);
+		      triggerNewAuditAuthor(aa);
 		} else {
+
 			// trigger a generic bean that can deal with all missing data types...
 			triggerGeneric(category,loopFields,lineData);
 		}
@@ -713,6 +720,11 @@ public class SimpleMMcifParser implements MMcifParser {
 		}
 	}
 
+	private void triggerNewAuditAuthor(AuditAuthor aa){
+       for(MMcifConsumer c : consumers){
+           c.newAuditAuthor(aa);
+       }
+   }
 	private void triggerNewDatabasePDBrev(DatabasePDBrev dbrev){
 		for(MMcifConsumer c : consumers){
 			c.newDatabasePDBrev(dbrev);
