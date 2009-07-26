@@ -29,6 +29,7 @@ public class PDBHeader implements PDBRecord, Serializable{
 	Date modDate;
 	String technique;
 	float resolution;
+	String authors;
 
 	public static final float DEFAULT_RESOLUTION = 99;
 
@@ -107,7 +108,9 @@ public class PDBHeader implements PDBRecord, Serializable{
 		printHeader(buf);
 		printTitle(buf);
 		printExpdata(buf);
+		printAuthors(buf);
 		printResolution(buf);
+
 	}
 
 	private void printResolution(StringBuffer buf){
@@ -143,6 +146,99 @@ public class PDBHeader implements PDBRecord, Serializable{
 		fillLine(buf,l);
 
 		buf.append(newline);
+
+	}
+
+	private void printAuthors(StringBuffer buf){
+	   String authors = getAuthors();
+	   if ( authors == null)
+	      return;
+	   if ( authors.equals("")){
+	      return;
+	   }
+
+	   printMultiLine(buf, "AUTHOR   ", authors,',');
+
+	   buf.append(buf);
+
+	}
+
+	private void printMultiLine(StringBuffer buf, String lineStart, String data, char breakChar){
+	   if ( lineStart.length() !=  9)
+	      System.err.println("lineStart != 9, there will be problems :" + lineStart);
+
+	   if ( data.length() < 58) {
+          buf.append(lineStart);
+          buf.append(" ");
+          buf.append(data);
+          buf.append(newline);
+          return;
+      }
+      String thisLine = "";
+      int count = 1;
+      while (data.length() > 57) {
+
+          // find first whitespace from left
+          // there are 10 chars to the left, so the cutoff position is 56
+         boolean charFound = false;
+          for ( int i =57;i>-1;i--){
+              char c = data.charAt(i);
+              if (c == breakChar){
+                  //System.out.println("found space at:"+ i);
+                  // found the whitespace
+
+                  thisLine = data.substring(0,i+1);
+                  data = data.substring(i);
+                  charFound = true;
+                  //System.out.println(thisLine);
+                  //System.out.println(title);
+                  break;
+              }
+          }
+          // for emergencies...  prevents an endless loop
+          if ( ! charFound){
+             thisLine = data.substring(0,58);
+             data = data.substring(57);
+          }
+          if ( ( breakChar == ',' )&& ( data.charAt(0)== ',')) {
+             data =   data.substring(1);
+          }
+
+
+          //TODO: check structures that have more than 10  lines...
+          // start printing..
+          buf.append(lineStart);
+          if ( count > 1) {
+              buf.append(count);
+              if ( breakChar != ' ' )
+                 buf.append(" ");
+          }
+          else
+              buf.append(" ");
+          buf.append(thisLine);
+
+          // fill up the white space to the right column
+          int l =  thisLine.length()+ 10;
+          while (l < 67){
+              l++;
+              buf.append(" ");
+          }
+
+          buf.append(newline);
+          count++;
+
+      }
+
+      // last line...
+      if ( data.trim().length() > 0){
+          buf.append(lineStart);
+          buf.append(count);
+          buf.append(data);
+          // fill up the white space to the right column
+          int l =  data.length()+ 10;
+          fillLine(buf,l);
+          buf.append(newline);
+      }
 
 	}
 
@@ -210,63 +306,7 @@ public class PDBHeader implements PDBRecord, Serializable{
 		if ( (title == null) || ( title.trim().length() == 0) )
 			return;
 
-
-		if ( title.length() < 58) {
-			buf.append("TITLE     ");
-			buf.append(title);
-			buf.append(newline);
-			return;
-		}
-		String thisLine = "";
-		int count = 1;
-		while (title.length() > 57) {
-
-			// find first whitespace from left
-			// there are 10 chars to the left, so the cutoff position is 56
-			for ( int i =57;i>-1;i--){
-				char c = title.charAt(i);
-				if (c == ' '){
-					//System.out.println("found space at:"+ i);
-					// found the whitespace
-					thisLine = title.substring(0,i+1);
-					title = title.substring(i);
-					//System.out.println(thisLine);
-					//System.out.println(title);
-					break;
-				}
-			}
-
-			//TODO: check structures that have more than 10 title lines...
-			// start printing..
-			buf.append("TITLE    ");
-			if ( count > 1)
-				buf.append(count);
-			else
-				buf.append(" ");
-			buf.append(thisLine);
-
-			// fill up the white space to the right column
-			int l =  thisLine.length()+ 10;
-			while (l < 67){
-				l++;
-				buf.append(" ");
-			}
-
-			buf.append(newline);
-			count++;
-
-		}
-
-		// last line...
-		if ( title.trim().length() > 0){
-			buf.append("TITLE    ");
-			buf.append(count);
-			buf.append(title);
-			// fill up the white space to the right column
-			int l =  title.length()+ 10;
-			fillLine(buf,l);
-			buf.append(newline);
-		}
+		printMultiLine(buf, "TITLE    ", title,' ');
 
 	}
 
@@ -412,5 +452,20 @@ public class PDBHeader implements PDBRecord, Serializable{
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	/** Returns the names of the authors as listed in the AUTHORS section of a PDB file.
+	 * Not necessarily the same authors as listed in the AUTH section of the primary citation!
+	 *
+	 * @return Authors as a string
+	 */
+   public String getAuthors()
+   {
+      return authors;
+   }
+
+   public void setAuthors(String authors)
+   {
+      this.authors = authors;
+   }
 
 }
