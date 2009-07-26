@@ -444,6 +444,33 @@ public class PDBFileParser  {
 	}
 
 
+	/** parses the following record:
+	 <pre>
+	 COLUMNS      DATA  TYPE      FIELD         DEFINITION
+------------------------------------------------------------------------------------
+ 1 -  6      Record name     "AUTHOR"
+ 9 - 10      Continuation    continuation  Allows concatenation of multiple records.
+11 - 79      List            authorList    List of the author names, separated
+                                           by commas.
+
+</pre>
+	 * @param line
+	 */
+	private void pdb_AUTHOR_Handler(String line) {
+
+	   String authors = line.substring(10).trim();
+
+	   String auth = pdbHeader.getAuthors();
+	   if (auth == null){
+	      pdbHeader.setAuthors(authors);
+	   } else {
+	      auth +=  authors;
+	      pdbHeader.setAuthors(auth);
+	   }
+
+	}
+
+
 
 	/** parses the following record:
 
@@ -1908,7 +1935,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 		try {
 			val = Integer.parseInt(intString.trim());
 		} catch (NumberFormatException ex){
-			ex.printStackTrace();
+			//ex.printStackTrace();
+		   System.err.println("NumberformatException: " + ex.getMessage());
 		}
 		return val;
 	}
@@ -2077,6 +2105,8 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
 						pdb_MODEL_Handler(line);
 					else if (recordName.equals("HEADER"))
 						pdb_HEADER_Handler(line);
+					else if (recordName.equals("AUTHOR"))
+					   pdb_AUTHOR_Handler(line);
 					else if (recordName.equals("TITLE"))
 						pdb_TITLE_Handler(line);
 					else if (recordName.equals("SOURCE"))
@@ -2496,7 +2526,7 @@ COLUMNS   DATA TYPE         FIELD          DEFINITION
                 journalName = "TO BE PUBLISHED";
                 return;
             }
-            
+
 
             //REF    NUCLEIC ACIDS RES.                         2009
             //REF    MOL.CELL                                   2009
