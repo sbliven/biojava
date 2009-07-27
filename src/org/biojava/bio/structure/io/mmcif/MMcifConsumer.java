@@ -80,6 +80,11 @@ public interface MMcifConsumer {
 	public void newStructKeywords(StructKeywords kw);
 	public void newRefine(Refine r);
 	public void newChemComp(ChemComp c);
+
+	/** AuditAuthor contains the info from the PDB-AUTHOR records.
+	 *
+	 * @param aa
+	 */
 	public void newAuditAuthor(AuditAuthor aa);
 
 	/** This method is called if no particular handler for the provided cif category
