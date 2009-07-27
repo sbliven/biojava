@@ -159,8 +159,6 @@ public class PDBHeader implements PDBRecord, Serializable{
 
 	   printMultiLine(buf, "AUTHOR   ", authors,',');
 
-	   buf.append(buf);
-
 	}
 
 	private void printMultiLine(StringBuffer buf, String lineStart, String data, char breakChar){
@@ -200,13 +198,14 @@ public class PDBHeader implements PDBRecord, Serializable{
              thisLine = data.substring(0,58);
              data = data.substring(57);
           }
-          if ( ( breakChar == ',' )&& ( data.charAt(0)== ',')) {
+          if ( ( breakChar == ',' ) && ( data.charAt(0)== ',')) {
              data =   data.substring(1);
           }
 
 
           //TODO: check structures that have more than 10  lines...
           // start printing..
+
           buf.append(lineStart);
           if ( count > 1) {
               buf.append(count);
@@ -233,9 +232,14 @@ public class PDBHeader implements PDBRecord, Serializable{
       if ( data.trim().length() > 0){
           buf.append(lineStart);
           buf.append(count);
+          int filledLeft = 10;
+          if ( breakChar != ' ' ) {
+             buf.append(" ");
+             filledLeft++;
+          }
           buf.append(data);
           // fill up the white space to the right column
-          int l =  data.length()+ 10;
+          int l =  data.length()+ filledLeft;
           fillLine(buf,l);
           buf.append(newline);
       }
