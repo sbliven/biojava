@@ -139,7 +139,7 @@ public class ChemCompConsumer implements MMcifConsumer {
 
 	}
 
-   @Override
+
    public void newAuditAuthor(AuditAuthor aa)
    {
       // TODO Auto-generated method stub
