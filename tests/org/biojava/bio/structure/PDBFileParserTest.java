@@ -140,7 +140,12 @@ public class PDBFileParserTest extends TestCase {
 			Structure s = parser.parsePDBFile(br);
 			String pdb = s.toPDB();
 
-			//compareString(t, pdb);
+			if (! pdb.equalsIgnoreCase(t)){
+			   compareString(t, pdb);
+			   System.out.println(t);
+			   System.out.println(pdb);
+			}
+
 			// we ignore the case here, since the month FEB is written as Feb, which should be ok...
 			assertTrue("the created header does not match the PDB file" ,pdb.equalsIgnoreCase(t));
 
