@@ -88,7 +88,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * and write RichSequence objects. Loosely Based on code from the old, deprecated,
  * org.biojava.bio.seq.io.GenbankXmlFormat object.
  *
- * Understands http://www.ebi.ac.uk/embl/Documentation/DTD/INSDC_V1.4.dtd.txt
+ * Understands http://www.insdc.org/files/documents/INSD_V1.4.dtd
  * 
  * Does NOT understand the "sites" keyword in INSDReference_position. Interprets
  * this instead as an empty location. This is because
@@ -307,7 +307,7 @@ public class INSDseqFormat extends RichSequenceFormat.BasicFormat {
     public void beginWriting() throws IOException {
         XMLWriter xml = getXMLWriter();
         xml.printRaw("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-        xml.printRaw("<!DOCTYPE INSDSeq PUBLIC \"-//EMBL-EBI//INSD INSDSeq/EN\" \"http://www.ebi.ac.uk/dtd/INSD_INSDSeq.dtd\">");
+        xml.printRaw("<!DOCTYPE INSDSeq PUBLIC \"-//EMBL-EBI//INSD INSDSeq/EN\" \"http://www.insdc.org/files/documents/INSD_V1.4.dtd\">");
         xml.openTag(INSDSEQS_GROUP_TAG);
     }
     
