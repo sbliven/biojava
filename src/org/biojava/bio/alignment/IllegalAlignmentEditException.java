@@ -38,63 +38,60 @@
 
  */
 
-
-
-
-
 package org.biojava.bio.alignment;
-
-
 
 import org.biojava.bio.BioRuntimeException;
 
-
-
 /**
-
+ * 
  * <p>
-
- * The usual reason for throwing an IllegalAlignmentEditException is that you are
-
- * trying to shift a group of bases in such a way that it would require deleting bases.
-
+ * 
+ * The usual reason for throwing an IllegalAlignmentEditException is that you
+ * are
+ * 
+ * trying to shift a group of bases in such a way that it would require deleting
+ * bases.
+ * 
  * Only gaps can be deleted.
-
+ * 
  * </p>
-
- *
-
+ * 
+ * 
+ * 
  * @author David Waring
-
  */
 
 public class IllegalAlignmentEditException extends BioRuntimeException {
 
-  /**
+	/**
+	 * Generated Serial Version ID.
+	 */
+	private static final long serialVersionUID = 4662428071284597336L;
 
-   * Just make the exception.
+	/**
+	 * 
+	 * Just make the exception.
+	 */
 
-   */
+	public IllegalAlignmentEditException() {
+		super();
+	}
 
-  public IllegalAlignmentEditException() { super(); }
+	/**
+	 * 
+	 * Make the exception with a message.
+	 */
 
+	public IllegalAlignmentEditException(String message) {
+		super(message);
+	}
 
+	public IllegalAlignmentEditException(Throwable t) {
+		super(t);
+	}
 
-  /**
-
-   * Make the exception with a message.
-
-   */
-
-  public IllegalAlignmentEditException(String message) { super(message); }
-
-
-
-  public IllegalAlignmentEditException(Throwable t) { super(t); }
-
-
-
-  public IllegalAlignmentEditException(Throwable t, String message) { super(message, t); }
+	public IllegalAlignmentEditException(Throwable t, String message) {
+		super(message, t);
+	}
 
 }
-

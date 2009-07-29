@@ -227,7 +227,7 @@ public abstract class AbstractULAlignment extends AbstractSymbolList implements 
     * it the larger of the two considered to the Left
     */
 
-    public class LeftRightLocationComparator implements Comparator{
+    public class LeftRightLocationComparator<T> implements Comparator<T> {
        public int compare(Object o1, Object o2){
             int ret = 1;
             Location loc1,loc2;

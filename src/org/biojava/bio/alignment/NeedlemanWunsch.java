@@ -38,10 +38,6 @@ import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
-
-/*
- * Created on 23.06.2005
- */
 import org.biojava.bio.symbol.SymbolList;
 
 /**

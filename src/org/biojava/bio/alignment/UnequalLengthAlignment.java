@@ -63,12 +63,12 @@ public interface UnequalLengthAlignment extends Alignment{
         /**
         * Returns a list labels, of all seqs that cover that column
         */        
-        public List labelsAt(int column);
+        public List<Object> labelsAt(int column);
 
         /**
         * Returns list of all the labels that intersect that range
         */      
-        public List labelsInRange(Location loc);   
+        public List<Object> labelsInRange(Location loc);   
        
 
 

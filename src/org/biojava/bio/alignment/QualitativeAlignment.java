@@ -19,8 +19,8 @@
  *
  */
 
-
 package org.biojava.bio.alignment;
+
 /**
  * QualitativeAlignment for SymbolLists that implement Qualitative.
  *
@@ -30,12 +30,10 @@ package org.biojava.bio.alignment;
 import java.util.List;
 
 public interface QualitativeAlignment {
-        
-        /**
-        * Returns a quality score for label/position
-        */        
-        public List qualityAt(Object label,int column);
 
-
+	/**
+	 * Returns a quality score for label/position
+	 */
+	public List<Double> qualityAt(Object label, int column);
 
 }

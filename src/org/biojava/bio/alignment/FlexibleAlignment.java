@@ -65,10 +65,10 @@ public class FlexibleAlignment
     extends AbstractULAlignment
     implements ARAlignment, EditableAlignment{
     
-    protected Map data;
-    protected List labelOrder;
+    protected Map<Object, AlignmentElement> data;
+    protected List<Object> labelOrder;
     protected  Location alignmentRange;
-    List alphaList = new ArrayList();
+    List<Alphabet> alphaList = new ArrayList<Alphabet>();
     
     /**
     * construct this object with the reference sequence which can either be a gappedSymbolList or not
@@ -77,19 +77,15 @@ public class FlexibleAlignment
     * labels are different objects even though they may hold the same name.
     */
 
-    public FlexibleAlignment (List seqList)throws BioException{
-        data = new Hashtable();
-        labelOrder = new Vector();
+    public FlexibleAlignment (List<AlignmentElement> seqList)throws BioException{
+        data = new Hashtable<Object, AlignmentElement>();
+        labelOrder = new Vector<Object>();
         alignmentRange = new RangeLocation(1,1);
         
         int k=0;
         // go through the list make sure that all seqs are GappedSymbolLists
-        for (Iterator i = seqList.iterator();i.hasNext();){
-            Object element = i.next();
-            if (!(element instanceof AlignmentElement)){
-                throw new BioException("All elements of seqList must be AlignmentElements ");
-            }
-            AlignmentElement ae = (AlignmentElement)element;
+        for (Iterator<AlignmentElement> i = seqList.iterator();i.hasNext();){
+            AlignmentElement ae = i.next();
             Object label = ae.getLabel();
             Location loc = ae.getLoc();            
             SymbolList seq = ae.getSymbolList();
@@ -200,19 +196,17 @@ public class FlexibleAlignment
         return getAE(label).getLoc();
     }        
         
-    public List getLabelsAt(int column) throws IndexOutOfBoundsException {
-        if (column < 1 || column > this.length()){
+    public List<Object> getLabelsAt(int column) throws IndexOutOfBoundsException {
+        if (column < 1 || column > this.length())
             throw new IndexOutOfBoundsException();
-        }
-        List labelList = new ArrayList();
+        List<Object> labelList = new ArrayList<Object>();
         Location loc;
         Object label;
-        for (Iterator labelIterator = data.keySet().iterator();labelIterator.hasNext();){
+        for (Iterator<Object> labelIterator = data.keySet().iterator();labelIterator.hasNext();){
             label = labelIterator.next();
             loc = getAE(label).getLoc();
-            if (loc.contains(column)){
+            if (loc.contains(column))
                 labelList.add(label);
-            }
         }
         return labelList;
     }
@@ -234,10 +228,10 @@ public class FlexibleAlignment
     * getLabels will return a list of labels in left to right order
     */
     
-    public synchronized List getLabels(){
-        TreeSet sorted = new TreeSet(new LeftRightLocationComparator());
+    public synchronized List<Object> getLabels(){
+        TreeSet<Object> sorted = new TreeSet<Object>(new LeftRightLocationComparator<Object>());
         sorted.addAll(labelOrder);
-        return new Vector(sorted);
+        return new Vector<Object>(sorted);
     }
     
     /**
@@ -453,7 +447,7 @@ debug("OOOPS something is wrong " + loc.toString() + " " + absOffset);
         int lMax;
         int count = 1;
         // get the current range from all labels
-        for (Iterator i = getLabels().iterator();i.hasNext();){
+        for (Iterator<Object> i = getLabels().iterator();i.hasNext();){
             Object label = i.next();            
             lMin = locInAlignment(label).getMin();
             lMax = locInAlignment(label).getMax();
@@ -479,8 +473,8 @@ debug("OOOPS something is wrong " + loc.toString() + " " + absOffset);
     
     
     protected synchronized void shiftAll(int offset)throws ChangeVetoException{
-        List lList = getLabels();
-        for (Iterator i= lList.iterator();i.hasNext();){
+        List<Object> lList = getLabels();
+        for (Iterator<Object> i= lList.iterator();i.hasNext();){
             Object label = i.next();
             shift (label,offset);
         }
@@ -516,7 +510,7 @@ debug("OOOPS something is wrong " + loc.toString() + " " + absOffset);
     }
     protected AlignmentElement getAE(Object label) throws NoSuchElementException{
         if (!(data.containsKey(label)));
-        return (AlignmentElement)data.get(label);
+        return data.get(label);
     }
     /**
     * get the position in the sequence corresponding to the postion within the alignment
