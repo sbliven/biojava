@@ -24,8 +24,8 @@ package org.biojava.bio.search;
 import java.util.Comparator;
 
 import org.biojava.bio.Annotatable;
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.bio.symbol.Alignment;
 
 /**
  * Objects of this type represent one particular sub-hit (one concrete

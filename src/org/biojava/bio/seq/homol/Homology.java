@@ -20,8 +20,8 @@
  */
 package org.biojava.bio.seq.homol;
  
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.utils.ChangeType;
 
 /**

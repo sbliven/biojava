@@ -27,15 +27,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
+
+import junit.framework.TestCase;
 
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.Symbol;
-
-import junit.framework.TestCase;
 
 public class SubstitutionMatrixTest extends TestCase {
 

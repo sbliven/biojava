@@ -23,7 +23,7 @@ package org.biojava.bio.seq.io;
 
 import java.io.BufferedReader;
 
-import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.alignment.Alignment;
 
 /**
  * @author Matthew Pocock

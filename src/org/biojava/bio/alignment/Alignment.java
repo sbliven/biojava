@@ -19,13 +19,16 @@
  *
  */
 
-package org.biojava.bio.symbol;
+package org.biojava.bio.alignment;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.biojava.bio.symbol.Location;
+import org.biojava.bio.symbol.Symbol;
+import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeType;
 
 /**

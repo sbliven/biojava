@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.biojava.bio.BioException;
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.alignment.FlexibleAlignment;
 import org.biojava.bio.alignment.SimpleAlignmentElement;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.io.ParseException;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.LocationTools;

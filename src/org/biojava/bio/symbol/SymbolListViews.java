@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.biojava.bio.alignment.Alignment;
+import org.biojava.bio.alignment.SimpleAlignment;
 import org.biojava.bio.seq.SequenceIterator;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Unchangeable;

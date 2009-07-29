@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.utils.ChangeVetoException;
 import org.biojava.utils.Unchangeable;
 

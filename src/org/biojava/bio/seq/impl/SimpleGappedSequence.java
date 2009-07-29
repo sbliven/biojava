@@ -34,153 +34,166 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.SimpleFeatureHolder;
 import org.biojava.bio.seq.projection.ProjectedFeatureHolder;
 import org.biojava.bio.seq.projection.ReparentContext;
+import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Location;
 import org.biojava.bio.symbol.SimpleGappedSymbolList;
 import org.biojava.utils.AssertionFailure;
 import org.biojava.utils.ChangeVetoException;
 
 /**
- * Simple implementation of GappedSequence. Please note that this is a view onto 
- * another Sequence. Gaps created and removed are only in the view not the underlying original. This
- * means that any gaps present in the original cannot be manipulated in this
- * view. To manipulate the original you would need to use Edit objects.
- *
+ * Simple implementation of GappedSequence. Please note that this is a view onto
+ * another Sequence. Gaps created and removed are only in the view not the
+ * underlying original. This means that any gaps present in the original cannot
+ * be manipulated in this view. To manipulate the original you would need to use
+ * Edit objects.
+ * 
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.3
  */
 
-public class SimpleGappedSequence
-extends SimpleGappedSymbolList
-implements GappedSequence {
-  private Sequence sequence;
+public class SimpleGappedSequence extends SimpleGappedSymbolList implements
+		GappedSequence {
+	/**
+	 * Generated Serial Verion ID.
+	 */
+	private static final long serialVersionUID = -791305118810523245L;
 
-  private MergeFeatureHolder features;
-  private SimpleFeatureHolder localFeatures;
-  private FeatureHolder projectedFeatures;
+	private Sequence sequence;
 
-  private boolean createOnUnderlying;
+	private MergeFeatureHolder features;
+	private SimpleFeatureHolder localFeatures;
+	private FeatureHolder projectedFeatures;
 
-  public SimpleGappedSequence(Sequence seq) {
-    super(seq);
-    this.sequence = seq;
-    createOnUnderlying = false;
-  }
+	private boolean createOnUnderlying;
 
-  public SimpleGappedSequence(GappedSequence seq) {
-    super(seq);
-    this.sequence = seq;
-    createOnUnderlying = false;
-  }
+	public SimpleGappedSequence(Alphabet alpha) {
+		super(alpha);
+	}
+	
+	public SimpleGappedSequence(Sequence seq) {
+		super(seq);
+		this.sequence = seq;
+		createOnUnderlying = false;
+	}
 
-  public boolean getCreateOnUnderlyingSequence() {
-    return createOnUnderlying;
-  }
+	public SimpleGappedSequence(GappedSequence seq) {
+		super(seq);
+		this.sequence = seq;
+		createOnUnderlying = false;
+	}
 
-  public void setCreateOnUnderlyingSequence(boolean underlying) {
-    this.createOnUnderlying = underlying;
-  }
+	public boolean getCreateOnUnderlyingSequence() {
+		return createOnUnderlying;
+	}
 
-  public Annotation getAnnotation() {
-    return sequence.getAnnotation();
-  }
+	public void setCreateOnUnderlyingSequence(boolean underlying) {
+		this.createOnUnderlying = underlying;
+	}
 
-  public String getName() {
-    return sequence.getName();
-  }
+	public Annotation getAnnotation() {
+		return sequence.getAnnotation();
+	}
 
-  public String getURN() {
-    return sequence.getURN();
-  }
+	public String getName() {
+		return sequence.getName();
+	}
 
-  private FeatureHolder getFeatures() {
-    if (features == null) {
-      features = makeFeatures();
-    }
-    return features;
-  }
+	public String getURN() {
+		return sequence.getURN();
+	}
 
-  private MergeFeatureHolder makeFeatures() {
-    projectedFeatures = new ProjectedFeatureHolder(
-            new GappedContext());
+	private FeatureHolder getFeatures() {
+		if (features == null) {
+			features = makeFeatures();
+		}
+		return features;
+	}
 
-    localFeatures = new SimpleFeatureHolder();
+	private MergeFeatureHolder makeFeatures() {
+		projectedFeatures = new ProjectedFeatureHolder(new GappedContext());
 
-    features = new MergeFeatureHolder();
+		localFeatures = new SimpleFeatureHolder();
 
-    try {
-      features.addFeatureHolder(projectedFeatures);
-      features.addFeatureHolder(localFeatures);
-    } catch (ChangeVetoException cve) {
-      throw new AssertionFailure("Assertion Failure: Should be able to do this", cve);
-    }
+		features = new MergeFeatureHolder();
 
-    return features;
-  }
+		try {
+			features.addFeatureHolder(projectedFeatures);
+			features.addFeatureHolder(localFeatures);
+		} catch (ChangeVetoException cve) {
+			throw new AssertionFailure(
+					"Assertion Failure: Should be able to do this", cve);
+		}
 
-  public Iterator features() {
-    return getFeatures().features();
-  }
+		return features;
+	}
 
-  public FeatureHolder filter(FeatureFilter ff) {
-    return getFeatures().filter(ff);
-  }
+	public Iterator<Feature> features() {
+		return getFeatures().features();
+	}
 
-  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-    return getFeatures().filter(ff, recurse);
-  }
+	public FeatureHolder filter(FeatureFilter ff) {
+		return getFeatures().filter(ff);
+	}
 
-  public int countFeatures() {
-    return getFeatures().countFeatures();
-  }
+	public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+		return getFeatures().filter(ff, recurse);
+	}
 
-  public boolean containsFeature(Feature f) {
-    return getFeatures().containsFeature(f);
-  }
+	public int countFeatures() {
+		return getFeatures().countFeatures();
+	}
 
-  public FeatureFilter getSchema() {
-    return getFeatures().getSchema();
-  }
+	public boolean containsFeature(Feature f) {
+		return getFeatures().containsFeature(f);
+	}
 
-  public void removeFeature(Feature f)
-      throws ChangeVetoException, BioException
-  {
-      getFeatures();
-      if (localFeatures.containsFeature(f)) {
-          localFeatures.removeFeature(f);
-      } else {
-          projectedFeatures.removeFeature(f);
-      }
-  }
+	public FeatureFilter getSchema() {
+		return getFeatures().getSchema();
+	}
 
-  public Feature createFeature(Feature.Template templ)
-  throws ChangeVetoException, BioException
-  {
-    getFeatures();
-    if(createOnUnderlying) {
-      return projectedFeatures.createFeature(templ);
-    } else {
-      Feature f = FeatureImpl.DEFAULT.realizeFeature(this, this, templ);
-      localFeatures.addFeature(f);
-      return f;
-    }
-  }
+	public void removeFeature(Feature f) throws ChangeVetoException,
+			BioException {
+		getFeatures();
+		if (localFeatures.containsFeature(f)) {
+			localFeatures.removeFeature(f);
+		} else {
+			projectedFeatures.removeFeature(f);
+		}
+	}
 
-  public class GappedContext extends ReparentContext {
-    public GappedContext() {
-      super(SimpleGappedSequence.this, sequence);
-    }
+	public Feature createFeature(Feature.Template templ)
+			throws ChangeVetoException, BioException {
+		getFeatures();
+		if (createOnUnderlying) {
+			return projectedFeatures.createFeature(templ);
+		} else {
+			Feature f = FeatureImpl.DEFAULT.realizeFeature(this, this, templ);
+			localFeatures.addFeature(f);
+			return f;
+		}
+	}
 
-    public Location projectLocation(Location loc) {
-      return loc.newInstance(locationToGapped(loc));
-    }
+	public class GappedContext extends ReparentContext {
+		/**
+		 * Generated Serial Version ID.
+		 */
+		private static final long serialVersionUID = 8878073952684354286L;
 
-    public Location mapLocation(Location loc) {
-      return loc.newInstance(locationToGapped(loc));
-    }
+		public GappedContext() {
+			super(SimpleGappedSequence.this, sequence);
+		}
 
-    public Location revertLocation(Location oldLoc) {
-      return gappedToLocation(oldLoc);
-    }
-  }
+		public Location projectLocation(Location loc) {
+			return loc.newInstance(locationToGapped(loc));
+		}
+
+		public Location mapLocation(Location loc) {
+			return loc.newInstance(locationToGapped(loc));
+		}
+
+		public Location revertLocation(Location oldLoc) {
+			return gappedToLocation(oldLoc);
+		}
+	}
 }

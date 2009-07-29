@@ -6,11 +6,11 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.biojava.bio.alignment.Alignment;
+import org.biojava.bio.alignment.SimpleAlignment;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Sequence;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.AlphabetManager;
-import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.Symbol;
 
 /**

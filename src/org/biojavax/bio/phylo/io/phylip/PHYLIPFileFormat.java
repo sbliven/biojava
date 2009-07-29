@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.seq.io.ParseException;
-import org.biojava.bio.symbol.Alignment;
 
 /**
  * Reads PHYLIP interleaved alignment files and fires events at a PHYLIPFileListener object.

@@ -23,8 +23,8 @@ package org.biojava.bio.search;
 
 import org.biojava.bio.Annotatable;
 import org.biojava.bio.Annotation;
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.seq.StrandedFeature.Strand;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.utils.AbstractChangeable;
 import org.biojava.utils.ChangeForwarder;
 import org.biojava.utils.ChangeListener;

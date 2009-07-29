@@ -23,7 +23,6 @@ package org.biojava.bio.alignment;
 
 import java.util.List;
 
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.Location;
 
 /**

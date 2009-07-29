@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.BioException;
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.dist.Distribution;
 import org.biojava.bio.dist.DistributionFactory;
 import org.biojava.bio.dist.DistributionTools;
@@ -50,7 +51,6 @@ import org.biojava.bio.seq.io.SimpleSequenceBuilder;
 import org.biojava.bio.seq.io.StreamReader;
 import org.biojava.bio.seq.io.StreamWriter;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.BasisSymbol;

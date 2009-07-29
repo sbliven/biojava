@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.seq.StrandedFeature;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.IllegalAlphabetException;

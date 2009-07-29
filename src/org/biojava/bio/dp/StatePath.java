@@ -22,7 +22,7 @@
 
 package org.biojava.bio.dp;
 
-import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.alignment.Alignment;
 
 /**
  * Extends the Alignment interface so that it is explicitly used to represent

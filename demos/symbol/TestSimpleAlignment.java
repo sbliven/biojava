@@ -22,6 +22,8 @@ package symbol;
 
 import java.util.*;
 
+import org.biojava.bio.alignment.Alignment;
+import org.biojava.bio.alignment.SimpleAlignment;
 import org.biojava.bio.symbol.*;
 
 /**

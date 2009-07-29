@@ -26,8 +26,8 @@ import java.io.InputStreamReader;
 
 import junit.framework.TestCase;
 
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.seq.DNATools;
-import org.biojava.bio.symbol.Alignment;
 
 /**
  * JUnit test for MSFAlignmentFormat

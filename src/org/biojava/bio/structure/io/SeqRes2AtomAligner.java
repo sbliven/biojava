@@ -33,6 +33,7 @@ import java.util.List;
 
 import org.biojava.bio.BioException;
 import org.biojava.bio.alignment.NeedlemanWunsch;
+import org.biojava.bio.alignment.SimpleAlignment;
 import org.biojava.bio.alignment.SubstitutionMatrix;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.Sequence;
@@ -43,7 +44,6 @@ import org.biojava.bio.structure.Structure;
 import org.biojava.bio.structure.StructureException;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 
@@ -235,7 +235,7 @@ public class SeqRes2AtomAligner {
             	System.out.println("seq1: " + bjseq1.seqString());
             	System.out.println("seq2: " + bjseq2.seqString());
             }
-            org.biojava.bio.symbol.Alignment ali = aligner.getAlignment(bjseq1,bjseq2);
+            org.biojava.bio.alignment.Alignment ali = aligner.getAlignment(bjseq1,bjseq2);
             if ( ! (ali instanceof SimpleAlignment )) {
                 throw new Exception ("Alignment is not a SimpleAlignment!");
 

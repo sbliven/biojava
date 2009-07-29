@@ -33,12 +33,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.biojava.bio.BioException;
+import org.biojava.bio.alignment.Alignment;
+import org.biojava.bio.alignment.SimpleAlignment;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.ProteinTools;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.FiniteAlphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
-import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.Symbol;
 
 /**

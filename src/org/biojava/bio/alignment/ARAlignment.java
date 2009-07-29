@@ -23,7 +23,6 @@
 package org.biojava.bio.alignment;
 
 import org.biojava.bio.BioException;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.utils.ChangeType;
 import org.biojava.utils.ChangeVetoException;
 

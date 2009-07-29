@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.biojava.bio.Annotation;
 import org.biojava.bio.BioException;
+import org.biojava.bio.alignment.SimpleAlignment;
 import org.biojava.bio.search.SearchBuilder;
 import org.biojava.bio.search.SeqSimilaritySearchHit;
 import org.biojava.bio.search.SeqSimilaritySearchResult;
@@ -43,7 +44,6 @@ import org.biojava.bio.seq.db.SequenceDB;
 import org.biojava.bio.seq.db.SequenceDBInstallation;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.FiniteAlphabet;
-import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 import org.biojava.utils.SmallMap;
 

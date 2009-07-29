@@ -209,7 +209,7 @@ public interface Location {
    * @return an Iterator over Location objects that are the maximally contiguous
    *         set of locations contained within this location
    */
-  Iterator blockIterator();
+  Iterator<Location> blockIterator();
 
   /**
    * The <code>Location</code> which contains no points.

@@ -44,7 +44,6 @@ import java.util.Vector;
 
 import org.biojava.bio.BioError;
 import org.biojava.bio.symbol.AbstractSymbolList;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.IllegalSymbolException;
 import org.biojava.bio.symbol.Location;

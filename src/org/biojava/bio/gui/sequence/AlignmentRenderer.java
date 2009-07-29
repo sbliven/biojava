@@ -23,8 +23,8 @@ package org.biojava.bio.gui.sequence;
 
 import java.awt.Graphics2D;
 
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.seq.FeatureHolder;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeSupport;

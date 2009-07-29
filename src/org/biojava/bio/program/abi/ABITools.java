@@ -25,11 +25,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.biojava.bio.BioError;
+import org.biojava.bio.alignment.Alignment;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.io.CharacterTokenization;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.AbstractAlphabet;
-import org.biojava.bio.symbol.Alignment;
 import org.biojava.bio.symbol.AlphabetManager;
 import org.biojava.bio.symbol.AtomicSymbol;
 import org.biojava.bio.symbol.FiniteAlphabet;

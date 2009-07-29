@@ -30,12 +30,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.biojava.bio.symbol.Alignment;
+import org.biojava.bio.alignment.Alignment;
+import org.biojava.bio.alignment.SimpleAlignment;
 import org.biojava.bio.symbol.Alphabet;
 import org.biojava.bio.symbol.Edit;
 import org.biojava.bio.symbol.IllegalAlphabetException;
 import org.biojava.bio.symbol.Location;
-import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.Symbol;
 import org.biojava.bio.symbol.SymbolList;
 import org.biojava.utils.ChangeVetoException;

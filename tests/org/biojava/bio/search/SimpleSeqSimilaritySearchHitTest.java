@@ -29,12 +29,12 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.biojava.bio.Annotation;
+import org.biojava.bio.alignment.Alignment;
+import org.biojava.bio.alignment.SimpleAlignment;
 import org.biojava.bio.seq.ProteinTools;
 import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.StrandedFeature.Strand;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.Alignment;
-import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 
 /**

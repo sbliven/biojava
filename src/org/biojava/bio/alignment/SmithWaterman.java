@@ -31,7 +31,6 @@ import org.biojava.bio.seq.Sequence;
 import org.biojava.bio.seq.impl.SimpleGappedSequence;
 import org.biojava.bio.seq.impl.SimpleSequence;
 import org.biojava.bio.seq.io.SymbolTokenization;
-import org.biojava.bio.symbol.SimpleAlignment;
 import org.biojava.bio.symbol.SimpleSymbolList;
 
 /*
@@ -197,7 +196,7 @@ public class SmithWaterman extends NeedlemanWunsch {
 
 		if (squery.getAlphabet().equals(ssubject.getAlphabet())
 		    && squery.getAlphabet().equals(subMatrix.getAlphabet())) {
-
+			StringBuffer[] align = { new StringBuffer(), new StringBuffer() };
 			long time = System.currentTimeMillis();
 			int i, j, maxI = 0, maxJ = 0, queryStart = 0, targetStart = 0;
 			scoreMatrix = new int[squery.length() + 1][ssubject.length() + 1];
