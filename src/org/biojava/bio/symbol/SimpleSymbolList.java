@@ -53,7 +53,7 @@ import org.biojava.utils.ChangeVetoException;
  * <code>
  * String seqString = "gaattc";
  * FiniteAlphabet dna = (FiniteAlphabet) AlphabetManager.alphabetForName("DNA");
- * SymbolParser parser = dna.getParser("token");
+ * SymbolParser parser = dna.getTokenization("token");
  * SymbolList mySl = new SimpleSymbolList (parser,seqString);
  * System.out.println("Look at my sequence " + mySl.seqString());
  * </code>
