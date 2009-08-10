@@ -331,7 +331,7 @@ public interface Ontology extends Changeable {
 				 */
 				private static final long serialVersionUID = -2135777733685713181L;
 
-				public Set getRemoteTerms() {
+				public Set<Term> getRemoteTerms() {
 					return localRemoteTerms;
 				}
 			};
@@ -357,11 +357,11 @@ public interface Ontology extends Changeable {
 		public Term getTerm(String name)
 		throws NoSuchElementException
 		{
-			Term t = (Term) terms.get(name);
+			Term t = terms.get(name);
 			if (t == null) {
 				throw new NoSuchElementException("No term named '" + name + "'");
 			} else {
-				return (Term) terms.get(name);
+				return terms.get(name);
 			}
 		}
 
@@ -397,8 +397,8 @@ public interface Ontology extends Changeable {
 			}
 
 			Set<Triple> retval = new HashSet<Triple>();
-			for (Iterator i = base.iterator(); i.hasNext(); ) {
-				Triple t = (Triple) i.next();
+			for (Iterator<Triple> i = base.iterator(); i.hasNext(); ) {
+				Triple t = i.next();
 				if (subject != null && t.getSubject() != subject) {
 					continue;
 				}
@@ -417,7 +417,7 @@ public interface Ontology extends Changeable {
 		throws AlreadyExistsException, IllegalArgumentException, ChangeVetoException
 		{
 			if (terms.containsKey(t.getName())) {
-				throw new AlreadyExistsException("Ontology " + getName() + " already contains " + t.getName());
+				throw new AlreadyExistsException("Ontology " + getName() + " already contains " + t.toString());
 			}
 
 			if(!hasListeners()) {
@@ -493,7 +493,7 @@ public interface Ontology extends Changeable {
 				return t;
 			}
 
-			RemoteTerm rt = (RemoteTerm) remoteTerms.get(t);
+			RemoteTerm rt = remoteTerms.get(t);
 			if (rt == null) {
 				rt = new RemoteTerm.Impl(this, t, name);
 				try {
@@ -626,8 +626,8 @@ public interface Ontology extends Changeable {
 			pullTriple(relationTriples, t.getPredicate(), t);
 		}
 
-		private void pullTriple(Map m, Term key, Triple t) {
-			Set s = (Set) m.get(key);
+		private void pullTriple(Map<Term, Set<Triple>> subjectTriples2, Term key, Triple t) {
+			Set<Triple> s = subjectTriples2.get(key);
 			if (s != null) {
 				s.remove(t);
 			}

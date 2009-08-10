@@ -84,14 +84,11 @@ public class OboFileHandler implements OboFileEventListener {
 	}
 
 	public void documentStart() {
-
 		termStack = new ArrayList<Term>();
-
 	}
 
 	public void newOboFileHeader() {
 		// TODO Auto-generated method stub
-
 	}
 
 	public void newStanza(String stanza) {
@@ -146,15 +143,19 @@ public class OboFileHandler implements OboFileEventListener {
 				Annotation anno = currentTerm.getAnnotation();				
 				anno.setProperty(IS_OBSOLETE, new Boolean(true));
 				
-				
 			} else if (key.equals(IS_A) || 
 					key.equals(RELATIONSHIP) || 
 					key.equals(DISJOINT_FROM) ||
 					key.equals(INTERSECTION_OF) ||
 					key.equals(SUBSET)) {
-				//TODO: deal with relationships
-				
-				
+				try {
+					Term object = ontology.containsTerm(value) ?
+						object = ontology.getTerm(value): ontology.createTerm(value);
+					Term predicate = ontology.containsTerm(key) ? ontology.getTerm(key) : ontology.createTerm(key);
+   			        ontology.createTriple(currentTerm, object, predicate, currentTerm + " " + predicate + " " + object, key+"-relationship");				      
+				} catch (AlreadyExistsException ex) {
+				}
+								
 			} else if (key.equals(COMMENT)){
 				Annotation anno = currentTerm.getAnnotation();				
 				anno.setProperty(COMMENT, value);
@@ -178,11 +179,6 @@ public class OboFileHandler implements OboFileEventListener {
 		if (isTerm) {
 			currentTerm.addSynonym(synonym);
 		}
-		 
 	}
-
-	
-
-
 
 }

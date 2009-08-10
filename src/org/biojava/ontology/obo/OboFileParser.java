@@ -450,7 +450,7 @@ public class OboFileParser {
 			if (c == '\\') {
 				i++;
 				c = str.charAt(i);
-				Character mapchar = (Character) escapeChars
+				Character mapchar = escapeChars
 				.get(new Character(c));
 				if (mapchar == null)
 					throw new ParseException("Unrecognized escape"
@@ -620,11 +620,11 @@ class NestedValue {
 
 	public String toString(){
 		String txt = "NestedValue: " ;
-		Set keys = propertyValues.keySet();
-		Iterator<String> iter = keys.iterator();
+		Set<Object> keys = propertyValues.keySet();
+		Iterator<Object> iter = keys.iterator();
 		while (iter.hasNext()){
-			String key = iter.next();
-			String value = (String) propertyValues.get(key);
+			String key = iter.next().toString();
+			String value = propertyValues.get(key).toString();
 			txt += " [" + key + ":" + value + "]";
 		}
 
@@ -641,11 +641,11 @@ class NestedValue {
 	}
 
 	public void addPropertyValue(Properties pv) {
-		Set keys = pv.keySet();
-		Iterator<String> iter = keys.iterator();
+		Set<Object> keys = pv.keySet();
+		Iterator<Object> iter = keys.iterator();
 		while (iter.hasNext()){
-			String key = iter.next();
-			String value = (String) pv.get(key);
+			String key = iter.next().toString();
+			String value = pv.get(key).toString();
 			propertyValues.setProperty(key, value); 	
 		}
 

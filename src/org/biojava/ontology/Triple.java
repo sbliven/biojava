@@ -124,7 +124,7 @@ extends Term {
 		private final Term predicate;
 		private /*final*/ String name;
 		private /*final*/ String description;
-		private Set synonyms;
+		private Set<Object> synonyms;
 
 		public Impl(Term subject, Term object, Term predicate) {
 			this(subject, object, predicate, null, null, null);
@@ -180,7 +180,7 @@ extends Term {
 			this.name = name;
 			this.description = description;
 
-			this.synonyms = new TreeSet();
+			this.synonyms = new TreeSet<Object>();
 			if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
 		}
 
@@ -251,7 +251,9 @@ extends Term {
 		}
 
 		public String toString() {
-			return getName();
+			if (getName().length() > 0)
+    			return getName();
+			return subject + " " + predicate + " " + object;
 		}
 	}
 }

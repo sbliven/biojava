@@ -133,7 +133,7 @@ public interface Term extends Annotatable {
         
         private final Ontology ontology;
         private Annotation annotation;
-        private Set synonyms;
+        private Set<Object> synonyms;
 
         public Impl(Ontology ontology, String name) {
             this(ontology,name,null,null);
@@ -159,7 +159,7 @@ public interface Term extends Annotatable {
             this.description = description;
             this.ontology = ontology;
 
-            this.synonyms = new TreeSet();
+            this.synonyms = new TreeSet<Object>();
             if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
         }
 
@@ -183,7 +183,7 @@ public interface Term extends Annotatable {
 			this.annotation = annotation;
 		}
 
-		public void setSynonyms(Set synonyms) {
+		public void setSynonyms(Set<Object> synonyms) {
 			this.synonyms = synonyms;
 		}
 

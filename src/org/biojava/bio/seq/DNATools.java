@@ -82,7 +82,7 @@ public final class DNATools {
   static private final SimpleReversibleTranslationTable transcriptionTable;
 
 
-  static private Map symbolToComplement;
+  static private Map<Symbol, Symbol> symbolToComplement;
 
   static {
     try {
@@ -105,7 +105,7 @@ public final class DNATools {
       d = syms.symbolAt(14);
       b = syms.symbolAt(15);
 
-      symbolToComplement = new HashMap();
+      symbolToComplement = new HashMap<Symbol, Symbol>();
 
       // add the gap symbol
       Symbol gap = dna.getGapSymbol();
@@ -116,7 +116,7 @@ public final class DNATools {
           Symbol as = (Symbol) i.next();
           FiniteAlphabet matches = (FiniteAlphabet) as.getMatches();
           if (matches.size() > 1) {   // We've hit an ambiguous symbol.
-              Set l = new HashSet();
+              Set<Symbol> l = new HashSet<Symbol>();
               for(Iterator j = matches.iterator(); j.hasNext(); ) {
                   l.add(complement((Symbol) j.next()));
               }
@@ -321,7 +321,7 @@ public final class DNATools {
     } else if(sym == t) {
       return a;
     }
-    Symbol s = (Symbol) symbolToComplement.get(sym);
+    Symbol s = symbolToComplement.get(sym);
     if(s != null) {
       return s;
     } else {
