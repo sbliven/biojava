@@ -709,9 +709,18 @@ public class CharactersBlockParser extends NexusBlockParser.Abstract {
 		}
 
 		else if (this.expectingInterleave
-				&& "INTERLEAVE".equalsIgnoreCase(token)) {
+				&& token.toUpperCase().startsWith("INTERLEAVE")) {
+			boolean interleaved = true;
+			if (token.indexOf("=") >= 0) {
+				final String[] parts = token.split("=");
+				if (parts.length > 1) {
+					if (!("YES".equalsIgnoreCase(parts[1]) || "TRUE".equalsIgnoreCase(parts[1]))) {
+						interleaved = false;
+					}
+				}
+			}
 			((CharactersBlockListener) this.getBlockListener())
-					.setInterleaved(true);
+					.setInterleaved(interleaved);
 			this.expectingInterleave = false;
 		}
 
