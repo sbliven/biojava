@@ -59,15 +59,15 @@ public class HetatomImpl implements Group,Serializable {
     long id;
 
     /* stores if 3d coordinates are available. */
-    boolean pdb_flag ;
+   protected boolean pdb_flag ;
 
     /* 3 letter name of amino acid in pdb file. */
-    String pdb_name ;
+    protected String pdb_name ;
 
     /* pdb numbering. */
-    String pdb_code ;
+    protected String pdb_code ;
 
-    List<Atom> atoms ;
+    protected List<Atom> atoms ;
 
     //WeakReference parent;
     Chain parent;
@@ -219,6 +219,26 @@ public class HetatomImpl implements Group,Serializable {
         throw new StructureException(" No atom "+name + " in group " + pdb_name + " " + pdb_code + " !");
 
     }
+    
+    /**  Get an atom by the full PDB name e.g. " N  " for N. Throws StructureException if atom not found.
+     * @param name  a String
+     * @return an Atom object
+     * @throws StructureException ...
+     */
+    public Atom getAtomByPDBname(String name)
+    throws StructureException
+    {
+
+        for (int i=0;i<atoms.size();i++){
+            Atom atom = atoms.get(i);
+            if (atom.getFullName().equals(name)){
+                return atom;
+            }
+        }
+
+        throw new StructureException(" No atom "+name + " in group " + pdb_name + " " + pdb_code + " !");
+
+    }
 
     /** return an atom by its position in the internal List.
      *
@@ -258,7 +278,7 @@ public class HetatomImpl implements Group,Serializable {
 
         String str = "Hetatom "+ pdb_code + " " + pdb_name +  " "+ pdb_flag;
         if (pdb_flag) {
-            str = str + "atoms: "+atoms.size();
+            str = str + " atoms: "+atoms.size();
         }
 
 
