@@ -145,6 +145,14 @@ public interface Group {
 	 */
 	public Atom getAtom(String name) throws StructureException;
 
+	  
+    /**  Get an atom by the full PDB name e.g. " N  " for N. Throws StructureException if atom not found.
+     * @param name  a String
+     * @return an Atom object
+     * @throws StructureException ...
+     */
+	public  Atom getAtomByPDBname(String pdbName) throws StructureException;
+	
 	/** Get at atom by position.
 	 *
 	 * @param position  an int
