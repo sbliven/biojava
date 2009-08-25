@@ -1079,7 +1079,7 @@ public class PDBFileParser  {
 			try {
 			   i = Integer.valueOf(value);
 			} catch (NumberFormatException e){
-			   e.printStackTrace();
+			   System.err.println(e.getMessage() + " while trying to parse COMPND line.");
 			}
 			if (molTypeCounter != i) {
 				molTypeCounter++;
