@@ -144,6 +144,9 @@ public class PDBFileReader implements StructureIOFile {
 	boolean autoFetch;
 	boolean parseCAOnly;
     boolean alignSeqRes;
+    boolean pdbDirectorySplit;
+    
+    public static final String lineSplit = System.getProperty("file.separator");
 
 
 	public static void main(String[] args){
@@ -192,6 +195,7 @@ public class PDBFileReader implements StructureIOFile {
 		autoFetch     = false;
         parseCAOnly   = false;
         alignSeqRes   = true;
+        pdbDirectorySplit = false;
 	}
 
 
@@ -296,7 +300,22 @@ public class PDBFileReader implements StructureIOFile {
 	public void clearExtensions(){
 		extensions.clear();
 	}
+	
+	/** Flag that defines if the PDB directory is containing all PDB files or is split into sub dirs (like the FTP site).
+	 *  
+	 * @return boolean. default is false (all files in one directory)
+	 */
+	public boolean isPdbDirectorySplit() {
+		return pdbDirectorySplit;
+	}
 
+	/** Flag that defines if the PDB directory is containing all PDB files or is split into sub dirs (like the FTP site).
+	 *  
+	 * @param boolean. If set to false all files are in one directory.
+	 */
+	public void setPdbDirectorySplit(boolean pdbDirectorySplit) {
+		this.pdbDirectorySplit = pdbDirectorySplit;
+	}
 
 
 	/** try to find the file in the filesystem and return a filestream in order to parse it
@@ -323,9 +342,23 @@ public class PDBFileReader implements StructureIOFile {
 		File f = null ;
 
 		// this are the possible PDB file names...
-		String fpath = path+"/"+pdbId;
-		String ppath = path +"/pdb"+pdbId;
+		String fpath ;
+		String ppath ;
 
+		// pdb files are split into subdirectories based on their middle position...
+		
+		if ( pdbDirectorySplit){
+			if ( pdbId.length() < 4)
+				throw new IOException("the provided ID does not look like a PDB ID : " + pdbId);
+					
+			String middle = pdbId.substring(1,3);
+			fpath = path+lineSplit + middle + lineSplit + pdbId;
+			 ppath = path +lineSplit +  middle + lineSplit + "pdb"+pdbId;
+		} else {
+				fpath = path+lineSplit + pdbId;
+			 ppath = path +lineSplit + "pdb"+pdbId;
+		}
+		
 		String[] paths = new String[]{fpath,ppath};
 
 		for ( int p=0;p<paths.length;p++ ){
@@ -370,7 +403,23 @@ public class PDBFileReader implements StructureIOFile {
 			path = ".";
 		}
 
-		File tempFile = new File(path+"/"+pdbId+".pdb.gz");
+		
+		File tempFile ;
+		
+		if ( pdbDirectorySplit) {
+			String middle = pdbId.substring(1,3);
+			String dir = path+lineSplit+middle;
+			File directoryCheck = new File (dir);
+			if ( ! directoryCheck.exists()){
+				directoryCheck.mkdir();
+			}
+			
+			tempFile =new File(dir+lineSplit+ pdbId+".pdb.gz");
+			
+		} else {
+			
+			tempFile = new File(path+lineSplit+pdbId+".pdb.gz");
+		}
 		File pdbHome = new File(path);
 
 		if ( ! pdbHome.canWrite() ){
