@@ -18,12 +18,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>jgrapht</groupId>
-    	<artifactId>jgrapht</artifactId>
-    	<version>0.7.3</version>
-    	<scope>compile</scope>
-    </dependency>
-    <dependency>
     	<groupId>commons-pool</groupId>
     	<artifactId>commons-pool</artifactId>
     	<version>20030825.183949</version>
