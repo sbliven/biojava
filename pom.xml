@@ -64,11 +64,12 @@
     </build>
     <modules>
         <module>core</module>
-    	<module>structure</module>
+	<module>alignment</module>
+	<module>blast</module>
     	<module>das</module>
-    <module>blast</module>
-    <module>phylo</module>
-    <module>alignment</module>
-    <module>sequencing</module>
+	<module>sequence</module>
+	<module>sequencing</module>
+    	<module>structure</module>
+	<module>phylo</module>
   </modules>
 </project>
