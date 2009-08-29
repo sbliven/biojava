@@ -64,6 +64,7 @@
     </build>
     <modules>
         <module>core</module>
-    <module>structure</module>
+    	<module>structure</module>
+    	<module>das</module>
   </modules>
 </project>
