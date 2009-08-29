@@ -68,11 +68,11 @@
         </plugins>
     </build>
     <modules>
-        <module>core</module>
-        <module>dna</module>
-        <module>rna</module>
-        <module>biosql</module>
-        <module>fasta</module>
-        <module>blastxml</module>
+        <module>sequence-core</module>
+        <module>sequence-dna</module>
+        <module>sequence-rna</module>
+        <module>sequence-biosql</module>
+        <module>sequence-fasta</module>
+        <module>sequence-blastxml</module>
     </modules>
 </project>
