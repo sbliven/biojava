@@ -30,5 +30,12 @@
     	<type>jar</type>
     	<scope>compile</scope>
     </dependency>
+    <dependency>
+    	<groupId>commons-dbcp</groupId>
+    	<artifactId>commons-dbcp</artifactId>
+    	<version>20030825.184428</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
   </dependencies>
 </project>
