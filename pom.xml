@@ -66,5 +66,6 @@
         <module>core</module>
     	<module>structure</module>
     	<module>das</module>
+    <module>blast</module>
   </modules>
 </project>
