@@ -67,5 +67,8 @@
     	<module>structure</module>
     	<module>das</module>
     <module>blast</module>
+    <module>phylo</module>
+    <module>alignment</module>
+    <module>sequencing</module>
   </modules>
 </project>
