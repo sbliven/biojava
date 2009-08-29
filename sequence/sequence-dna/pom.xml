@@ -8,7 +8,7 @@
   <packaging>jar</packaging>
   <parent>
     <groupId>org.biojava</groupId>
-    <artifactId>biojava</artifactId>
+    <artifactId>sequence</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
   <build>
