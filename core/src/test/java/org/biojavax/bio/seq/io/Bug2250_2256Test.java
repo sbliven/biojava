@@ -53,7 +53,7 @@ public class Bug2250_2256Test extends TestCase{
      * Mainly tests the parsing of the locus line.
      */
     public void testBug2250_2256(){
-        String filename = "/files/AL121964.gb";
+        String filename = "/AL121964.gb";
         RichSequence seq = readFile(filename);
         
         assertEquals("AL121964",seq.getAccession());

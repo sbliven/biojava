@@ -54,7 +54,7 @@ public class Bug2249_2248Test extends TestCase{
      * Mainly tests the parsing of the locus line.
      */
     public void testBug2249_2248(){
-        String filename = "/files/AAX56332.gp";
+        String filename = "/AAX56332.gp";
         RichSequence seq = readFile(filename);
         
         assertEquals("AAX56332",seq.getAccession());

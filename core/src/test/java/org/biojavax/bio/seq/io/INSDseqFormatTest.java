@@ -29,7 +29,7 @@ public class INSDseqFormatTest extends TestCase {
     }
 
     public void testINSDParsing() {
-	RichSequence sequence = readFile("/files/NM_008366.xml");
+	RichSequence sequence = readFile("/NM_008366.xml");
         assertEquals("NM_008366", sequence.getName());
         assertFalse(sequence.getCircular());
         assertEquals("Mus musculus interleukin 2 (Il2), mRNA", sequence.getDescription());
@@ -60,7 +60,7 @@ public class INSDseqFormatTest extends TestCase {
      * (">testempty no sequence") under the tested format.
      */
     public void testReadEmptySequence() {
-        RichSequence sequence = readFile("/files/empty_insdseq.xml");
+        RichSequence sequence = readFile("/empty_insdseq.xml");
         assertNotNull(sequence);
         assertEquals(sequence.getName(), "testempty");
         assertEquals(sequence.getAccession(), "");

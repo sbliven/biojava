@@ -50,31 +50,31 @@ public class BlastTest extends TestCase {
 
 	public void testBLASTP2_2_11() throws Exception
 	{
-		String filename = "files/org/biojava/bio/program/sax/blastp-2.2.11.txt.gz";
+		String filename = "org/biojava/bio/program/sax/blastp-2.2.11.txt.gz";
 		parseBlastFile(filename, 2, 2, 2);
 	}
 
 	public void testBLASTP2_2_15() throws Exception
 	{
-		String filename = "files/org/biojava/bio/program/sax/blastp-2.2.15.txt.gz";
+		String filename = "org/biojava/bio/program/sax/blastp-2.2.15.txt.gz";
 		parseBlastFile(filename, 2, 2, 2);
 	}
 
 	public void testTBLASTN2_2_18() throws Exception
 	{
-		String filename = "files/org/biojava/bio/program/sax/tblastn-2.2.18.txt.gz";
+		String filename = "org/biojava/bio/program/sax/tblastn-2.2.18.txt.gz";
 		parseBlastFile(filename, 2, 10, 2);
 	}
 
 	public void testSingleBLASTHit2_2_15() throws Exception
 	{
-		String filename = "files/org/biojava/bio/program/sax/single-blastp-2.2.15.txt.gz";
+		String filename = "org/biojava/bio/program/sax/single-blastp-2.2.15.txt.gz";
 		parseBlastFile(filename, 2, 2, 1);
 	}
 	
 	public void testBug2584() throws Exception {
-		String filename="files/org/biojava/bio/program/sax/bug-2584-test_file.txt.gz";
-		InputStream resStream = new GZIPInputStream( getClass().getClassLoader().getResourceAsStream(filename));
+		String filename="org/biojava/bio/program/sax/bug-2584-test_file.txt.gz";
+		InputStream resStream = new GZIPInputStream( this.getClass().getClassLoader().getResourceAsStream(filename));
 		assert resStream != null: "Resource " + filename + " could not be located";
 		InputSource is = new InputSource(resStream);
 		BlastLikeSAXParser parser = new BlastLikeSAXParser();
@@ -126,7 +126,7 @@ public class BlastTest extends TestCase {
 	}
 	private void parseBlastFile(String filename, int numberOfReports, int numberOfHits, int numberOfHsps) throws IOException, SAXException {
 		String resName = filename;
-		InputStream resStream = new GZIPInputStream( getClass().getClassLoader().getResourceAsStream(
+		InputStream resStream = new GZIPInputStream( this.getClass().getClassLoader().getResourceAsStream(
 				resName));
 		assert resStream != null
 		: "Resource " + resName + " could not be located";

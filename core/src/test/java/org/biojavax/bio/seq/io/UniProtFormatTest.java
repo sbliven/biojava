@@ -36,7 +36,7 @@ public class UniProtFormatTest extends TestCase {
      * (">testempty no sequence") under the tested format.
      */
     public void testReadEmptySequence() {
-        RichSequence sequence = readFile("/files/empty_uniprot.pro");
+        RichSequence sequence = readFile("/empty_uniprot.pro");
         assertNotNull(sequence);
         assertEquals(sequence.getName(), "testempty");
         assertEquals(sequence.getAccession(), "");
@@ -68,7 +68,7 @@ public class UniProtFormatTest extends TestCase {
 	}
 
     public void testReadUniprotFormat() {
-        InputStream inStream = this.getClass().getResourceAsStream("/files/P05814.pro");
+        InputStream inStream = this.getClass().getResourceAsStream("/P05814.pro");
         BufferedInputStream bis = new BufferedInputStream(inStream);
         try {
             assertTrue(unpFormat.canRead(bis));
@@ -76,7 +76,7 @@ public class UniProtFormatTest extends TestCase {
             ex.printStackTrace();
             fail("Unexpected exception: "+ex);
         }
-        RichSequence sequence = readFile("/files/P05814.pro");
+        RichSequence sequence = readFile("/P05814.pro");
         assertNotNull(sequence);
         assertEquals(sequence.getName(), "CASB");
         assertEquals(sequence.getAccession(), "P05814");
@@ -99,7 +99,7 @@ public class UniProtFormatTest extends TestCase {
     }
 
     public void testReadIPIFormat() {
-        InputStream inStream = this.getClass().getResourceAsStream("/files/IPI00010849.pro");
+        InputStream inStream = this.getClass().getResourceAsStream("/IPI00010849.pro");
         BufferedInputStream bis = new BufferedInputStream(inStream);
         try {
             assertTrue(unpFormat.canRead(bis));
@@ -107,7 +107,7 @@ public class UniProtFormatTest extends TestCase {
             ex.printStackTrace();
             fail("Unexpected exception: "+ex);
         }
-        RichSequence sequence = readFile("/files/IPI00010849.pro");
+        RichSequence sequence = readFile("/IPI00010849.pro");
         assertNotNull(sequence);
         assertEquals(sequence.getName(), "IPI00010849");
         assertEquals(sequence.getAccession(), "IPI00010849");

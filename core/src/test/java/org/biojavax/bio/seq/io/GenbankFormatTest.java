@@ -36,11 +36,11 @@ public class GenbankFormatTest extends TestCase {
     }
 		
 		public void testGenbankParsingWithBondFeatures() {
-				readProteinFile("/files/BondFeature.gb");
+				readProteinFile("/BondFeature.gb");
 		}
 
     public void testGenbankParsing_oldStyleFile() {
-		RichSequence sequence = readDNAFile("/files/NoAccession.gb");
+		RichSequence sequence = readDNAFile("/NoAccession.gb");
         assertEquals("NoAccess", sequence.getName());
         assertTrue(sequence.getCircular());
         assertEquals(null, sequence.getDescription());
@@ -66,7 +66,7 @@ public class GenbankFormatTest extends TestCase {
 
 
     public void testGenbankParsing_contemporaryApp() {
-		RichSequence sequence = readDNAFile("/files/AY069118.gb");
+		RichSequence sequence = readDNAFile("/AY069118.gb");
         assertEquals("AY069118", sequence.getName());
         assertFalse(sequence.getCircular());
         assertEquals("Drosophila melanogaster GH13089 full length cDNA.", sequence.getDescription());
@@ -94,14 +94,14 @@ public class GenbankFormatTest extends TestCase {
 
 
     public void testGenbankWithNoAccession() {
-    	RichSequence sequence = readDNAFile("/files/NoAccession.gb");
+    	RichSequence sequence = readDNAFile("/NoAccession.gb");
         assertNotNull(sequence);
         assertEquals("NoAccess", sequence.getAccession());
     }
 
     public void testCanReadWhatIsWritten() {
     	// Read a genbank file
-    	RichSequence sequence = readDNAFile("/files/AY069118.gb");
+    	RichSequence sequence = readDNAFile("/AY069118.gb");
         assertNotNull(sequence);
 
         // Write the file to an in-memory buffer
@@ -139,7 +139,7 @@ public class GenbankFormatTest extends TestCase {
      * (">testempty no sequence") under the tested format.
      */
     public void testReadEmptySequence() {
-        RichSequence sequence = readDNAFile("/files/empty_genbank.gb");
+        RichSequence sequence = readDNAFile("/empty_genbank.gb");
         assertNotNull(sequence);
         assertEquals(sequence.getName(), "testempty");
         assertEquals(sequence.getAccession(), "");

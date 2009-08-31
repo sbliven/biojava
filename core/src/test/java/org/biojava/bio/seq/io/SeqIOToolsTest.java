@@ -66,7 +66,7 @@ public class SeqIOToolsTest extends TestCase
         /******* test readFastaDNA *********/
 
         // get access to the test file
-        InputStream inputS = this.getClass().getResourceAsStream("/files/AY069118.fa");
+        InputStream inputS = this.getClass().getResourceAsStream("/AY069118.fa");
         assertNotNull(inputS);
 
         // get SequenceIterator
@@ -100,7 +100,7 @@ public class SeqIOToolsTest extends TestCase
         /******* test readGenbank **********/
 
         // get access to the test file
-        inputS = this.getClass().getResourceAsStream("/files/AY069118.gb");
+        inputS = this.getClass().getResourceAsStream("/AY069118.gb");
         assertNotNull(inputS);
 
         // get SequenceIterator
@@ -134,7 +134,7 @@ public class SeqIOToolsTest extends TestCase
         /******* test readGenbankXml ***********/
         
         // get access to the test file
-        inputS = this.getClass().getResourceAsStream("/files/AY069118-gb.xml");
+        inputS = this.getClass().getResourceAsStream("/AY069118-gb.xml");
         assertNotNull(inputS);
 
         // get SequenceIterator
@@ -168,7 +168,7 @@ public class SeqIOToolsTest extends TestCase
         /******* test readEmblNucleotide **********/
 
         // get access to the test file
-        inputS = this.getClass().getResourceAsStream("/files/AY069118.em");
+        inputS = this.getClass().getResourceAsStream("/AY069118.em");
         assertNotNull(inputS);
 
         // get SequenceIterator
@@ -206,7 +206,7 @@ public class SeqIOToolsTest extends TestCase
         /******* test readFastaProtein *********/
 
         // get access to the test file
-        InputStream inputS = this.getClass().getResourceAsStream("/files/AAL039263.fa");
+        InputStream inputS = this.getClass().getResourceAsStream("/AAL039263.fa");
         assertNotNull(inputS);
 
         // get SequenceIterator
@@ -237,7 +237,7 @@ public class SeqIOToolsTest extends TestCase
         /******* test readGenpept **********/
 
         // get access to the test file
-        inputS = this.getClass().getResourceAsStream("/files/AAL039263.gb");
+        inputS = this.getClass().getResourceAsStream("/AAL039263.gb");
         assertNotNull(inputS);
 
         // get SequenceIterator
@@ -274,7 +274,7 @@ public class SeqIOToolsTest extends TestCase
         // get access to the test file
         System.out.println("Testing SP read");
         System.out.println("Testing SP read");
-        inputS = this.getClass().getResourceAsStream("/files/AAC4_HUMAN.sp");
+        inputS = this.getClass().getResourceAsStream("/AAC4_HUMAN.sp");
         assertNotNull(inputS);
 
         // get SequenceIterator
@@ -309,7 +309,7 @@ public class SeqIOToolsTest extends TestCase
 
         /****** read big sequence as fasta ***********/
         // get access to the test file
-        InputStream inputS = this.getClass().getResourceAsStream("/files/NC_004432.fa");
+        InputStream inputS = this.getClass().getResourceAsStream("/NC_004432.fa");
         assertNotNull(inputS);
 
         // get SequenceIterator
@@ -331,7 +331,7 @@ public class SeqIOToolsTest extends TestCase
 
         /****** read big sequence as genbank ***********/
         // get access to the test file
-        inputS = this.getClass().getResourceAsStream("/files/NC_004432.gb");
+        inputS = this.getClass().getResourceAsStream("/NC_004432.gb");
         assertNotNull(inputS);
 
         // get SequenceIterator

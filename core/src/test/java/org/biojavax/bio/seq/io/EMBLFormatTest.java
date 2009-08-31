@@ -31,7 +31,7 @@ public class EMBLFormatTest extends TestCase {
      * sequence names are lost and are replaced by accessions. 
      */
     public void testReadEmptySequence() {
-        RichSequence sequence = readFile("/files/empty_embl.embl");
+        RichSequence sequence = readFile("/empty_embl.embl");
         assertNotNull(sequence);
         assertEquals(sequence.getName(), "test");
         assertEquals(sequence.getAccession(), "test");

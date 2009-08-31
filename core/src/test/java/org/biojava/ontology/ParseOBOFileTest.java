@@ -38,7 +38,7 @@ public class ParseOBOFileTest extends TestCase{
 
 
 		OboParser parser = new OboParser();
-		InputStream inStream = this.getClass().getResourceAsStream("/files/org/biojava/bio/ontology/biosapiens.obo");
+		InputStream inStream = this.getClass().getResourceAsStream("/org/biojava/bio/ontology/biosapiens.obo");
 
 		assertNotNull("could not find biosapiens.obo file",inStream);
 		BufferedReader oboFile = new BufferedReader ( new InputStreamReader ( inStream ) );

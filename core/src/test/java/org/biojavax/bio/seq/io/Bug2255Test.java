@@ -52,7 +52,7 @@ public class Bug2255Test extends TestCase{
      * Mainly tests the parsing of the locus line.
      */
     public void testBug2255(){
-        String filename = "/files/X56734.embl";
+        String filename = "/X56734.embl";
         RichSequence seq = readFile(filename);
         
         ArrayList kws = new ArrayList();

@@ -46,7 +46,7 @@ public class MSFAlignmentFormatTest extends TestCase
     public void testReadDNAAlignment()
     {
         // get access to the test file
-        InputStream inputS = this.getClass().getResourceAsStream("/files/dna.msf");
+        InputStream inputS = this.getClass().getResourceAsStream("/dna.msf");
         assertNotNull(inputS);
 
         Alignment alignment = new MSFAlignmentFormat().read(new BufferedReader(new InputStreamReader(inputS)));
