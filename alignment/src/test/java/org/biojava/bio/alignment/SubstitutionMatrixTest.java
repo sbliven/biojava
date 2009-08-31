@@ -41,7 +41,7 @@ public class SubstitutionMatrixTest extends TestCase {
 
 	public void testParseSubstitutionMatrix(){
 
-		InputStream inStream = this.getClass().getResourceAsStream("/files/blosum62.mat");
+		InputStream inStream = this.getClass().getResourceAsStream("/blosum62.mat");
         assertNotNull(inStream);
 
 
