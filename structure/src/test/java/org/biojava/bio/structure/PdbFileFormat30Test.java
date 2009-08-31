@@ -46,7 +46,7 @@ public class PdbFileFormat30Test extends TestCase {
 	 *
 	 */
 	public void testRead30File(){
-		Structure s = getStructure("/files/388d_v30.pdb");
+		Structure s = getStructure("/388d_v30.pdb");
 		int nrNuc = getNrNucleotides(s);
 		
 		// there are 4 nucleotides less in the new version
@@ -55,7 +55,7 @@ public class PdbFileFormat30Test extends TestCase {
 		int shouldNr = 20;
 		assertEquals("structure does not contain the right number of nucleotides ", shouldNr ,nrNuc);	
 		
-		Structure s2 = getStructure("/files/104D_v30.pdb");		
+		Structure s2 = getStructure("/104D_v30.pdb");		
 		
 		int nrNuc2 = getNrNucleotides(s2);		
 		int shouldNr2 = 24;
@@ -70,12 +70,12 @@ public class PdbFileFormat30Test extends TestCase {
 	
 	public void testRead23File(){
 		
-		Structure s = getStructure("/files/388d_v23.pdb");
+		Structure s = getStructure("/388d_v23.pdb");
 		int nrNuc = getNrNucleotides(s);		
 		int shouldNr = 24;
 		assertEquals("structure does not contain the right number of nucleotides ", shouldNr , nrNuc);	
 				
-		Structure s2 = getStructure("/files/104D_v23.pdb");	
+		Structure s2 = getStructure("/104D_v23.pdb");	
 		
 		int nrNuc2 = getNrNucleotides(s2);		
 		int shouldNr2 = 24;

@@ -38,9 +38,9 @@ public class StructurePairAlignerTest extends TestCase {
 
     protected void setUp()
     {
-        InputStream inStream = this.getClass().getResourceAsStream("/files/5pti.pdb");
+        InputStream inStream = this.getClass().getResourceAsStream("/5pti.pdb");
         assertNotNull(inStream);
-        InputStream inStream2 = this.getClass().getResourceAsStream("/files/1tap.pdb");
+        InputStream inStream2 = this.getClass().getResourceAsStream("/1tap.pdb");
         assertNotNull(inStream2);
 
         PDBFileParser pdbpars = new PDBFileParser();

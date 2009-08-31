@@ -35,7 +35,7 @@ public class StructureToolsTest extends TestCase {
 
     protected void setUp()
     {
-        InputStream inStream = this.getClass().getResourceAsStream("/files/5pti.pdb");
+        InputStream inStream = this.getClass().getResourceAsStream("/5pti.pdb");
         assertNotNull(inStream);
 
 

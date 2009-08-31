@@ -24,7 +24,7 @@ public class StructureTest extends TestCase {
 
 	protected void setUp()
 	{
-		InputStream inStream = this.getClass().getResourceAsStream("/files/5pti_old.pdb");
+		InputStream inStream = this.getClass().getResourceAsStream("/5pti_old.pdb");
 		assertNotNull(inStream);
 
 		PDBFileParser pdbpars = new PDBFileParser();

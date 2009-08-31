@@ -62,7 +62,7 @@ public class MMcifTest extends TestCase {
 
 
 	private void comparePDB2cif(String id, String chainId){
-		String fileName = "/files/"+id+".cif";
+		String fileName = "/"+id+".cif";
 		InputStream inStream = this.getClass().getResourceAsStream(fileName);
 		assertNotNull(inStream);
 
@@ -85,7 +85,7 @@ public class MMcifTest extends TestCase {
 
 		// load the PDB file via the PDB parser
 		Structure pdbStructure = null;
-		InputStream pinStream = this.getClass().getResourceAsStream("/files/"+id+".pdb");
+		InputStream pinStream = this.getClass().getResourceAsStream("/"+id+".pdb");
 		assertNotNull(inStream);
 
 		PDBFileParser pdbpars = new PDBFileParser();

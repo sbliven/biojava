@@ -53,7 +53,7 @@ public class SourceCompoundTest extends TestCase{
 
 	public void testCompoundSourceStructure(){
 
-		Structure s2 = getStructure("/files/2gox.pdb");
+		Structure s2 = getStructure("/2gox.pdb");
 		assertEquals(2, s2.getCompounds().size());
 		for (Compound compound : s2.getCompounds()){
 			if (compound.getMolId().equals("1")) {
@@ -89,8 +89,8 @@ public class SourceCompoundTest extends TestCase{
 	}
 
 	public void testCOMPNDsectionFRAGMENT(){
-		Structure s2 = getStructure("/files/2gox.pdb");
-		Structure s4 = getStructure("/files/3cfy.pdb");
+		Structure s2 = getStructure("/2gox.pdb");
+		Structure s4 = getStructure("/3cfy.pdb");
 
 		// this file has a CHAIN: string in the value for the FRAGMENT: filed which breaks the version 1.4 parser
 
@@ -111,7 +111,7 @@ public class SourceCompoundTest extends TestCase{
 	}
 
 	public void testCOMPNDsectionCHAINS(){
-		Structure s3 = getStructure("/files/2pos.pdb");
+		Structure s3 = getStructure("/2pos.pdb");
 		assertEquals(1, s3.getCompounds().size());
 		for (Compound compound : s3.getCompounds()){
 			/*System.out.println(compound.getMolId());
@@ -130,7 +130,7 @@ public class SourceCompoundTest extends TestCase{
 	}
 
 	public void testSOURCEsectionSTRAIN(){
-		Structure s4 = getStructure("/files/3cfy.pdb");
+		Structure s4 = getStructure("/3cfy.pdb");
 		for (Compound compound : s4.getCompounds()){
 			if (compound.getMolId().equals("1")) {
 				/*System.out.println(compound.getMolId());
@@ -166,7 +166,7 @@ public class SourceCompoundTest extends TestCase{
 	}
 
 	public void testSOURCEsectionORGSCI(){
-		Structure s5 = getStructure("/files/3cdl.pdb");
+		Structure s5 = getStructure("/3cdl.pdb");
 		for (Compound compound : s5.getCompounds()){
 			if (compound.getMolId().equals("1")) {
 				//System.out.println(compound.getOrganismScientific());
@@ -182,7 +182,7 @@ public class SourceCompoundTest extends TestCase{
      * systems is set correctly.
 	 */
 	public void testSourceTaxIdVersion32File(){
-		Structure structure = getStructure("/files/3dl7_v32.pdb");
+		Structure structure = getStructure("/3dl7_v32.pdb");
 
         Compound comp = structure.getCompoundById("1");
 
@@ -205,7 +205,7 @@ public class SourceCompoundTest extends TestCase{
 //        JRNL        REFN                   ISSN 1529-2908
 //        JRNL        PMID   17351618
 //        JRNL        DOI    10.1038/NI1450
-        Structure structure = getStructure("/files/2gox_v315.pdb");
+        Structure structure = getStructure("/2gox_v315.pdb");
         //check that there really is an publication
         assertTrue(structure.hasJournalArticle());
 
