@@ -31,5 +31,12 @@
     	<type>jar</type>
     	<scope>compile</scope>
     </dependency>
+     <dependency>
+    	<groupId>org.biojava</groupId>
+    	<artifactId>bytecode</artifactId>
+    	<version>3.0</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
   </dependencies>
 </project>
