@@ -192,7 +192,7 @@ public class IndexToolsTest extends TestCase
 
         for (int i = 0; i < files.length; i++)
         {
-            URL seqURL = getClass().getResource(fileNames[i]);
+            URL seqURL = getClass().getResource("/org/biojava/bio/program/indexdb/"+fileNames[i]);
             files[i] = new File(seqURL.getFile());
         }
 

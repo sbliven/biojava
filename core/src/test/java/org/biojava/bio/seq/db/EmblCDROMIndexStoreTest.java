@@ -64,8 +64,8 @@ public class EmblCDROMIndexStoreTest extends TestCase
 
     protected void setUp() throws Exception
     {
-        URL divURL = EmblCDROMIndexStoreTest.class.getResource("emblcd/division.lkp");
-        URL entURL = EmblCDROMIndexStoreTest.class.getResource("emblcd/entrynam.idx");
+        URL divURL = EmblCDROMIndexStoreTest.class.getResource("/org/biojava/bio/seq/db/emblcd/division.lkp");
+        URL entURL = EmblCDROMIndexStoreTest.class.getResource("/org/biojava/bio/seq/db/emblcd/entrynam.idx");
 
         File divisionLkp = new File(divURL.getFile());
         File entryNamIdx = new File(entURL.getFile());

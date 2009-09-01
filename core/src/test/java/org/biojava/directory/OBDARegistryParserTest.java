@@ -49,7 +49,7 @@ public class OBDARegistryParserTest extends TestCase
 
         try
         {
-            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("seqdatabase.ini")));
+            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/org/biojava/directory/seqdatabase.ini")));
             regConf = OBDARegistryParser.parseRegistry(br, locator);
         }
         finally
