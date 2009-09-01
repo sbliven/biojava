@@ -142,7 +142,10 @@ public class SubSequenceTest extends TestCase {
     templ.source = "test";
     templ.location = new RangeLocation(2, 3);
     templ.annotation = Annotation.EMPTY_ANNOTATION;
-    subseq.createFeature(templ);
+    synchronized (subseq) {
+    	subseq.createFeature(templ);	
+	}
+    
 
     Feature f = (Feature) seq.filter(new FeatureFilter.ByType("create_on_subsequence"), false).features().next();
     Location fl = f.getLocation();
