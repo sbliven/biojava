@@ -45,173 +45,192 @@ import org.biojava.utils.ChangeVetoException;
  */
 
 public class LazyFilterFeatureHolder implements FeatureHolder {
-    private FeatureHolder featureHolder;
-    private FeatureFilter featureFilter;
-    private transient ChangeSupport changeSupport;
-    
-    public LazyFilterFeatureHolder(FeatureHolder fh,
-                                   FeatureFilter ff)
-    {
-        this.featureHolder = fh;
-        this.featureFilter = ff;
-    }
-    
-    public Iterator features() {
-        return featureHolder.filter(featureFilter, false).features();
-    }
-    
-    public int countFeatures() {
-        return featureHolder.filter(featureFilter, false).countFeatures();
-    }
-    
-    public boolean containsFeature(Feature f) {
-        if (featureFilter.accept(f)) {
-            return featureHolder.containsFeature(f);
-        } else {
-            return false;
-        }
-    }
-    
-    public FeatureHolder filter(FeatureFilter ff) {
-        if (FilterUtils.areDisjoint(ff, featureFilter)) {
-            return FeatureHolder.EMPTY_FEATURE_HOLDER;
-        }
-        return featureHolder.filter(new FeatureFilter.And(ff, featureFilter));
-    }
-    
-    public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-        if (FilterUtils.areDisjoint(ff, featureFilter)) {
-            return FeatureHolder.EMPTY_FEATURE_HOLDER;
-        }
-        return featureHolder.filter(new FeatureFilter.And(ff, featureFilter), recurse);
-    }
-    
-    
-    public Feature createFeature(Feature.Template temp)
-        throws ChangeVetoException, BioException
-    {
-        return featureHolder.createFeature(temp);
-    }
+	private FeatureHolder featureHolder;
+	private FeatureFilter featureFilter;
+	private transient ChangeSupport changeSupport;
 
-    public void removeFeature(Feature f)
-        throws ChangeVetoException, BioException
-    {
-      featureHolder.removeFeature(f);
-    }
+	public LazyFilterFeatureHolder(FeatureHolder fh,
+			FeatureFilter ff)
+	{
+		this.featureHolder = fh;
+		this.featureFilter = ff;
+	}
+
+	public Iterator features() {
+		return featureHolder.filter(featureFilter, false).features();
+	}
+
+	public int countFeatures() {
+		return featureHolder.filter(featureFilter, false).countFeatures();
+	}
+
+	public boolean containsFeature(Feature f) {
+		if (featureFilter.accept(f)) {
+			return featureHolder.containsFeature(f);
+		} else {
+			return false;
+		}
+	}
+
+	public FeatureHolder filter(FeatureFilter ff) {
+		if (FilterUtils.areDisjoint(ff, featureFilter)) {
+			return FeatureHolder.EMPTY_FEATURE_HOLDER;
+		}
+		return featureHolder.filter(new FeatureFilter.And(ff, featureFilter));
+	}
+
+	public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+		if (FilterUtils.areDisjoint(ff, featureFilter)) {
+			return FeatureHolder.EMPTY_FEATURE_HOLDER;
+		}
+		return featureHolder.filter(new FeatureFilter.And(ff, featureFilter), recurse);
+	}
 
 
-    protected boolean hasListeners() {
-        return changeSupport != null;
-    }
+	public Feature createFeature(Feature.Template temp)
+	throws ChangeVetoException, BioException
+	{
 
-    protected ChangeSupport getChangeSupport() {
-        if(changeSupport != null) {
-            return changeSupport;
-        }
-    
-        synchronized(this) {
-            if(changeSupport == null) {
-                changeSupport = new ChangeSupport();
-            }
-            featureHolder.addChangeListener(new LFFHChangeForwarder(), ChangeType.UNKNOWN);
-        }
-    
-        return changeSupport;
-    }
-    
-    private class LFFHChangeForwarder implements ChangeListener {
-        public void preChange(ChangeEvent cev)
-            throws ChangeVetoException
-        {
-            ChangeEvent fcev = getForwardedEvent(cev);
-            if (fcev != null) {
-                getChangeSupport().firePreChangeEvent(fcev);
-            }
-        }
-        
-        public void postChange(ChangeEvent cev)
-        {
-            ChangeEvent fcev = getForwardedEvent(cev);
-            if (fcev != null) {
-                getChangeSupport().firePostChangeEvent(fcev);
-            }
-        }
-    }
+		Feature f= null;
 
-    /**
-     * Only forward events concerning features which are either accepted by
-     * our filter, or are parents of a feature which is.
-     *
-     * In future this maybe ought to look further down the event chain
-     * to reject forwarded events from uninterested features.
-     */
-    
-    private ChangeEvent getForwardedEvent(ChangeEvent cev) {
-        Object change = cev.getChange();
-        if (! (change instanceof Feature)) {
-            change = null;
-        }
-        Object previous = cev.getPrevious();
-        if (! (previous instanceof Feature)) {
-            previous = null;
-        }
-        boolean forward = false;
-        if (change == null && previous == null) {
-            forward = true;
-        } else {
-            forward = isInterestingFeature((Feature) previous) || 
-                      isInterestingFeature((Feature) change);
-        }
-        if (forward) {
-            return new ChangeEvent(this,
-                                   cev.getType(),
-                                   cev.getChange(),
-                                   cev.getPrevious(),
-                                   cev);
-        } else {
-            return null;
-        }
-    }
-    
-    private boolean isInterestingFeature(Feature f) {
-        if (f == null) {
-            return false;
-        } else if (featureFilter.accept(f)) {
-            return true;
-        } else {
-            return f.filter(featureFilter).countFeatures() > 0;
-        }
-    }
-    
-    public final void addChangeListener(ChangeListener cl) {
-        addChangeListener(cl, ChangeType.UNKNOWN);
-    }
+		synchronized (featureHolder) {
+			f = featureHolder.createFeature(temp);	
+		}
 
-    public final void addChangeListener(ChangeListener cl, ChangeType ct) {
-        if (!isUnchanging(ct)) {
-            ChangeSupport cs = getChangeSupport();
-            cs.addChangeListener(cl, ct);
-        }
-    }
+		return f;
+	}
 
-    public final void removeChangeListener(ChangeListener cl) {
-        removeChangeListener(cl, ChangeType.UNKNOWN);
-    }
+	public void removeFeature(Feature f)
+	throws ChangeVetoException, BioException
+	{
+		synchronized (featureHolder) {
+			featureHolder.removeFeature(f);
+		}
 
-    public final void removeChangeListener(ChangeListener cl, ChangeType ct) {
-        if(hasListeners()) {
-            ChangeSupport cs = getChangeSupport();
-            cs.removeChangeListener(cl, ct);
-        }
-    }
-    
-    public boolean isUnchanging(ChangeType ct) {
-        return featureHolder.isUnchanging(ct);
-    }
-    
-    public FeatureFilter getSchema() {
-        return new FeatureFilter.And(featureFilter,
-                                 new FeatureFilter.Or(featureHolder.getSchema(), 
-                                                      new FeatureFilter.ByAncestor(featureHolder.getSchema())));
-    }
+	}
+
+
+	protected boolean hasListeners() {
+		return changeSupport != null;
+	}
+
+	protected ChangeSupport getChangeSupport() {
+		if(changeSupport != null) {
+			return changeSupport;
+		}
+
+		synchronized(this) {
+			if(changeSupport == null) {
+				changeSupport = new ChangeSupport();
+			}
+			synchronized (featureHolder) {
+				featureHolder.addChangeListener(new LFFHChangeForwarder(), ChangeType.UNKNOWN);		
+			}
+
+		}
+
+		return changeSupport;
+	}
+
+	private class LFFHChangeForwarder implements ChangeListener {
+		public void preChange(ChangeEvent cev)
+		throws ChangeVetoException
+		{
+			ChangeEvent fcev = getForwardedEvent(cev);
+			if (fcev != null) {
+				ChangeSupport cs = getChangeSupport();
+				synchronized(cs){
+					cs.firePreChangeEvent(fcev);
+				}
+			}
+		}
+
+		public void postChange(ChangeEvent cev)
+		{
+			ChangeEvent fcev = getForwardedEvent(cev);
+			if (fcev != null) {
+				ChangeSupport cs = getChangeSupport();
+				synchronized(cs){
+					cs.firePostChangeEvent(fcev);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Only forward events concerning features which are either accepted by
+	 * our filter, or are parents of a feature which is.
+	 *
+	 * In future this maybe ought to look further down the event chain
+	 * to reject forwarded events from uninterested features.
+	 */
+
+	private ChangeEvent getForwardedEvent(ChangeEvent cev) {
+		Object change = cev.getChange();
+		if (! (change instanceof Feature)) {
+			change = null;
+		}
+		Object previous = cev.getPrevious();
+		if (! (previous instanceof Feature)) {
+			previous = null;
+		}
+		boolean forward = false;
+		if (change == null && previous == null) {
+			forward = true;
+		} else {
+			forward = isInterestingFeature((Feature) previous) || 
+			isInterestingFeature((Feature) change);
+		}
+		if (forward) {
+			return new ChangeEvent(this,
+					cev.getType(),
+					cev.getChange(),
+					cev.getPrevious(),
+					cev);
+		} else {
+			return null;
+		}
+	}
+
+	private boolean isInterestingFeature(Feature f) {
+		if (f == null) {
+			return false;
+		} else if (featureFilter.accept(f)) {
+			return true;
+		} else {
+			return f.filter(featureFilter).countFeatures() > 0;
+		}
+	}
+
+	public final void addChangeListener(ChangeListener cl) {
+		addChangeListener(cl, ChangeType.UNKNOWN);
+	}
+
+	public final void addChangeListener(ChangeListener cl, ChangeType ct) {
+		if (!isUnchanging(ct)) {
+			ChangeSupport cs = getChangeSupport();
+			cs.addChangeListener(cl, ct);
+		}
+	}
+
+	public final void removeChangeListener(ChangeListener cl) {
+		removeChangeListener(cl, ChangeType.UNKNOWN);
+	}
+
+	public final void removeChangeListener(ChangeListener cl, ChangeType ct) {
+		if(hasListeners()) {
+			ChangeSupport cs = getChangeSupport();
+			cs.removeChangeListener(cl, ct);
+		}
+	}
+
+	public boolean isUnchanging(ChangeType ct) {
+		return featureHolder.isUnchanging(ct);
+	}
+
+	public FeatureFilter getSchema() {
+		return new FeatureFilter.And(featureFilter,
+				new FeatureFilter.Or(featureHolder.getSchema(), 
+						new FeatureFilter.ByAncestor(featureHolder.getSchema())));
+	}
 }

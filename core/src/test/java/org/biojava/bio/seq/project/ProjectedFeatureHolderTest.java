@@ -294,7 +294,9 @@ public class ProjectedFeatureHolderTest extends TestCase
         pfhFeature.addChangeListener(ChangeListener.ALWAYS_VETO, ChangeType.UNKNOWN);
         boolean vetoed = false;
         try {
-            seqFeature.setLocation(new RangeLocation(1, 3));
+        	synchronized(seqFeature) {
+        		seqFeature.setLocation(new RangeLocation(1, 3));
+        	}
         } catch (ChangeVetoException cve) {
             vetoed = true;
         }

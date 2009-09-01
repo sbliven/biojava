@@ -294,7 +294,10 @@ public class ChangeSupport {
       if( ct.isMatchingType(lt)) {
         ChangeListener cl = (ChangeListener) listeners[i].get();
         if (cl != null) {
-          cl.preChange(ce);
+        	synchronized (cl) {
+        		cl.preChange(ce);	
+			}
+          
         } else {
           needToReap = true;
         }

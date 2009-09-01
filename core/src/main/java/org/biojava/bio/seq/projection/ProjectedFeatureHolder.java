@@ -31,6 +31,7 @@ import org.biojava.bio.seq.FeatureFilter;
 import org.biojava.bio.seq.FeatureHolder;
 import org.biojava.utils.ChangeEvent;
 import org.biojava.utils.ChangeListener;
+import org.biojava.utils.ChangeSupport;
 import org.biojava.utils.ChangeVetoException;
 
 /**
@@ -53,115 +54,130 @@ import org.biojava.utils.ChangeVetoException;
  */
 
 public final class ProjectedFeatureHolder
-        extends AbstractFeatureHolder
-        implements FeatureHolder, Serializable {
-    private final ProjectionContext context;
-    private transient final ChangeListener underlyingFeaturesChange;
-    private FeatureHolder topLevelFeatures;
+extends AbstractFeatureHolder
+implements FeatureHolder, Serializable {
+	private final ProjectionContext context;
+	private transient final ChangeListener underlyingFeaturesChange;
+	private FeatureHolder topLevelFeatures;
 
-  // don't ask why we need an initializer - blame it on the statics
-  {
-    underlyingFeaturesChange = new ChangeListener() {
-        public void preChange(ChangeEvent e)
-            throws ChangeVetoException
-        {
-            if (hasListeners()) {
-                ChangeEvent cev2 = forwardChangeEvent(e);
-                if (cev2 != null) {
-                    getChangeSupport(FeatureHolder.FEATURES).firePreChangeEvent(cev2);
-                }
-            }
-        }
+	// don't ask why we need an initializer - blame it on the statics
+	{
+		underlyingFeaturesChange = new ChangeListener() {
+			public void preChange(ChangeEvent e)
+			throws ChangeVetoException
+			{
+				if (hasListeners()) {
+					ChangeEvent cev2 = forwardChangeEvent(e);
+					if (cev2 != null) {
+						ChangeSupport cs = getChangeSupport(FeatureHolder.FEATURES);
+						synchronized (cs){
+							cs.firePreChangeEvent(cev2);
 
-        public void postChange(ChangeEvent e) {
-           if (hasListeners()) {
-               ChangeEvent cev2 = forwardChangeEvent(e);
-                if (cev2 != null) {
-                    getChangeSupport(FeatureHolder.FEATURES).firePostChangeEvent(cev2);
-                }
-           }
-        }
-    } ;
-  }
+						}
+					}
+				}
+			}
 
-  public ProjectedFeatureHolder(
-          ProjectionContext context)
-  {
-    this.context = context;
-    context.getUnprojectedFeatures().addChangeListener(underlyingFeaturesChange);
-  }
+			public void postChange(ChangeEvent e) {
+				if (hasListeners()) {
+					ChangeEvent cev2 = forwardChangeEvent(e);
+					if (cev2 != null) {
+						ChangeSupport cs =  getChangeSupport(FeatureHolder.FEATURES);
+						synchronized (cs){
+							cs.firePostChangeEvent(cev2);
+						}
+					}
+				}
+			}
+		} ;
+	}
 
-  public ProjectionContext getContext() {
-    return context;
-  }
+	public ProjectedFeatureHolder(
+			ProjectionContext context)
+	{
+		this.context = context;
+		context.getUnprojectedFeatures().addChangeListener(underlyingFeaturesChange);
+	}
 
-  private FeatureHolder getTopLevelFeatures() {
-    if (topLevelFeatures == null) {
-      topLevelFeatures = makeProjectionSet(context.getUnprojectedFeatures());
-    }
-    return topLevelFeatures;
-  }
+	public ProjectionContext getContext() {
+		return context;
+	}
 
-  //
-  // Normal FeatureHolder methods get delegated to our top-level ProjectionSet
-  //
+	private FeatureHolder getTopLevelFeatures() {
+		if (topLevelFeatures == null) {
+			topLevelFeatures = makeProjectionSet(context.getUnprojectedFeatures());
+		}
+		return topLevelFeatures;
+	}
 
-  public Iterator features() {
-    return getTopLevelFeatures().features();
-  }
+	//
+	// Normal FeatureHolder methods get delegated to our top-level ProjectionSet
+	//
 
-  public int countFeatures() {
-    return getTopLevelFeatures().countFeatures();
-  }
+	public Iterator features() {
+		return getTopLevelFeatures().features();
+	}
 
-  public boolean containsFeature(Feature f) {
-    return getTopLevelFeatures().containsFeature(f);
-  }
+	public int countFeatures() {
+		return getTopLevelFeatures().countFeatures();
+	}
 
-  public FeatureHolder filter(FeatureFilter ff) {
-    return getTopLevelFeatures().filter(ff);
-  }
+	public boolean containsFeature(Feature f) {
+		return getTopLevelFeatures().containsFeature(f);
+	}
 
-  public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
-    return getTopLevelFeatures().filter(ff, recurse);
-  }
+	public FeatureHolder filter(FeatureFilter ff) {
+		return getTopLevelFeatures().filter(ff);
+	}
 
-  public Feature createFeature(Feature.Template templ)
-    throws ChangeVetoException, BioException
-  {
-    return context.createFeature(templ);
-  }
+	public FeatureHolder filter(FeatureFilter ff, boolean recurse) {
+		return getTopLevelFeatures().filter(ff, recurse);
+	}
 
-    public void removeFeature(Feature dyingChild)
-        throws ChangeVetoException, BioException
-        {
-    context.removeFeature(dyingChild);
-        }
+	public Feature createFeature(Feature.Template templ)
+	throws ChangeVetoException, BioException
+	{
 
-    public FeatureFilter getSchema() {
-        return getTopLevelFeatures().getSchema();
-    }
+		Feature f = null;
+		synchronized(context){
+			f = context.createFeature(templ);
+		}	  
+		return f;
 
-    /**
-     * Called internally to construct a lightweight projected view of a set of
-     * features
-     */
+	}
 
-    protected FeatureHolder makeProjectionSet(FeatureHolder fh) {
-        return context.projectFeatures(fh);
-    }
+	public void removeFeature(Feature dyingChild)
+	throws ChangeVetoException, BioException
+	{
+		synchronized(context){
+			context.removeFeature(dyingChild);
+		}
+	}
 
-  /**
-   * Called internally to generate a forwarded version of a ChangeEvent from our
-   * underlying FeatureHolder
-   */
+	public FeatureFilter getSchema() {
+		return getTopLevelFeatures().getSchema();
+	}
 
-  protected ChangeEvent forwardChangeEvent(ChangeEvent cev) {
-      return new ChangeEvent(this,
-                             cev.getType(),
-                             cev.getChange(),
-                             cev.getPrevious(),
-                             cev);
-  }
+	/**
+	 * Called internally to construct a lightweight projected view of a set of
+	 * features
+	 */
+
+	protected FeatureHolder makeProjectionSet(FeatureHolder fh) {
+		return context.projectFeatures(fh);
+	}
+
+	/**
+	 * Called internally to generate a forwarded version of a ChangeEvent from our
+	 * underlying FeatureHolder
+	 */
+
+	protected ChangeEvent forwardChangeEvent(ChangeEvent cev) {
+		return new ChangeEvent(this,
+				cev.getType(),
+				cev.getChange(),
+				cev.getPrevious(),
+				cev);
+	}
 
 }

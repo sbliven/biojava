@@ -99,9 +99,13 @@ public class SimpleFeatureHolder extends AbstractFeatureHolder implements Serial
           this, FeatureHolder.FEATURES,
           f, null
         );
-        changeSupport.firePreChangeEvent(ce);
+        synchronized(ce){
+        	changeSupport.firePreChangeEvent(ce);
+        }
         features.add(f);
-        changeSupport.firePostChangeEvent(ce);
+        synchronized(ce){
+        	changeSupport.firePostChangeEvent(ce);
+        }
       }
     }
   }

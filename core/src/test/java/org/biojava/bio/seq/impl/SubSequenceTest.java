@@ -162,7 +162,9 @@ public class SubSequenceTest extends TestCase {
     templ.annotation = Annotation.EMPTY_ANNOTATION;
 
     Feature subf = (Feature) subseq.filter(new FeatureFilter.Not(new FeatureFilter.ByClass(RemoteFeature.class)), false).features().next();
-    subf.createFeature(templ);
+    synchronized(subf){
+    	subf.createFeature(templ);
+    }
 
     Feature f = (Feature) seq.filter(new FeatureFilter.ByType("create_on_subsequence_feature"), true).features().next();
     Location fl = f.getLocation();
