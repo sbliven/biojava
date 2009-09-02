@@ -31,6 +31,11 @@ import org.biojava.bio.BioException;
 
 public class DASException extends BioException {
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Constructs a DASException object.
      *
      * @param s  a String ...
@@ -47,7 +52,7 @@ public class DASException extends BioException {
      * @param s  a String ...
      */
     public DASException (Throwable t, String s) {
-	super(t, s);
+	super(s, t);
     }
 
     /**
