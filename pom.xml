@@ -41,11 +41,6 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>maven</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
     </dependencies>
     <organization>
     	<name>BioJava</name>
