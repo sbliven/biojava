@@ -414,11 +414,11 @@ public class PDBFileReader implements StructureIOFile {
 				directoryCheck.mkdir();
 			}
 			
-			tempFile =new File(dir+lineSplit+ pdbId+".pdb.gz");
+			tempFile =new File(dir+lineSplit+"pdb"+ pdbId.toLowerCase()+".ent.gz");
 			
 		} else {
 			
-			tempFile = new File(path+lineSplit+pdbId+".pdb.gz");
+			tempFile = new File(path+lineSplit+"pdb"+pdbId.toLowerCase()+".ent.gz");
 		}
 		File pdbHome = new File(path);
 
