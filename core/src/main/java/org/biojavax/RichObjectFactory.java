@@ -20,18 +20,14 @@
  */
 
 package org.biojavax;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.biojavax.bio.db.biosql.BioSQLCrossReferenceResolver;
-import org.biojavax.bio.db.biosql.BioSQLRichObjectBuilder;
-import org.biojavax.bio.db.biosql.BioSQLRichSequenceHandler;
+
 import org.biojavax.bio.seq.DummyRichSequenceHandler;
 import org.biojavax.bio.seq.PositionResolver;
 import org.biojavax.bio.seq.RichSequenceHandler;
@@ -244,14 +240,16 @@ public class RichObjectFactory {
      */
     public static RichSequenceHandler getDefaultRichSequenceHandler() { return defaultRichSequenceHandler; }
         
-    /** 
-     * A utility method that configures the RichObjectFactory for use with a Hibernate session.
-     * @param session an object containing a Hibernate session.
-     */
-    public static void connectToBioSQL(Object session) {
-    	clearLRUCache();
-        RichObjectFactory.setRichObjectBuilder(new BioSQLRichObjectBuilder(session));
-        RichObjectFactory.setDefaultCrossReferenceResolver(new BioSQLCrossReferenceResolver(session));      
-        RichObjectFactory.setDefaultRichSequenceHandler(new BioSQLRichSequenceHandler(session));        
-    }
+// commenting out for the moment, since it prevents core from compiling.
+// TODO: move to BioSql module    
+//    /** 
+//     * A utility method that configures the RichObjectFactory for use with a Hibernate session.
+//     * @param session an object containing a Hibernate session.
+//     */
+//    public static void connectToBioSQL(Object session) {
+//    	clearLRUCache();
+//        RichObjectFactory.setRichObjectBuilder(new BioSQLRichObjectBuilder(session));
+//        RichObjectFactory.setDefaultCrossReferenceResolver(new BioSQLCrossReferenceResolver(session));      
+//        RichObjectFactory.setDefaultRichSequenceHandler(new BioSQLRichSequenceHandler(session));        
+//    }
 }
