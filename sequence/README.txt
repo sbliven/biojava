@@ -4,12 +4,10 @@ This project is currently under development. At the present stable releases are 
 based on BioJava V1. For more information, please consult http://www.biojava.org
 
 
-biojava-3
+sequence
  |
- |- src : Java source files and package documentation
+ |- src/main/java: Java source files and package documentation
  |
- |- tests : Java unit test source files
- |
- |- jars : external JAR files on which BioJava is depending
+ |- src/main/tests : Java unit test source files
  
  
