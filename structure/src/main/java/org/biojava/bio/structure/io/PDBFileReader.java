@@ -351,7 +351,7 @@ public class PDBFileReader implements StructureIOFile {
 			if ( pdbId.length() < 4)
 				throw new IOException("the provided ID does not look like a PDB ID : " + pdbId);
 					
-			String middle = pdbId.substring(1,3);
+			String middle = pdbId.substring(1,3).toLowerCase();
 			fpath = path+lineSplit + middle + lineSplit + pdbId;
 			 ppath = path +lineSplit +  middle + lineSplit + "pdb"+pdbId;
 		} else {
@@ -407,7 +407,7 @@ public class PDBFileReader implements StructureIOFile {
 		File tempFile ;
 		
 		if ( pdbDirectorySplit) {
-			String middle = pdbId.substring(1,3);
+			String middle = pdbId.substring(1,3).toLowerCase();
 			String dir = path+lineSplit+middle;
 			File directoryCheck = new File (dir);
 			if ( ! directoryCheck.exists()){
