@@ -41,11 +41,6 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>maven</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>1.0</version>
-        </dependency>
     </dependencies>
     <organization>
     	<name>BioJava</name>
@@ -69,14 +64,14 @@
     </build>
     <modules>
         <module>core</module>
-	<module>alignment</module>
-	<module>blast</module>
+	    <module>alignment</module>
+		<module>blast</module>
     	<module>das</module>
-	<module>sequence</module>
-	<module>sequencing</module>
+		<module>sequence</module>
+		<module>sequencing</module>
     	<module>structure</module>
-	<module>phylo</module>
-    <module>biosql</module>
-    <module>gui</module>
+		<module>phylo</module>
+    	<module>biosql</module>
+    	<module>gui</module>
   </modules>
 </project>
