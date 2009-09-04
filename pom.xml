@@ -71,5 +71,7 @@
 	<module>sequencing</module>
     	<module>structure</module>
 	<module>phylo</module>
+    <module>biosql</module>
+    <module>gui</module>
   </modules>
 </project>
