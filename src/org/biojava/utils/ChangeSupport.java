@@ -181,7 +181,7 @@ public class ChangeSupport {
     synchronized(this) {
       growIfNecessary();
       types[listenerCount] = ct;
-      listeners[listenerCount] = new WeakReference(cl);
+      listeners[listenerCount] = new WeakReference<ChangeListener>(cl);
       listenerCount++;
     }
   }

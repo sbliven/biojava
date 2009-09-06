@@ -21,29 +21,32 @@
 
 package org.biojava.ontology;
 
-
 /**
  * Thrown to indicate an error in an Ontology object
- *
+ * 
  * @author Matthew Pocock
  * @since 1.4
  */
 
-public class OntologyException
-extends Exception {
-  public OntologyException() {
-    super();
-  }
-  
-  public OntologyException(String message) {
-    super(message);
-  }
-  
-  public OntologyException(Throwable cause) {
-    super(cause);
-  }
-  
-  public OntologyException(String message, Throwable cause) {
-    super(message, cause);
-  }
+public class OntologyException extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -714748120678424117L;
+
+	public OntologyException() {
+		super();
+	}
+
+	public OntologyException(String message) {
+		super(message);
+	}
+
+	public OntologyException(Throwable cause) {
+		super(cause);
+	}
+
+	public OntologyException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

@@ -140,7 +140,7 @@ public interface Annotation extends Changeable {
    *
    * @return  a Set of key objects
    */
-  Set keys();
+  Set<Object> keys();
   
   /**
    * Return a map that contains the same key/values as this Annotation.
@@ -150,7 +150,7 @@ public interface Annotation extends Changeable {
    *
    * @return a Map
    */
-  Map asMap();
+  Map<Object, Object> asMap();
    
   /**
    * <p>

@@ -26,62 +26,68 @@ import java.util.Map;
 import org.biojava.utils.SmallMap;
 
 /**
- * Annotation that is optimized for memory usage.  Access time
- * is linear, so SmallAnnotations are not recommended when
- * the number of entries is large.  However, they are fine for
- * small numbers of keys.
- *
+ * Annotation that is optimized for memory usage. Access time is linear, so
+ * SmallAnnotations are not recommended when the number of entries is large.
+ * However, they are fine for small numbers of keys.
+ * 
  * @author Thomas Down
  * @author Matthew Pocock
  * @since 1.2
- *
  * 
- * A minimal-memory alternative to SimpleAnnotation
- *
  * 
- * When creating a large number of small Annotation instances, it is worth
- * instantiating SmallAnnotation. Small is anything up to at least 30 properties
- * but will vary with the JavaVM and underlying platform.
+ *        A minimal-memory alternative to SimpleAnnotation
+ * 
+ * 
+ *        When creating a large number of small Annotation instances, it is
+ *        worth instantiating SmallAnnotation. Small is anything up to at least
+ *        30 properties but will vary with the JavaVM and underlying platform.
  */
 
 public class SmallAnnotation extends AbstractAnnotation {
-  private Map properties;
-  
-  protected final Map getProperties() {
-    if(!propertiesAllocated()) {
-      properties = new SmallMap();
-    }
-    return properties;
-  }
-  
-  protected final boolean propertiesAllocated() {
-    return properties != null;
-  }
+	/**
+	 * Genereated serial version id
+	 */
+	private static final long serialVersionUID = 6389435892850120768L;
+	private Map<Object, Object> properties;
 
-  /**
-   * Return a new SmallAnnotation optimised for small sets of properties.
-   */
-  public SmallAnnotation() {
-    super();
-  }
+	protected final Map<Object, Object> getProperties() {
+		if (!propertiesAllocated()) {
+			properties = new SmallMap();
+		}
+		return properties;
+	}
 
-  /**
-   * Return a new SmallAnnotation that copies all values from another annoation.
-   *
-   * @param ann  the Annoation to copy all values from
-   * @throws NullPointerException if ann is null
-   */
-  public SmallAnnotation(Annotation ann) {
-    super(ann);
-  }
+	protected final boolean propertiesAllocated() {
+		return properties != null;
+	}
 
-  /**
-   * Return a new SmallAnnotation that copies all values from a Map.
-   *
-   * @param map  the Map to copy values from
-   */
-  public SmallAnnotation(Map map) {
-    super(map);
-  }
+	/**
+	 * Return a new SmallAnnotation optimised for small sets of properties.
+	 */
+	public SmallAnnotation() {
+		super();
+	}
+
+	/**
+	 * Return a new SmallAnnotation that copies all values from another
+	 * annoation.
+	 * 
+	 * @param ann
+	 *            the Annoation to copy all values from
+	 * @throws NullPointerException
+	 *             if ann is null
+	 */
+	public SmallAnnotation(Annotation ann) {
+		super(ann);
+	}
+
+	/**
+	 * Return a new SmallAnnotation that copies all values from a Map.
+	 * 
+	 * @param map
+	 *            the Map to copy values from
+	 */
+	public SmallAnnotation(Map<Object, Object> map) {
+		super(map);
+	}
 }
-

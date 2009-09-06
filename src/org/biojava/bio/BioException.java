@@ -41,7 +41,12 @@ package org.biojava.bio;
  * @author Matthew Pocock
  */
 public class BioException extends Exception {
-  /**
+	/**
+	 * Genereated serial version id
+	 */
+	private static final long serialVersionUID = 1L;
+
+/**
    * Create a new BioException with a message.
    *
    * @param message  the message

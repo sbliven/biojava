@@ -66,10 +66,14 @@ public interface OntologyTerm extends Term {
     public final static class Impl
     extends AbstractChangeable
     implements OntologyTerm, java.io.Serializable {
-        private final Ontology ontology;
+        /**
+		 * Genereated serial version id
+		 */
+		private static final long serialVersionUID = -2829321326779080571L;
+		private final Ontology ontology;
         private final Ontology target;
         private transient ChangeForwarder forwarder;
-        private Set synonyms;
+        private Set<Object> synonyms;
         
         public Impl(Ontology ontology, Ontology target) {
             this(ontology, target, null);
@@ -85,7 +89,7 @@ public interface OntologyTerm extends Term {
             this.ontology = ontology;
             this.target = target;
             
-            this.synonyms = new TreeSet();
+            this.synonyms = new TreeSet<Object>();
             if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
         }
 

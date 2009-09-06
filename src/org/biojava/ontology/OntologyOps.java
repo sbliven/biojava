@@ -29,5 +29,5 @@ public interface OntologyOps {
    *
    * @return a Set containing all remote terms in the ontology
    */
-  public Set getRemoteTerms();
+  public Set<RemoteTerm> getRemoteTerms();
 }

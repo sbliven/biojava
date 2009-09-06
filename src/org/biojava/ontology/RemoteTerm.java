@@ -76,7 +76,7 @@ public interface RemoteTerm extends Term {
 		private final Ontology ontology;
         private final Term remoteTerm;
         private final String name;
-        private Set synonyms;
+        private Set<Object> synonyms;
 
         public Impl(Ontology ontology, Term remoteTerm, String name) {
             this(ontology, remoteTerm, name, null);
@@ -97,7 +97,7 @@ public interface RemoteTerm extends Term {
             this.remoteTerm = remoteTerm;
             this.name = name;
             
-            this.synonyms = new TreeSet();
+            this.synonyms = new TreeSet<Object>();
             if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
         }
 

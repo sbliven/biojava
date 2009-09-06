@@ -36,226 +36,219 @@ import org.biojava.utils.ChangeVetoException;
 /**
  * A utility class to ease the problem of implementing an Annotation to that of
  * providing an apropreate implementation of Map. Where possible implementations
- *
- * This class is only intended as a way to implement
- * Annotation. If you are not trying to do that, then don't read on. If you
- * are reading the documentation for an Annotation implementation that extends
- * this, then don't read on. There is nothing to see here.
- *
- * If you are still reading this, then you must be trying to
- * implement Annotation. To do that, extend this class and implement
- * <code>getProperties()</code> and <code>propertiesAllocated()</code>. 
- * Where possible implementations should be backed with a 
- * <code>LinkedHashMap</code> or similar so properties are iterated in the order
- * they were added.
+ * 
+ * This class is only intended as a way to implement Annotation. If you are not
+ * trying to do that, then don't read on. If you are reading the documentation
+ * for an Annotation implementation that extends this, then don't read on. There
+ * is nothing to see here.
+ * 
+ * If you are still reading this, then you must be trying to implement
+ * Annotation. To do that, extend this class and implement
+ * <code>getProperties()</code> and <code>propertiesAllocated()</code>. Where
+ * possible implementations should be backed with a <code>LinkedHashMap</code>
+ * or similar so properties are iterated in the order they were added.
  * 
  * @author Matthew Pocock
  * @author Greg Cox
- *
+ * 
  * @since 1.0
  */
-public abstract class AbstractAnnotation
-  extends
-    AbstractChangeable
-  implements
-    Annotation,
-    Serializable
-{
-  /**
-   * Implement this to return the Map delegate. Modifying this return value will
-   * modify the properties associated with this annotation.
-   *
-   * From code in the 1.2 version of AbstractAnnotation
-   * This is required for the implementation of an Annotation that
-   *            extends AbstractAnnotation. Where possible implementations 
-   *            should be backed with a 
-   *            <code>LinkedHashMap</code> or similar so properties are iterated in the order
-   *            they were added.
-   *
-   * @return a Map containing all properties
-   */
-  protected abstract Map getProperties();
+public abstract class AbstractAnnotation extends AbstractChangeable implements
+		Annotation, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1413062021538411761L;
 
-  /**
-   * A convenience method to see if we have allocated the properties
-   * Map.
-   * This is required for the implementation of an Annotation that
-   *            extends AbstractAnnotation.
-   * @return true if the properties have been allocated, false otherwise
-   * 
-   */
-  protected abstract boolean propertiesAllocated();
+	/**
+	 * Implement this to return the Map delegate. Modifying this return value
+	 * will modify the properties associated with this annotation.
+	 * 
+	 * From code in the 1.2 version of AbstractAnnotation This is required for
+	 * the implementation of an Annotation that extends AbstractAnnotation.
+	 * Where possible implementations should be backed with a
+	 * <code>LinkedHashMap</code> or similar so properties are iterated in the
+	 * order they were added.
+	 * 
+	 * @return a Map containing all properties
+	 */
+	protected abstract Map<Object, Object> getProperties();
 
+	/**
+	 * A convenience method to see if we have allocated the properties Map. This
+	 * is required for the implementation of an Annotation that extends
+	 * AbstractAnnotation.
+	 * 
+	 * @return true if the properties have been allocated, false otherwise
+	 * 
+	 */
+	protected abstract boolean propertiesAllocated();
 
-  public Object getProperty(Object key) throws NoSuchElementException {
-    if(propertiesAllocated()) {
-      Map prop = getProperties();
-      if(prop.containsKey(key)) {
-        return prop.get(key);
-      }
-    }
-    throw new NoSuchElementException("Property " + key + " unknown");
-  }
+	public Object getProperty(Object key) throws NoSuchElementException {
+		if (propertiesAllocated()) {
+			Map<Object, Object> prop = getProperties();
+			if (prop.containsKey(key)) {
+				return prop.get(key);
+			}
+		}
+		throw new NoSuchElementException("Property " + key + " unknown");
+	}
 
-  public void setProperty(Object key, Object value)
-  throws ChangeVetoException {
-    if(!hasListeners()) {
-      getProperties().put(key, value);
-    } else {
-      Map properties = getProperties();
-      ChangeEvent ce = new ChangeEvent(
-        this,
-        Annotation.PROPERTY,
-        new Object[] { key, value },
-        new Object[] { key, properties.get(key)}
-      );
-      ChangeSupport cs = getChangeSupport(Annotation.PROPERTY);
-      synchronized(cs) {
-        cs.firePreChangeEvent(ce);
-        properties.put(key, value);
-        cs.firePostChangeEvent(ce);
-      }
-    }
-  }
+	/*
+	 * (non-Javadoc)
+	 * @see org.biojava.bio.Annotation#setProperty(java.lang.Object, java.lang.Object)
+	 */
+	public void setProperty(Object key, Object value)
+			throws ChangeVetoException {
+		if (!hasListeners()) {
+			getProperties().put(key, value);
+		} else {
+			Map<Object, Object> properties = getProperties();
+			ChangeEvent ce = new ChangeEvent(this, Annotation.PROPERTY,
+					new Object[] { key, value }, new Object[] { key,
+							properties.get(key) });
+			ChangeSupport cs = getChangeSupport(Annotation.PROPERTY);
+			synchronized (cs) {
+				cs.firePreChangeEvent(ce);
+				properties.put(key, value);
+				cs.firePostChangeEvent(ce);
+			}
+		}
+	}
 
-  public void removeProperty(Object key)
-    throws ChangeVetoException, NoSuchElementException
-  {
-    if (!getProperties().containsKey(key)) {
-        throw new NoSuchElementException("Can't remove key " + key.toString());
-    }
+	public void removeProperty(Object key) throws ChangeVetoException,
+			NoSuchElementException {
+		if (!getProperties().containsKey(key)) {
+			throw new NoSuchElementException("Can't remove key "
+					+ key.toString());
+		}
 
-    if(!hasListeners()) {
-      getProperties().remove(key);
-    } else {
-      Map properties = getProperties();
-      ChangeEvent ce = new ChangeEvent(
-        this,
-        Annotation.PROPERTY,
-        new Object[] { key, null },
-        new Object[] { key, properties.get(key)}
-      );
-      ChangeSupport cs = getChangeSupport(Annotation.PROPERTY);
-      synchronized(cs) {
-        cs.firePreChangeEvent(ce);
-        properties.remove(key);
-        cs.firePostChangeEvent(ce);
-      }
-    }
-  }
+		if (!hasListeners()) {
+			getProperties().remove(key);
+		} else {
+			Map<Object, Object> properties = getProperties();
+			ChangeEvent ce = new ChangeEvent(this, Annotation.PROPERTY,
+					new Object[] { key, null }, new Object[] { key,
+							properties.get(key) });
+			ChangeSupport cs = getChangeSupport(Annotation.PROPERTY);
+			synchronized (cs) {
+				cs.firePreChangeEvent(ce);
+				properties.remove(key);
+				cs.firePostChangeEvent(ce);
+			}
+		}
+	}
 
-  public boolean containsProperty(Object key) {
-    if(propertiesAllocated()) {
-      return getProperties().containsKey(key);
-    } else {
-      return false;
-    }
-  }
+	public boolean containsProperty(Object key) {
+		if (propertiesAllocated()) {
+			return getProperties().containsKey(key);
+		} else {
+			return false;
+		}
+	}
 
-  public Set keys() {
-    if(propertiesAllocated()) {
-      return getProperties().keySet();
-    } else {
-      return Collections.EMPTY_SET;
-    }
-  }
+	public Set<Object> keys() {
+		if (propertiesAllocated()) {
+			return getProperties().keySet();
+		} else {
+			return Collections.EMPTY_SET;
+		}
+	}
 
-  public String toString() {
-    StringBuffer sb = new StringBuffer("{");
-    Map prop = getProperties();
-    Iterator i = prop.keySet().iterator();
-    if(i.hasNext()) {
-      Object key = i.next();
-      sb.append(key + "=" + prop.get(key));
-    }
-    while(i.hasNext()) {
-      Object key = i.next();
-      sb.append("," + key + "=" + prop.get(key));
-    }
-    sb.append("}");
-    return sb.substring(0);
-  }
+	public String toString() {
+		StringBuffer sb = new StringBuffer("{");
+		Map<Object, Object> prop = getProperties();
+		Iterator<Object> i = prop.keySet().iterator();
+		if (i.hasNext()) {
+			Object key = i.next();
+			sb.append(key + "=" + prop.get(key));
+		}
+		while (i.hasNext()) {
+			Object key = i.next();
+			sb.append("," + key + "=" + prop.get(key));
+		}
+		sb.append("}");
+		return sb.substring(0);
+	}
 
-  public Map asMap() {
-    return Collections.unmodifiableMap(getProperties());
-  }
+	public Map<Object, Object> asMap() {
+		return Collections.unmodifiableMap(getProperties());
+	}
 
-  /**
-   * Protected no-args constructor intended for sub-classes. This class is
-   * abstract and can not be directly instantiated.
-   */
-  protected AbstractAnnotation() {
-  }
+	/**
+	 * Protected no-args constructor intended for sub-classes. This class is
+	 * abstract and can not be directly instantiated.
+	 */
+	protected AbstractAnnotation() {
+	}
 
-  /**
-   * Copy-constructor.
-   *
-   * <p>
-   * This does a shallow copy of the annotation. The result is an annotation
-   * with the same properties and values, but which is independant of the
-   * original annotation.
-   * </p>
-   *
-   * @param ann  the Annotation to copy
-   */
-  protected AbstractAnnotation(Annotation ann) {
-    if(ann == null) {
-      throw new NullPointerException(
-        "Null annotation not allowed. Use Annotation.EMPTY_ANNOTATION instead."
-      );
-    }
-    if(ann == Annotation.EMPTY_ANNOTATION) {
-      return;
-    }
-    Map properties = getProperties();
-    for(Iterator i = ann.keys().iterator(); i.hasNext(); ) {
-      Object key = i.next();
-      try {
-        properties.put(key, ann.getProperty(key));
-      } catch (IllegalArgumentException iae) {
-        throw new BioError(
-          "Property was there and then disappeared: " + key, iae
-        );
-      }
-    }
-  }
+	/**
+	 * Copy-constructor.
+	 * 
+	 * <p>
+	 * This does a shallow copy of the annotation. The result is an annotation
+	 * with the same properties and values, but which is independant of the
+	 * original annotation.
+	 * </p>
+	 * 
+	 * @param ann
+	 *            the Annotation to copy
+	 */
+	protected AbstractAnnotation(Annotation ann) {
+		if (ann == null) {
+			throw new NullPointerException(
+					"Null annotation not allowed. Use Annotation.EMPTY_ANNOTATION instead.");
+		}
+		if (ann == Annotation.EMPTY_ANNOTATION) {
+			return;
+		}
+		Map<Object, Object> properties = getProperties();
+		for (Iterator<Object> i = ann.keys().iterator(); i.hasNext();) {
+			Object key = i.next();
+			try {
+				properties.put(key, ann.getProperty(key));
+			} catch (IllegalArgumentException iae) {
+				throw new BioError("Property was there and then disappeared: "
+						+ key, iae);
+			}
+		}
+	}
 
-  /**
-   * Create a new Annotation by copying the key-value pairs from a map. The
-   * resulting Annotation is independant of the map.
-   *
-   * @param annMap  the Map to copy from.
-   */
-  public AbstractAnnotation(Map annMap) {
-    if(annMap == null) {
-      throw new IllegalArgumentException(
-        "Null annotation Map not allowed. Use an empy map instead."
-      );
-    }
-    if(annMap.isEmpty()) {
-      return;
-    }
+	/**
+	 * Create a new Annotation by copying the key-value pairs from a map. The
+	 * resulting Annotation is independant of the map.
+	 * 
+	 * @param annMap
+	 *            the Map to copy from.
+	 */
+	public AbstractAnnotation(Map annMap) {
+		if (annMap == null) {
+			throw new IllegalArgumentException(
+					"Null annotation Map not allowed. Use an empy map instead.");
+		}
+		if (annMap.isEmpty()) {
+			return;
+		}
 
-    Map properties = getProperties();
-    for(Iterator i = annMap.keySet().iterator(); i.hasNext(); ) {
-      Object key = i.next();
-      properties.put(key, annMap.get(key));
-    }
-  }
+		Map<Object, Object> properties = getProperties();
+		for (Iterator i = annMap.keySet().iterator(); i.hasNext();) {
+			Object key = i.next();
+			properties.put(key, annMap.get(key));
+		}
+	}
 
+	public int hashCode() {
+		return asMap().hashCode();
+	}
 
-  public int hashCode() {
-    return asMap().hashCode();
-  }
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof Annotation)) {
+			return false;
+		}
 
-  public boolean equals(Object o) {
-    if(o == this){
-        return true;
-    }
-    if (! (o instanceof Annotation)) {
-      return false;
-    }
-
-    return ((Annotation) o).asMap().equals(asMap());
-  }
+		return ((Annotation) o).asMap().equals(asMap());
+	}
 }

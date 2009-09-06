@@ -47,6 +47,7 @@ import org.biojava.utils.Changeable;
  *
  * @author Thomas Down
  * @author Matthew Pocock
+ * @author Andreas Dr&auml;ger
  *
  * @since 1.4
  * @see org.biojavax.ontology.ComparableOntology
@@ -306,7 +307,7 @@ public interface Ontology extends Changeable {
 		private final Map<Term, Set<Triple>> objectTriples;
 		private final Map<Term, Set<Triple>> relationTriples;
 		private final Map<Term,RemoteTerm> remoteTerms;
-		private final Set<Term> localRemoteTerms;
+		private final Set<RemoteTerm> localRemoteTerms;
 
 		private /*final*/ String name;
 		private /*final*/ String description;
@@ -319,7 +320,7 @@ public interface Ontology extends Changeable {
 			objectTriples    = new HashMap<Term, Set<Triple>>();
 			relationTriples  = new HashMap<Term, Set<Triple>>();
 			remoteTerms      = new HashMap<Term, RemoteTerm>();
-			localRemoteTerms = new HashSet<Term>();
+			localRemoteTerms = new HashSet<RemoteTerm>();
 		}
 
 		public Impl(String name, String description) {
@@ -331,7 +332,7 @@ public interface Ontology extends Changeable {
 				 */
 				private static final long serialVersionUID = -2135777733685713181L;
 
-				public Set<Term> getRemoteTerms() {
+				public Set<RemoteTerm> getRemoteTerms() {
 					return localRemoteTerms;
 				}
 			};

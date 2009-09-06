@@ -19,7 +19,6 @@
  *
  */
 
-
 /*
  * BioException.java
  *
@@ -30,64 +29,76 @@ package org.biojava.bio;
 
 /**
  * A nestable biological error.
- *
-
+ * 
+ * 
  * Catch this whenever it, or one of it's sub-classes are thrown and you know
  * what to do once you've got it. Note: in general, you should not be catching
  * errors. However, there are cases where it is necisary e.g. for logging. You
- * will nearly always want to either re-throw the Error, throw a new Error
- * or exit the current thread.
- *
+ * will nearly always want to either re-throw the Error, throw a new Error or
+ * exit the current thread.
+ * 
  * 
  * Throw this when something has gone wrong and in general people should not be
  * handeling it.
+ * 
  * @author Matthew Pocock
  * @since 1.0
  */
 public class BioError extends Error {
-  /**
-   * Create a new BioError with a message.
-   *
-   * @param message  the message
-   */
-  public BioError(String message) {
-	  super(message);
-  }
+	/**
+	 * Generated serial version id
+	 */
+	private static final long serialVersionUID = -3231433998390184165L;
 
-  /**
-   * Create a new BioError with a cause.
-   *
-   * @param ex  the Throwable that caused this BioError
-   */
-  public BioError(Throwable ex) {
-    super(ex);
-  }
+	/**
+	 * Create a new BioError with a message.
+	 * 
+	 * @param message
+	 *            the message
+	 */
+	public BioError(String message) {
+		super(message);
+	}
 
-  /**
-   * Create a new BioError with a cause and a message.
-   *
-   * @param ex  the Throwable that caused this BioError
-   * @param message  the message
-   * @deprecated Use BioError(message, ex) instead.
-   */
-  public BioError(Throwable ex, String message) {
-    this(message, ex);
-  }
+	/**
+	 * Create a new BioError with a cause.
+	 * 
+	 * @param ex
+	 *            the Throwable that caused this BioError
+	 */
+	public BioError(Throwable ex) {
+		super(ex);
+	}
 
-  /**
-   * Create a new BioError with a cause and a message.
-   *
-   * @param message  the message
-   * @param ex  the Throwable that caused this BioError
-   */
-  public BioError(String message, Throwable ex) {
-    super(message, ex);
-  }
-  
-  /**
-   * Create a new BioError.
-   */
-  public BioError() {
-	  super();
-  }
+	/**
+	 * Create a new BioError with a cause and a message.
+	 * 
+	 * @param ex
+	 *            the Throwable that caused this BioError
+	 * @param message
+	 *            the message
+	 * @deprecated Use BioError(message, ex) instead.
+	 */
+	public BioError(Throwable ex, String message) {
+		this(message, ex);
+	}
+
+	/**
+	 * Create a new BioError with a cause and a message.
+	 * 
+	 * @param message
+	 *            the message
+	 * @param ex
+	 *            the Throwable that caused this BioError
+	 */
+	public BioError(String message, Throwable ex) {
+		super(message, ex);
+	}
+
+	/**
+	 * Create a new BioError.
+	 */
+	public BioError() {
+		super();
+	}
 }

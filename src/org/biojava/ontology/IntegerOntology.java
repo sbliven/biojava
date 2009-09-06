@@ -22,7 +22,7 @@ import org.biojava.utils.cache.WeakValueHashMap;
 public class IntegerOntology
 extends Unchangeable
 implements Ontology {
-	private final Map termCache;
+	private final Map<Integer, IntTerm> termCache;
 
 	IntegerOntology() {
 		termCache = new WeakValueHashMap();
@@ -39,8 +39,8 @@ implements Ontology {
 	public void setDescription(String description){		
 	}
 
-	public Set getTerms() {
-		return new AbstractSet() {
+	public Set<Term> getTerms() {
+		return new AbstractSet<Term>() {
 			public boolean contains(Object o) {
 				return o instanceof IntTerm;
 			}
@@ -49,15 +49,15 @@ implements Ontology {
 				return Integer.MAX_VALUE;
 			}
 
-			public Iterator iterator() {
-				return new Iterator() {
+			public Iterator<Term> iterator() {
+				return new Iterator<Term>() {
 					int i = 0;
 
 					public boolean hasNext() {
 						return i > 0;
 					}
 
-					public Object next() {
+					public Term next() {
 						return resolveInt(i++);
 					}
 
@@ -74,13 +74,18 @@ implements Ontology {
 		return resolveInt(val);
 	}
 
-	public Set getTriples(Term subject, Term object, Term predicate) {
+	public Set<Triple> getTriples(Term subject, Term object, Term predicate) {
 		return Collections.EMPTY_SET;
 	}
 
 	public OntologyOps getOps() {
 		return new DefaultOps() {
-			public Set getRemoteTerms() {
+			/**
+			 * Genereated serial version id
+			 */
+			private static final long serialVersionUID = -4878626586621032593L;
+
+			public Set<RemoteTerm> getRemoteTerms() {
 				return Collections.EMPTY_SET;
 			}
 		};
@@ -152,7 +157,7 @@ implements Ontology {
 
 	public IntTerm resolveInt(int val) {
 		Integer i = new Integer(val);
-		IntTerm term = (IntTerm) termCache.get(i);
+		IntTerm term = termCache.get(i);
 
 		if(term == null) {
 			term = new IntTerm(val);
@@ -166,7 +171,7 @@ implements Ontology {
 	extends Unchangeable
 	implements Term {
 		private final int val;
-		private Set synonyms;
+		private Set<Object> synonyms;
 
 		public IntTerm(int val) {
 			this(val, null);
@@ -175,7 +180,7 @@ implements Ontology {
 		public IntTerm(int val, Object[] synonyms) {
 			this.val = val;
 
-			this.synonyms = new TreeSet();
+			this.synonyms = new TreeSet<Object>();
 			if (synonyms!=null) this.synonyms.addAll(Arrays.asList(synonyms));
 		}
 
