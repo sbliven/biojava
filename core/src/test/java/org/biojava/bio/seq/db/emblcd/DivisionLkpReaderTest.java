@@ -25,6 +25,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -48,9 +49,9 @@ public class DivisionLkpReaderTest extends TestCase
     protected void setUp() throws Exception
     {
         URL url = DivisionLkpReaderTest.class.getResource("division.lkp");
-
+        
         BufferedInputStream bis = new BufferedInputStream(new
-            FileInputStream(new File(url.getFile())));
+            FileInputStream(new File(new URI("file://"+url.getFile()))));
 
         div = new DivisionLkpReader(bis);
     }

@@ -25,6 +25,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -55,7 +56,7 @@ public class EntryNamIdxReaderTest extends TestCase
         URL url = EntryNamIdxReaderTest.class.getResource("entrynam.idx");
 
         BufferedInputStream bis = new BufferedInputStream(new
-            FileInputStream(new File(url.getFile())));
+            FileInputStream(new File(new URI("file://"+url.getFile()))));
 
         ent = new EntryNamIdxReader(bis);
 

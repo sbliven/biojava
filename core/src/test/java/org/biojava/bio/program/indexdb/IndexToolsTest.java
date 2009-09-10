@@ -23,6 +23,7 @@ package org.biojava.bio.program.indexdb;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -193,7 +194,9 @@ public class IndexToolsTest extends TestCase
         for (int i = 0; i < files.length; i++)
         {
             URL seqURL = getClass().getResource("/org/biojava/bio/program/indexdb/"+fileNames[i]);
-            files[i] = new File(seqURL.getFile());
+            
+            
+            files[i] = new File(new URI("file://"+seqURL.getFile()));
         }
 
         return files;

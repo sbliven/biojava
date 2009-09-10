@@ -22,6 +22,7 @@
 package org.biojava.bio.seq.db;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,8 +68,8 @@ public class EmblCDROMIndexStoreTest extends TestCase
         URL divURL = EmblCDROMIndexStoreTest.class.getResource("/org/biojava/bio/seq/db/emblcd/division.lkp");
         URL entURL = EmblCDROMIndexStoreTest.class.getResource("/org/biojava/bio/seq/db/emblcd/entrynam.idx");
 
-        File divisionLkp = new File(divURL.getFile());
-        File entryNamIdx = new File(entURL.getFile());
+        File divisionLkp = new File(new URI("file://"+divURL.getFile()));
+        File entryNamIdx = new File(new URI("file://"+entURL.getFile()));
 
         format  = new FastaFormat();
         alpha   = ProteinTools.getAlphabet();

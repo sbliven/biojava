@@ -23,6 +23,7 @@ package org.biojava.bio.seq.db.emblcd;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -51,7 +52,7 @@ public class EntryNamRandomAccessTest extends TestCase
     protected void setUp() throws Exception
     {
         URL url = EntryNamRandomAccessTest.class.getResource("entrynam.idx");
-        File  f = new File(url.getFile());
+        File  f = new File(new URI("file://"+url.getFile()));
 
         rand = new EntryNamRandomAccess(f, 300, 30, 30);
 
