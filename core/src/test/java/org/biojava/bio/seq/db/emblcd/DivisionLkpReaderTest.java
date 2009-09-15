@@ -51,7 +51,7 @@ public class DivisionLkpReaderTest extends TestCase
         URL url = DivisionLkpReaderTest.class.getResource("division.lkp");
         
         BufferedInputStream bis = new BufferedInputStream(new
-            FileInputStream(new File(new URI("file://"+url.getFile()))));
+            FileInputStream(new File(url.toURI())));
 
         div = new DivisionLkpReader(bis);
     }

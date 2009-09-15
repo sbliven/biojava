@@ -68,8 +68,8 @@ public class EmblCDROMIndexStoreTest extends TestCase
         URL divURL = EmblCDROMIndexStoreTest.class.getResource("/org/biojava/bio/seq/db/emblcd/division.lkp");
         URL entURL = EmblCDROMIndexStoreTest.class.getResource("/org/biojava/bio/seq/db/emblcd/entrynam.idx");
 
-        File divisionLkp = new File(new URI("file://"+divURL.getFile()));
-        File entryNamIdx = new File(new URI("file://"+entURL.getFile()));
+        File divisionLkp = new File(divURL.toURI());
+        File entryNamIdx = new File(entURL.toURI());
 
         format  = new FastaFormat();
         alpha   = ProteinTools.getAlphabet();

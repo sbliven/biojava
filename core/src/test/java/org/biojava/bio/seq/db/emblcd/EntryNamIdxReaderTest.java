@@ -56,7 +56,7 @@ public class EntryNamIdxReaderTest extends TestCase
         URL url = EntryNamIdxReaderTest.class.getResource("entrynam.idx");
 
         BufferedInputStream bis = new BufferedInputStream(new
-            FileInputStream(new File(new URI("file://"+url.getFile()))));
+            FileInputStream(new File(url.toURI())));
 
         ent = new EntryNamIdxReader(bis);
 

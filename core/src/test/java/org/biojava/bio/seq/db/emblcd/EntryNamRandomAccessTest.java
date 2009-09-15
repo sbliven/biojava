@@ -52,7 +52,7 @@ public class EntryNamRandomAccessTest extends TestCase
     protected void setUp() throws Exception
     {
         URL url = EntryNamRandomAccessTest.class.getResource("entrynam.idx");
-        File  f = new File(new URI("file://"+url.getFile()));
+        File  f = new File(url.toURI());
 
         rand = new EntryNamRandomAccess(f, 300, 30, 30);
 
