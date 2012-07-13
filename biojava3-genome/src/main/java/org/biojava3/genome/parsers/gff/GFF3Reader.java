@@ -3,8 +3,9 @@ package org.biojava3.genome.parsers.gff;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
 
 /**
  * http://www.bioperl.org/wiki/GTF

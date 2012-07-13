@@ -18,7 +18,7 @@ import org.biojava3.core.sequence.DNASequence;
  */
 public class FeatureList extends ArrayList<FeatureI> {
 
-	static final Map<String, Map<String,List<FeatureI>>> featindex = new HashMap<String,Map<String,List<FeatureI>>>();
+	 Map<String, Map<String,List<FeatureI>>> featindex = new HashMap<String,Map<String,List<FeatureI>>>();
 	Location mLocation;			//genomic location (union of feature locations)
 
 	/**
@@ -54,7 +54,7 @@ public class FeatureList extends ArrayList<FeatureI> {
 		} else if (null != feature.location()) {
 			mLocation = mLocation.union(feature.location().plus());
 		}
-		for (Entry<String, String> entry : feature.userData().entrySet()){
+		for (Entry<String, String> entry : feature.getAttributes().entrySet()){
 			if (featindex.containsKey(entry.getKey())){
 				Map<String,List<FeatureI>> feat = featindex.get(entry.getKey());
 				if (feat==null){
@@ -241,8 +241,6 @@ public class FeatureList extends ArrayList<FeatureI> {
 	 * @return A list of features that include the key/value pair. 
 	 */
 	public FeatureList selectByAttribute(String key, String value) {
-
-
 		if (featindex.containsKey(key)){
 			Map<String,List<FeatureI>> featuresmap = featindex.get(key);
 			if (featuresmap==null) return new FeatureList();
@@ -250,9 +248,8 @@ public class FeatureList extends ArrayList<FeatureI> {
 			if (list == null){
 				return new FeatureList();
 			}
-			return  new FeatureList(Collections.unmodifiableCollection(list));
+			return  new FeatureList(list);
 		}
-
 		FeatureList list = new FeatureList();
 		for (FeatureI f : this) {
 			if (f.hasAttribute(key, value)) {
@@ -261,7 +258,6 @@ public class FeatureList extends ArrayList<FeatureI> {
 		}
 		return list;
 	}
-
 	/**
 	 * Create a list of all features that include the specified attribute key.
 	 *
@@ -301,10 +297,8 @@ public class FeatureList extends ArrayList<FeatureI> {
 				list.add(f);
 			}
 		}
-
 		return list;
 	}
-
 	/**
 	 * Create a list of all features that include the specified key in their userMap().
 	 *
@@ -318,7 +312,6 @@ public class FeatureList extends ArrayList<FeatureI> {
 				list.add(f);
 			}
 		}
-
 		return list;
 	}
 
