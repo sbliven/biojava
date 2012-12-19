@@ -84,7 +84,7 @@ public interface FeatureI
      *
      * @return The user HashMap.
      */
-    public  HashMap<String, String> userData();
+    public  HashMap<String, Object> userData();
 
 	public HashMap<String, String> getAttributes();
     

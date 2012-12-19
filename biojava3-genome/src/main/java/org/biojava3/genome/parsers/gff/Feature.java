@@ -19,7 +19,7 @@ public class Feature implements FeatureI {
     private double mScore;			//or . if none
     private int mFrame;				//0,1,2
     private String mAttributes;			//any trailing stuff
-    private HashMap<String, String> mUserMap;
+    private HashMap<String, Object> mUserMap;
 
     /**
      * Get the sequence name. (GFF field 1). Note that feature objects have
@@ -131,7 +131,7 @@ public class Feature implements FeatureI {
         mFrame = feature.mFrame;
         mAttributes = feature.mAttributes;
         initAttributeHashMap();
-        mUserMap = new HashMap<String, String>(feature.mUserMap);
+        mUserMap = new HashMap<String, Object>(feature.mUserMap);
     }
 
     /**
@@ -155,7 +155,7 @@ public class Feature implements FeatureI {
         mFrame = frame;
         mAttributes = attributes;
         initAttributeHashMap();
-        mUserMap = new HashMap<String, String>();
+        mUserMap = new HashMap<String, Object>();
 
     }
 
@@ -172,7 +172,7 @@ public class Feature implements FeatureI {
      *
      * @return The user HashMap.
      */
-    public HashMap<String, String> userData() {
+    public HashMap<String, Object> userData() {
         return mUserMap;
     }
 
